@@ -1,1 +1,1 @@
-# sound-streaming
+# sound-ethernet-streaming
