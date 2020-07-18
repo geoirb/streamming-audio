@@ -5,8 +5,7 @@ import (
 )
 
 type source interface {
-	Connect(ctx context.Context) (err error)
-	Get() (src <-chan []byte)
+	Connect(ctx context.Context) (src <-chan []byte, err error)
 }
 
 type destinision interface {
@@ -25,23 +24,27 @@ type server struct {
 }
 
 func (s *server) Stream(ctx context.Context) (err error) {
-	if err = s.src.Connect(ctx); err != nil {
+	var audioChan <-chan []byte
+	if audioChan, err = s.src.Connect(ctx); err != nil {
 		return
 	}
 	if err = s.dst.Connect(ctx); err != nil {
 		return
 	}
 
-	for {
-		select {
-		case data := <-s.src.Get():
-			if err = s.dst.Send(data); err != nil {
+	go func() {
+		for {
+			select {
+			case data := <-audioChan:
+				if err = s.dst.Send(data); err != nil {
+					return
+				}
+			case <-ctx.Done():
 				return
 			}
-		case <-ctx.Done():
-			return
 		}
-	}
+	}()
+	return
 }
 
 // NewServer ...
