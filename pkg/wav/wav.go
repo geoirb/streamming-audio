@@ -2,6 +2,7 @@ package wav
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/cryptix/wav"
 )
@@ -23,13 +24,14 @@ func (w *WAV) Parse(data []byte) (err error) {
 
 // GetSample get audio sample
 func (w *WAV) GetSample() (samples []int16, err error) {
+	if w.reader == nil {
+		err = fmt.Errorf("wav info not exist")
+		return
+	}
 	var s []int32
 	// todo
 	// del consts
-	s, err = w.reader.ReadSampleEvery(
-		2,
-		0,
-	)
+	s, err = w.reader.ReadSampleEvery(2, 0)
 
 	samples = make([]int16, 0, len(s))
 	for _, semple := range s {
