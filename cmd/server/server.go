@@ -15,10 +15,9 @@ import (
 )
 
 const (
+	sizeData = 5
 	dstAddr  = "255.255.255.255:8080"
-	sizeData = 10
-
-	file = "/home/geo/go/src/github.com/GeoIrb/sound-ethernet-streaming/audio/test.wav"
+	file     = "/home/geo/go/src/github.com/GeoIrb/sound-ethernet-streaming/audio/test.wav"
 )
 
 func main() {
@@ -33,10 +32,10 @@ func main() {
 	}
 	defer udpSrv.Shutdown()
 
-	cnv := converter.NewConverter()
-	srv := server.NewServer(
+	c7v := converter.NewConverter()
+	s4v := server.NewServer(
 		udpSrv,
-		cnv,
+		c7v,
 		sizeData,
 	)
 
@@ -51,14 +50,12 @@ func main() {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	go func() {
-		fmt.Println(srv.Streaming(ctx, audio))
-	}()
+	go s4v.Streaming(ctx, audio)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 
 	sig := <-c
-	fmt.Printf("received signal, exiting signal %v", sig)
+	fmt.Printf("received signal, exiting signal %v\n", sig)
 	cancel()
 }

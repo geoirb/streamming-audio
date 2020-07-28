@@ -31,7 +31,6 @@ func (m *Media) Repicenting(ctx context.Context) (err error) {
 	for {
 		select {
 		case data := <-c:
-			fmt.Println(data)
 			audio := m.converter.ToInt16(data)
 			m.device.Play(audio)
 		case <-ctx.Done():

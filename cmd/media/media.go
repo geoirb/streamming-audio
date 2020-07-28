@@ -14,11 +14,12 @@ import (
 )
 
 const (
+	sizeData   = 5
 	localAddr  = ":8080"
+
 	deviceName = "default"
 	channels   = 1
-	rate       = 4100
-	sizeData   = 10
+	rate       = 44100
 	buffSize   = 1024
 )
 

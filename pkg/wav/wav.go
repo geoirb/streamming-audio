@@ -3,7 +3,6 @@ package wav
 import (
 	"bytes"
 	"fmt"
-	"io"
 
 	"github.com/cryptix/wav"
 )
@@ -40,16 +39,15 @@ func (w *WAV) GetSample() (<-chan []int16, <-chan error) {
 		)
 
 		for {
-			if s, err = w.reader.ReadSampleEvery(2, 0); err != nil && err != io.EOF {
-				w.e <- err
-			}
+			s, err = w.reader.ReadSampleEvery(2, 0)
 
 			samples := make([]int16, 0, len(s))
-			for _, semple := range s {
-				samples = append(samples, int16(semple))
+			for _, sample := range s {
+				samples = append(samples, int16(sample))
 			}
 
 			w.c <- samples
+			w.e <- err
 		}
 	}()
 	return w.c, w.e
