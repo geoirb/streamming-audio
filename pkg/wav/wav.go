@@ -3,6 +3,7 @@ package wav
 import (
 	"bytes"
 	"fmt"
+	"io"
 
 	"github.com/cryptix/wav"
 )
@@ -10,6 +11,8 @@ import (
 // WAV audio file
 type WAV struct {
 	reader *wav.Reader
+	c      chan []int16
+	e      chan error
 }
 
 // Parse wav file
@@ -23,25 +26,39 @@ func (w *WAV) Parse(data []byte) (err error) {
 }
 
 // GetSample get audio sample
-func (w *WAV) GetSample() (samples []int16, err error) {
+func (w *WAV) GetSample() (<-chan []int16, <-chan error) {
 	if w.reader == nil {
-		err = fmt.Errorf("wav info not exist")
-		return
+		w.e <- fmt.Errorf("wav info not exist")
+		return w.c, w.e
 	}
-	var s []int32
 	// todo
 	// del consts
-	s, err = w.reader.ReadSampleEvery(2, 0)
+	go func() {
+		var (
+			s   []int32
+			err error
+		)
 
-	samples = make([]int16, 0, len(s))
-	for _, semple := range s {
-		samples = append(samples, int16(semple))
-	}
+		for {
+			if s, err = w.reader.ReadSampleEvery(2, 0); err != nil && err != io.EOF {
+				w.e <- err
+			}
 
-	return
+			samples := make([]int16, 0, len(s))
+			for _, semple := range s {
+				samples = append(samples, int16(semple))
+			}
+
+			w.c <- samples
+		}
+	}()
+	return w.c, w.e
 }
 
 // NewWAV return handler wav file
 func NewWAV() *WAV {
-	return &WAV{}
+	return &WAV{
+		c: make(chan []int16),
+		e: make(chan error),
+	}
 }

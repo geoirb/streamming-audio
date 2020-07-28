@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	dstAddr  = "255.255.255.255:1235"
+	dstAddr  = "255.255.255.255:8080"
 	sizeData = 10
 
 	file = "/home/geo/go/src/github.com/GeoIrb/sound-ethernet-streaming/audio/test.wav"
@@ -51,7 +51,9 @@ func main() {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	go srv.Streaming(ctx, audio)
+	go func() {
+		fmt.Println(srv.Streaming(ctx, audio))
+	}()
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)

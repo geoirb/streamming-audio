@@ -2,10 +2,11 @@ package server
 
 import (
 	"context"
+	"io"
 )
 
 type audio interface {
-	GetSample() ([]int16, error)
+	GetSample() (<-chan []int16, <-chan error)
 }
 
 type connection interface {
@@ -26,18 +27,24 @@ type Server struct {
 
 // Streaming audio over connection
 func (s *Server) Streaming(ctx context.Context, audio audio) (err error) {
-	var (
-		samples []int16
-		data    []byte
-	)
-	if samples, err = audio.GetSample(); err != nil {
-		return
+	sChan, eChan := audio.GetSample()
+	var data []byte
+	for {
+		select {
+		case samples := <-sChan:
+			for i := 0; i < len(samples)-s.size; i += s.size {
+				data = s.converter.ToByte(samples[i : i+s.size])
+				s.connection.Send(data)
+			}
+		case err = <-eChan:
+			if err == io.EOF {
+				return nil
+			}
+			return
+		case <-ctx.Done():
+			return
+		}
 	}
-	for i := 0; i < len(samples)-s.size; i += s.size {
-		data = s.converter.ToByte(samples[i : i+s.size])
-		s.connection.Send(data)
-	}
-	return
 }
 
 // NewServer ...

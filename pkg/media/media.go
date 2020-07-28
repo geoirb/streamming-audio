@@ -2,6 +2,7 @@ package media
 
 import (
 	"context"
+	"fmt"
 )
 
 type converter interface {
@@ -13,8 +14,7 @@ type device interface {
 }
 
 type connection interface {
-	StartReceive()
-	GetChan() (c <-chan []byte)
+	StartReceive() <-chan []byte
 }
 
 // Media audio repicient
@@ -27,10 +27,11 @@ type Media struct {
 
 // Repicenting data over vonnection
 func (m *Media) Repicenting(ctx context.Context) (err error) {
-	c := m.connection.GetChan()
+	c := m.connection.StartReceive()
 	for {
 		select {
 		case data := <-c:
+			fmt.Println(data)
 			audio := m.converter.ToInt16(data)
 			m.device.Play(audio)
 		case <-ctx.Done():

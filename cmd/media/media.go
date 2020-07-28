@@ -14,30 +14,33 @@ import (
 )
 
 const (
-	localAddr  = ":1235"
+	localAddr  = ":8080"
 	deviceName = "default"
 	channels   = 1
 	rate       = 4100
 	sizeData   = 10
+	buffSize   = 1024
 )
 
 func main() {
-	udpClt := udp.NewClientUDP(localAddr)
+	udpClt := udp.NewClientUDP(localAddr, buffSize)
 	udpClt.Connect()
 	defer udpClt.Disconnect()
 
-	dvc := device.NewDevice(
+	d4c := device.NewDevice(
 		deviceName,
 		channels,
 		rate,
 	)
+	d4c.Connect()
+	defer d4c.Disconnect()
 
-	cnv := converter.NewConverter()
+	c7r := converter.NewConverter()
 
 	m := media.NewMedia(
 		udpClt,
-		dvc,
-		cnv,
+		d4c,
+		c7r,
 		sizeData,
 	)
 	ctx, cancel := context.WithCancel(context.Background())
@@ -47,6 +50,6 @@ func main() {
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 
 	sig := <-c
-	fmt.Printf("received signal, exiting signal %v", sig)
+	fmt.Printf("received signal, exiting signal %v\n", sig)
 	cancel()
 }
