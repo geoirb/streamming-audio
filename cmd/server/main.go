@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	sizeData = 5
+	sizeData = 100
 	dstAddr  = "255.255.255.255:8080"
 	file     = "/home/geo/go/src/github.com/GeoIrb/sound-ethernet-streaming/audio/test.wav"
 )

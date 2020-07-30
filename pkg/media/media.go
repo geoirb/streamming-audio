@@ -2,6 +2,7 @@ package media
 
 import (
 	"context"
+	"time"
 )
 
 type connection interface {
@@ -45,6 +46,7 @@ func (m *Media) Repicenting(ctx context.Context) {
 		}
 	}()
 
+	time.Sleep(20 * time.Second)
 	for {
 		audio := m.cash.Pop()
 		if audio != nil {
