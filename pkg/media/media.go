@@ -2,19 +2,23 @@ package media
 
 import (
 	"context"
-	"fmt"
 )
 
-type converter interface {
-	ToInt16(src []byte) (dst []int16)
+type connection interface {
+	StartReceive() <-chan []byte
 }
 
 type device interface {
 	Play(audio []int16)
 }
 
-type connection interface {
-	StartReceive() <-chan []byte
+type converter interface {
+	ToInt16([]byte) []int16
+}
+
+type cash interface {
+	Push(e []int16)
+	Pop() []int16
 }
 
 // Media audio repicient
@@ -22,19 +26,29 @@ type Media struct {
 	connection connection
 	device     device
 	converter  converter
+	cash       cash
 	size       int
 }
 
 // Repicenting data over vonnection
-func (m *Media) Repicenting(ctx context.Context) (err error) {
-	c := m.connection.StartReceive()
+func (m *Media) Repicenting(ctx context.Context) {
+	go func() {
+		c := m.connection.StartReceive()
+		for {
+			select {
+			case data := <-c:
+				el := m.converter.ToInt16(data)
+				m.cash.Push(el)
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
 	for {
-		select {
-		case data := <-c:
-			audio := m.converter.ToInt16(data)
+		audio := m.cash.Pop()
+		if audio != nil {
 			m.device.Play(audio)
-		case <-ctx.Done():
-			return
 		}
 	}
 }
@@ -44,13 +58,14 @@ func NewMedia(
 	connection connection,
 	device device,
 	converter converter,
-
+	cash cash,
 	size int,
 ) *Media {
 	return &Media{
 		connection: connection,
 		device:     device,
 		converter:  converter,
+		cash:       cash,
 		size:       size,
 	}
 }

@@ -7,6 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/GeoIrb/sound-ethernet-streaming/pkg/cash"
+
 	"github.com/GeoIrb/sound-ethernet-streaming/pkg/converter"
 	"github.com/GeoIrb/sound-ethernet-streaming/pkg/device"
 	"github.com/GeoIrb/sound-ethernet-streaming/pkg/media"
@@ -14,8 +16,8 @@ import (
 )
 
 const (
-	sizeData   = 5
-	localAddr  = ":8080"
+	sizeData  = 5
+	localAddr = ":8080"
 
 	deviceName = "default"
 	channels   = 1
@@ -37,11 +39,13 @@ func main() {
 	defer d4c.Disconnect()
 
 	c7r := converter.NewConverter()
+	c2h := cash.NewCash()
 
 	m := media.NewMedia(
 		udpClt,
 		d4c,
 		c7r,
+		c2h,
 		sizeData,
 	)
 	ctx, cancel := context.WithCancel(context.Background())

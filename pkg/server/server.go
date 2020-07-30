@@ -3,6 +3,8 @@ package server
 import (
 	"context"
 	"io"
+
+	alsa "github.com/cocoonlife/goalsa"
 )
 
 type audio interface {
@@ -27,11 +29,21 @@ type Server struct {
 
 // Streaming audio over connection
 func (s *Server) Streaming(ctx context.Context, audio audio) (err error) {
+	out, _ := alsa.NewPlaybackDevice(
+		"default",
+		1,
+		alsa.FormatS16LE,
+		44100,
+		alsa.BufferParams{},
+	)
 	sChan, eChan := audio.GetSample()
 	for {
 		select {
 		case samples := <-sChan:
 			for i := 0; i < len(samples)-s.size; i += s.size {
+				a := make([]int16, s.size)
+				copy(a, samples[i:i+s.size])
+				out.Write(a)
 				data := s.converter.ToByte(samples[i : i+s.size])
 				s.connection.Send(data)
 			}

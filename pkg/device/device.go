@@ -1,12 +1,16 @@
 package device
 
 import (
+	"sync"
+
 	alsa "github.com/cocoonlife/goalsa"
 )
 
 // Device playback device
 type Device struct {
-	out        *alsa.PlaybackDevice
+	out   *alsa.PlaybackDevice
+	mutex sync.Mutex
+
 	deviceName string
 	channels   int
 	rate       int
