@@ -2,36 +2,49 @@ package server
 
 import (
 	"context"
+	"fmt"
 )
 
 type audio interface {
-	GetSample(size int) (<-chan []byte, <-chan error)
+	StartReadingSample(ctx context.Context)
+	Sample() <-chan []byte
+	Error() <-chan error
+	StopReadingSample()
 }
 
 type connection interface {
 	Send(data []byte) error
 }
 
-type converter interface {
-	ToInt16(src []byte) (dst []int16)
-}
-
 // Server audio server
 type Server struct {
-	connection connection
-	converter  converter
-
-	size int
+	pull map[connection]audio
 }
 
-// Streaming audio over connection
-func (s *Server) Streaming(ctx context.Context, audio audio) (err error) {
-	sChan, eChan := audio.GetSample(s.size)
+// AddStreaming audio over connection
+func (s *Server) AddStreaming(connection connection, audio audio) (err error) {
+	if _, isExist := s.pull[connection]; isExist {
+		return fmt.Errorf("connection is exist: %v", connection)
+	}
+	s.pull[connection] = audio
+	return
+}
+
+// Start server
+func (s *Server) Start(ctx context.Context) {
+	for connection, audio := range s.pull {
+		go s.streaming(ctx, connection, audio)
+	}
+}
+
+func (s *Server) streaming(ctx context.Context, connection connection, audio audio) {
+	go audio.StartReadingSample(ctx)
+	defer audio.StopReadingSample()
 	for {
 		select {
-		case samples := <-sChan:
-			s.connection.Send(samples)
-		case err = <-eChan:
+		case sample := <-audio.Sample():
+			connection.Send(sample)
+		case <-audio.Error():
 			return
 		case <-ctx.Done():
 			return
@@ -40,14 +53,8 @@ func (s *Server) Streaming(ctx context.Context, audio audio) (err error) {
 }
 
 // NewServer ...
-func NewServer(
-	connection connection,
-	converter converter,
-	size int,
-) *Server {
+func NewServer() *Server {
 	return &Server{
-		connection: connection,
-		converter:  converter,
-		size:       size,
+		pull: make(map[connection]audio),
 	}
 }

@@ -8,16 +8,14 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/GeoIrb/sound-ethernet-streaming/pkg/converter"
 	"github.com/GeoIrb/sound-ethernet-streaming/pkg/server"
 	udp "github.com/GeoIrb/sound-ethernet-streaming/pkg/udp/server"
 	"github.com/GeoIrb/sound-ethernet-streaming/pkg/wav"
 )
 
 const (
-	sizeData = 100
-	dstAddr  = "255.255.255.255:8080"
-	file     = "/home/geo/go/src/github.com/GeoIrb/sound-ethernet-streaming/audio/test.wav"
+	dstAddr = "127.0.0.1:8080"
+	file    = "/home/geo/go/src/github.com/GeoIrb/sound-ethernet-streaming/audio/test.wav"
 )
 
 func main() {
@@ -26,18 +24,11 @@ func main() {
 		data []byte
 	)
 	udpSrv := udp.NewServerUDP(dstAddr)
-	if err = udpSrv.Start(); err != nil {
+	if err = udpSrv.TurnOn(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 	defer udpSrv.Shutdown()
-
-	c7v := converter.NewConverter()
-	s4v := server.NewServer(
-		udpSrv,
-		c7v,
-		sizeData,
-	)
 
 	if data, err = ioutil.ReadFile(file); err != nil {
 		fmt.Println(err)
@@ -49,8 +40,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	s4v := server.NewServer()
+	s4v.AddStreaming(udpSrv, audio)
+
 	ctx, cancel := context.WithCancel(context.Background())
-	go s4v.Streaming(ctx, audio)
+	s4v.Start(ctx)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)

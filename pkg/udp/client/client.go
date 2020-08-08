@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"net"
 )
 
@@ -21,15 +22,24 @@ func (s *ClientUDP) Connect() (err error) {
 }
 
 // StartReceive start receiving data over UDP connection
-func (s *ClientUDP) StartReceive() <-chan []byte {
-	go func() {
-		for {
+func (s *ClientUDP) StartReceive(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
 			inputBytes := make([]byte, s.buffSize)
-			l, _, _ := s.connection.ReadFromUDP(inputBytes)
+			l, _, err := s.connection.ReadFromUDP(inputBytes)
+			if err != nil {
+				return
+			}
 			s.c <- inputBytes[:l]
 		}
-	}()
+	}
+}
 
+// Data return data chan
+func (s *ClientUDP) Data() <-chan []byte {
 	return s.c
 }
 

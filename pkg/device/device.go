@@ -1,22 +1,16 @@
 package device
 
 import (
-	"sync"
-	"time"
-
 	alsa "github.com/cocoonlife/goalsa"
 )
 
 // Device playback device
 type Device struct {
-	out   *alsa.PlaybackDevice
-	mutex sync.Mutex
+	out *alsa.PlaybackDevice
 
 	deviceName string
 	channels   int
 	rate       int
-
-	interval time.Duration
 }
 
 // Connect to device
@@ -28,15 +22,12 @@ func (d *Device) Connect() (err error) {
 		d.rate,
 		alsa.BufferParams{},
 	)
-
-	d.interval = time.Duration(1 / float64(d.rate) * 1e9) 
 	return
 }
 
 // Play audio track
 func (d *Device) Play(audio []int16) {
 	d.out.Write(audio)
-	time.Sleep(d.interval)
 	return
 }
 

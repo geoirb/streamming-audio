@@ -8,7 +8,6 @@ import (
 	"syscall"
 
 	"github.com/GeoIrb/sound-ethernet-streaming/pkg/cash"
-
 	"github.com/GeoIrb/sound-ethernet-streaming/pkg/converter"
 	"github.com/GeoIrb/sound-ethernet-streaming/pkg/device"
 	"github.com/GeoIrb/sound-ethernet-streaming/pkg/media"
@@ -19,7 +18,7 @@ const (
 	sizeData  = 100
 	localAddr = ":8080"
 
-	deviceName = "default"
+	deviceName = "hw:2,0"
 	channels   = 2
 	rate       = 44100
 	buffSize   = 1024
@@ -35,26 +34,22 @@ func main() {
 		channels,
 		rate,
 	)
-	d4c.Connect()
-	defer d4c.Disconnect()
+	fmt.Println(d4c.Connect())
 
 	c7r := converter.NewConverter()
 	c2h := cash.NewCash()
 
-	m := media.NewMedia(
-		udpClt,
-		d4c,
-		c7r,
-		c2h,
-		sizeData,
-	)
+	m := media.NewMedia(c7r)
+
+	m.Add(d4c, udpClt, c2h)
 	ctx, cancel := context.WithCancel(context.Background())
-	go m.Repicenting(ctx)
+	m.Start(ctx)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 
 	sig := <-c
 	fmt.Printf("received signal, exiting signal %v\n", sig)
+	d4c.Disconnect()
 	cancel()
 }

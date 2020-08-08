@@ -2,15 +2,16 @@ package media
 
 import (
 	"context"
-	"time"
+	"fmt"
 )
 
 type connection interface {
-	StartReceive() <-chan []byte
+	StartReceive(context.Context)
+	Data() <-chan []byte
 }
 
 type device interface {
-	Play(audio []int16)
+	Play([]int16)
 }
 
 type converter interface {
@@ -18,56 +19,71 @@ type converter interface {
 }
 
 type cash interface {
-	Push(e []int16)
+	Push([]int16)
 	Pop() []int16
 }
 
-// Media audio repicient
-type Media struct {
-	connection connection
-	device     device
-	converter  converter
+type receive struct {
 	cash       cash
-	size       int
+	connection connection
 }
 
-// Repicenting data over vonnection
-func (m *Media) Repicenting(ctx context.Context) {
-	go func() {
-		c := m.connection.StartReceive()
-		for {
-			select {
-			case data := <-c:
-				el := m.converter.ToInt16(data)
-				m.cash.Push(el)
-			case <-ctx.Done():
-				return
-			}
-		}
-	}()
+// Media audio receiver
+type Media struct {
+	pull map[device]receive
 
-	time.Sleep(20 * time.Second)
+	converter converter
+}
+
+// Add ...
+func (m *Media) Add(device device, connection connection, cash cash) error {
+	if _, isExist := m.pull[device]; isExist {
+		return fmt.Errorf("device is exist: %v", connection)
+	}
+	m.pull[device] = receive{
+		cash:       cash,
+		connection: connection,
+	}
+	return nil
+}
+
+// Start media
+func (m *Media) Start(ctx context.Context) {
+	for device, i := range m.pull {
+		go m.receiving(ctx, i.connection, i.cash)
+		go m.play(ctx, device, i.cash)
+	}
+}
+
+func (m *Media) receiving(ctx context.Context, connection connection, cash cash) {
+	go connection.StartReceive(ctx)
 	for {
-		audio := m.cash.Pop()
-		if audio != nil {
-			m.device.Play(audio)
+		select {
+		case data := <-connection.Data():
+			cash.Push(m.converter.ToInt16(data))
+		case <-ctx.Done():
+			return
+		}
+	}
+}
+
+func (m *Media) play(ctx context.Context, device device, cash cash) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			if samples := cash.Pop(); samples != nil {
+				device.Play(samples)
+			}
 		}
 	}
 }
 
 // NewMedia ...
-func NewMedia(
-	connection connection,
-	device device,
-	converter converter,
-	cash cash,
-	size int,
-) *Media {
+func NewMedia(converter converter) *Media {
 	return &Media{
-		connection: connection,
-		device:     device,
-		converter:  converter,
-		cash:       cash,
-		size:       size,
+		pull:      make(map[device]receive),
+		converter: converter,
 	}
 }
