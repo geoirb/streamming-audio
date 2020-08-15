@@ -1,6 +1,6 @@
 package cash
 
-// Cash structure
+// Cash - linked list
 type Cash struct {
 	top  *element
 	back *element

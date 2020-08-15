@@ -11,7 +11,7 @@ type connection interface {
 }
 
 type device interface {
-	Play([]int16)
+	Write([]int16)
 }
 
 type converter interface {
@@ -74,7 +74,8 @@ func (m *Media) play(ctx context.Context, device device, cash cash) {
 			return
 		default:
 			if samples := cash.Pop(); samples != nil {
-				device.Play(samples)
+				fmt.Println(samples)
+				device.Write(samples)
 			}
 		}
 	}

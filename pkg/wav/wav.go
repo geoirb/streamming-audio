@@ -32,8 +32,8 @@ func (w *WAV) Parse(data []byte) (err error) {
 	return
 }
 
-// StartReadingSample reading audio sample
-func (w *WAV) StartReadingSample(ctx context.Context) {
+// StartReadingSamples reading audio samples
+func (w *WAV) StartReadingSamples(ctx context.Context) {
 	sample := make([]byte, w.bytesPerSample*w.channels)
 	for {
 		select {
@@ -54,13 +54,13 @@ func (w *WAV) Sample() <-chan []byte {
 	return w.sample
 }
 
-// Error return chan for reading error
+// Error return chan for error
 func (w *WAV) Error() <-chan error {
 	return w.err
 }
 
-// StopReadingSample ...
-func (w *WAV) StopReadingSample() {
+// StopReadingSamples ...
+func (w *WAV) StopReadingSamples() {
 	close(w.sample)
 	close(w.err)
 }
