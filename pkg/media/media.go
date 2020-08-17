@@ -74,7 +74,6 @@ func (m *Media) play(ctx context.Context, device device, cash cash) {
 			return
 		default:
 			if samples := cash.Pop(); samples != nil {
-				fmt.Println(samples)
 				device.Write(samples)
 			}
 		}

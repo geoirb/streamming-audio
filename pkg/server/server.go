@@ -9,7 +9,6 @@ type audio interface {
 	StartReadingSamples(ctx context.Context)
 	Sample() <-chan []byte
 	Error() <-chan error
-	StopReadingSamples()
 }
 
 type connection interface {
@@ -39,11 +38,12 @@ func (s *Server) Start(ctx context.Context) {
 
 func (s *Server) streaming(ctx context.Context, connection connection, audio audio) {
 	go audio.StartReadingSamples(ctx)
-	defer audio.StopReadingSamples()
 	for {
 		select {
 		case sample := <-audio.Sample():
-			connection.Send(sample)
+			if err := connection.Send(sample); err != nil {
+				return
+			}
 		case <-audio.Error():
 			return
 		case <-ctx.Done():

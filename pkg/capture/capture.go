@@ -66,10 +66,8 @@ func (c *Capture) Error() <-chan error {
 	return c.err
 }
 
-// StopReadingSamples ...
-func (c *Capture) StopReadingSamples() {
-	close(c.sample)
-	close(c.err)
+// Disconnect from capture device
+func (c *Capture) Disconnect() {
 	c.in.Close()
 }
 

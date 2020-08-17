@@ -59,12 +59,6 @@ func (w *WAV) Error() <-chan error {
 	return w.err
 }
 
-// StopReadingSamples ...
-func (w *WAV) StopReadingSamples() {
-	close(w.sample)
-	close(w.err)
-}
-
 // NewWAV return handler wav file
 func NewWAV() *WAV {
 	return &WAV{}

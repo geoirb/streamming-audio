@@ -1,8 +1,6 @@
 package playback
 
 import (
-	"sync"
-
 	alsa "github.com/cocoonlife/goalsa"
 )
 
@@ -12,8 +10,6 @@ type Playback struct {
 	deviceName string
 	channels   int
 	rate       int
-
-	mutex sync.Mutex
 }
 
 // Device connect
@@ -31,7 +27,6 @@ func (d *Playback) Device() (err error) {
 // Write audio track
 func (d *Playback) Write(samples []int16) {
 	d.out.Write(samples)
-	return
 }
 
 // Disconnect from device

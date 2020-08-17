@@ -13,8 +13,9 @@ type ConnectionUDP struct {
 // TurnOn configuring and starting UDP server
 func (s *ConnectionUDP) TurnOn() (err error) {
 	var destinationAddress *net.UDPAddr
-	destinationAddress, err = net.ResolveUDPAddr("udp", s.dstAddr)
-	s.connection, err = net.DialUDP("udp", nil, destinationAddress)
+	if destinationAddress, err = net.ResolveUDPAddr("udp", s.dstAddr); err == nil {
+		s.connection, err = net.DialUDP("udp", nil, destinationAddress)
+	}
 	return
 }
 
