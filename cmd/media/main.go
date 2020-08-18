@@ -62,7 +62,10 @@ func main() {
 
 	m := media.NewMedia(c7r)
 
-	m.Add(p6k, udpClt, c2h)
+	if err = m.Add(p6k, udpClt, c2h); err != nil {
+		_ = level.Error(logger).Log("msg", "failed to add in media", "err", err)
+		os.Exit(1)
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	m.Start(ctx)
 	_ = level.Error(logger).Log("msg", "server start")
