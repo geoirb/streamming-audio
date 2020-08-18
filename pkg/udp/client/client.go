@@ -16,8 +16,10 @@ type ClientUDP struct {
 
 // Connect to UDP server
 func (s *ClientUDP) Connect() (err error) {
-	serverAddress, _ := net.ResolveUDPAddr("udp", s.serverAddr)
-	s.connection, _ = net.ListenUDP("udp", serverAddress)
+	var serverAddress *net.UDPAddr
+	if serverAddress, err = net.ResolveUDPAddr("udp", s.serverAddr); err == nil {
+		s.connection, err = net.ListenUDP("udp", serverAddress)
+	}
 	return
 }
 

@@ -7,8 +7,8 @@ RUN go build \
     -o /out/service \
     ./cmd/server/main.go
 
-# copy to alpine image
 FROM alpine:3.8
 WORKDIR /app
 COPY --from=build /out/service /app/service
+COPY ./audio ./
 CMD ["/app/service"]

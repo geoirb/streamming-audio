@@ -8,7 +8,7 @@ check-code:
 	out=$(go fmt ./...) && if [[ -n "$out" ]]; then echo "$out"; exit 1; fi
 
 media:
-	docker build -t sound-media -f build/media/Dockerfile .
+	docker build -t $(tag) -f build/media/Dockerfile .
 
 server:
-	docker build -t sound-server -f build/server/Dockerfile .
+	docker build -t $(tag) -f build/server/Dockerfile .

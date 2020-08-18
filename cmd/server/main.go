@@ -17,7 +17,7 @@ import (
 )
 
 type configuration struct {
-	Port string `envconfig:"PORT" default:":8080"`
+	Port string `envconfig:"PORT" default:"255.255.255.255:8080"`
 	File string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/test.wav"`
 }
 

@@ -18,7 +18,7 @@ import (
 )
 
 type configuration struct {
-	UDPAddr    string `envconfig:"UDP_ADDRESS" default:"127.0.0.1:8080"`
+	UDPAddr    string `envconfig:"UDP_ADDRESS" default:":8080"`
 	UDPBufSize int    `envconfig:"UDP_BUF_SIZE" default:"1024"`
 
 	PlaybackDeviceName string `envconfig:"PLAYBACK_DEVICE_NAME" default:"hw:1,0"`
