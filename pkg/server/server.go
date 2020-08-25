@@ -6,7 +6,7 @@ import (
 )
 
 type audio interface {
-	StartReadingSamples(ctx context.Context)
+	StartReadingSamples(ctx context.Context, packageSize int)
 	Sample() <-chan []byte
 	Error() <-chan error
 }
@@ -32,12 +32,13 @@ func (s *Server) AddStreaming(connection connection, audio audio) (err error) {
 // Start server
 func (s *Server) Start(ctx context.Context) {
 	for connection, audio := range s.pull {
+
 		go s.streaming(ctx, connection, audio)
 	}
 }
 
 func (s *Server) streaming(ctx context.Context, connection connection, audio audio) {
-	go audio.StartReadingSamples(ctx)
+	go audio.StartReadingSamples(ctx, 1024)
 	for {
 		select {
 		case sample := <-audio.Sample():
