@@ -11,14 +11,14 @@ import (
 	"github.com/kelseyhightower/envconfig"
 
 	"github.com/geoirb/sound-ethernet-streaming/pkg/cash"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/client"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/converter"
-	"github.com/geoirb/sound-ethernet-streaming/pkg/media"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/playback"
 	udp "github.com/geoirb/sound-ethernet-streaming/pkg/udp/client"
 )
 
 type configuration struct {
-	UDPAddr    string `envconfig:"UDP_ADDRESS" default:":8080"`
+	Port       string `envconfig:"PORT" default:":8080"`
 	UDPBufSize int    `envconfig:"UDP_BUF_SIZE" default:"1024"`
 
 	PlaybackDeviceName string `envconfig:"PLAYBACK_DEVICE_NAME" default:"hw:1,0"`
@@ -40,7 +40,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	udpClt := udp.NewClientUDP(cfg.UDPAddr, cfg.UDPBufSize)
+	udpClt := udp.NewClientUDP(cfg.Port, cfg.UDPBufSize)
 	if err = udpClt.Connect(); err != nil {
 		_ = level.Error(logger).Log("msg", "failed to connect udp server", "err", err)
 		os.Exit(1)
@@ -60,10 +60,10 @@ func main() {
 	c7r := converter.NewConverter()
 	c2h := cash.NewCash()
 
-	m := media.NewMedia(c7r)
+	m := client.NewClient(c7r)
 
 	if err = m.Add(p6k, udpClt, c2h); err != nil {
-		_ = level.Error(logger).Log("msg", "failed to add in media", "err", err)
+		_ = level.Error(logger).Log("msg", "failed to add in client", "err", err)
 		os.Exit(1)
 	}
 	ctx, cancel := context.WithCancel(context.Background())

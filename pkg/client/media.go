@@ -1,4 +1,4 @@
-package media
+package client
 
 import (
 	"context"
@@ -28,15 +28,15 @@ type receive struct {
 	connection connection
 }
 
-// Media audio receiver
-type Media struct {
+// Client audio receiver
+type Client struct {
 	pull map[device]receive
 
 	converter converter
 }
 
 // Add ...
-func (m *Media) Add(device device, connection connection, cash cash) error {
+func (m *Client) Add(device device, connection connection, cash cash) error {
 	if _, isExist := m.pull[device]; isExist {
 		return fmt.Errorf("device is exist: %v", connection)
 	}
@@ -47,15 +47,15 @@ func (m *Media) Add(device device, connection connection, cash cash) error {
 	return nil
 }
 
-// Start media
-func (m *Media) Start(ctx context.Context) {
+// Start client
+func (m *Client) Start(ctx context.Context) {
 	for device, i := range m.pull {
 		go m.receiving(ctx, i.connection, i.cash)
 		go m.play(ctx, device, i.cash)
 	}
 }
 
-func (m *Media) receiving(ctx context.Context, connection connection, cash cash) {
+func (m *Client) receiving(ctx context.Context, connection connection, cash cash) {
 	go connection.StartReceive(ctx)
 	for {
 		select {
@@ -67,7 +67,7 @@ func (m *Media) receiving(ctx context.Context, connection connection, cash cash)
 	}
 }
 
-func (m *Media) play(ctx context.Context, device device, cash cash) {
+func (m *Client) play(ctx context.Context, device device, cash cash) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -81,9 +81,9 @@ func (m *Media) play(ctx context.Context, device device, cash cash) {
 	}
 }
 
-// NewMedia ...
-func NewMedia(converter converter) *Media {
-	return &Media{
+// NewClient ...
+func NewClient(converter converter) *Client {
+	return &Client{
 		pull:      make(map[device]receive),
 		converter: converter,
 	}

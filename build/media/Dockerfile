@@ -1,6 +1,6 @@
-FROM golang AS build
+FROM golang:1.15-alpine AS build
 
-WORKDIR /go/src/media
+WORKDIR /go/src/client
 COPY . ./
 
 RUN apk update \
@@ -8,7 +8,7 @@ RUN apk update \
 
 RUN go build \
     -o /out/service \
-    ./cmd/media/main.go
+    ./cmd/client/main.go
 
 FROM alpine
 WORKDIR /app

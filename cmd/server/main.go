@@ -17,8 +17,8 @@ import (
 )
 
 type configuration struct {
-	Port string `envconfig:"PORT" default:"255.255.255.255:8080"`
-	File string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/test.wav"`
+	DstAddress string `envconfig:"DST_ADDRESS" default:"255.255.255.255:8080"`
+	File       string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/test.wav"`
 }
 
 func main() {
@@ -45,7 +45,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	udpSrv := udp.NewServerUDP(cfg.Port)
+	udpSrv := udp.NewServerUDP(cfg.DstAddress)
 	if err = udpSrv.TurnOn(); err != nil {
 		_ = level.Error(logger).Log("msg", "failed to turn on udp server", "err", err)
 		os.Exit(1)

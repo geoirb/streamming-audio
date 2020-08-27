@@ -38,6 +38,7 @@ func (s *Server) Start(ctx context.Context) {
 }
 
 func (s *Server) streaming(ctx context.Context, connection connection, audio audio) {
+	//todo
 	go audio.StartReadingSamples(ctx, 1024)
 	for {
 		select {

@@ -8,7 +8,7 @@ import (
 // ClientUDP struct for receiving data over UDP connection
 type ClientUDP struct {
 	connection *net.UDPConn
-	serverAddr string
+	port       string
 	buffSize   int
 
 	c chan []byte
@@ -16,9 +16,9 @@ type ClientUDP struct {
 
 // Connect to UDP server
 func (s *ClientUDP) Connect() (err error) {
-	var serverAddress *net.UDPAddr
-	if serverAddress, err = net.ResolveUDPAddr("udp", s.serverAddr); err == nil {
-		s.connection, err = net.ListenUDP("udp", serverAddress)
+	var clientAddress *net.UDPAddr
+	if clientAddress, err = net.ResolveUDPAddr("udp", s.port); err == nil {
+		s.connection, err = net.ListenUDP("udp", clientAddress)
 	}
 	return
 }
@@ -52,10 +52,10 @@ func (s *ClientUDP) Disconnect() {
 }
 
 // NewClientUDP return UDP client
-func NewClientUDP(serverAddr string, buffSize int) *ClientUDP {
+func NewClientUDP(port string, buffSize int) *ClientUDP {
 	return &ClientUDP{
-		serverAddr: serverAddr,
-		buffSize:   buffSize,
-		c:          make(chan []byte, 1),
+		port:     port,
+		buffSize: buffSize,
+		c:        make(chan []byte, 1),
 	}
 }
