@@ -21,7 +21,7 @@ type configuration struct {
 	Port       string `envconfig:"PORT" default:":8080"`
 	UDPBufSize int    `envconfig:"UDP_BUF_SIZE" default:"1024"`
 
-	PlaybackDeviceName string `envconfig:"PLAYBACK_DEVICE_NAME" default:"hw:1,0"`
+	PlaybackDeviceName string `envconfig:"PLAYBACK_DEVICE_NAME" default:"hw:0,0"`
 	PlaybackChannels   int    `envconfig:"PLAYBACK_DEVICE_NAME" default:"2"`
 	PlaybackRate       int    `envconfig:"PLAYBACK_DEVICE_NAME" default:"44100"`
 }
