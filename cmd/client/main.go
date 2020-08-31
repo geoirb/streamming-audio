@@ -22,8 +22,8 @@ type configuration struct {
 	UDPBufSize int    `envconfig:"UDP_BUF_SIZE" default:"1024"`
 
 	PlaybackDeviceName string `envconfig:"PLAYBACK_DEVICE_NAME" default:"hw:1,0"`
-	PlaybackChannels   int    `envconfig:"PLAYBACK_DEVICE_NAME" default:"2"`
-	PlaybackRate       int    `envconfig:"PLAYBACK_DEVICE_NAME" default:"44100"`
+	PlaybackChannels   int    `envconfig:"PLAYBACK_CHANELS" default:"2"`
+	PlaybackRate       int    `envconfig:"PLAYBACK_RATE" default:"44100"`
 }
 
 func main() {
