@@ -24,8 +24,8 @@ type cash interface {
 }
 
 type receive struct {
-	cash       cash
 	connection connection
+	cash       cash	
 }
 
 // Client audio receiver
@@ -41,8 +41,8 @@ func (m *Client) Add(device device, connection connection, cash cash) error {
 		return fmt.Errorf("device is exist: %v", connection)
 	}
 	m.pull[device] = receive{
-		cash:       cash,
 		connection: connection,
+		cash:       cash,
 	}
 	return nil
 }
@@ -74,7 +74,6 @@ func (m *Client) play(ctx context.Context, device device, cash cash) {
 			return
 		default:
 			if samples := cash.Pop(); samples != nil {
-				fmt.Println(samples)
 				device.Write(samples)
 			}
 		}

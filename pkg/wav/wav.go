@@ -2,7 +2,6 @@ package wav
 
 import (
 	"bytes"
-	"context"
 	"io"
 
 	"github.com/cryptix/wav"
@@ -13,9 +12,6 @@ type WAV struct {
 	reader         io.Reader
 	channels       int
 	bytesPerSample int
-
-	sample chan []byte
-	err    chan error
 }
 
 // Parse wav file
@@ -27,40 +23,17 @@ func (w *WAV) Parse(data []byte) (err error) {
 	}
 	w.channels = int(wavReader.GetNumChannels())
 	w.bytesPerSample = int(wavReader.GetBitsPerSample() / 8)
-	w.sample, w.err = make(chan []byte, 1), make(chan error, 1)
 	w.reader, err = wavReader.GetDumbReader()
 	return
 }
 
-// StartReadingSamples reading audio samples
-func (w *WAV) StartReadingSamples(ctx context.Context, packageSize int) {
-	var (
-		l      int
-		err    error
-		sample = make([]byte, packageSize)
-	)
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			if l, err = w.reader.Read(sample); err != nil {
-				w.err <- err
-				return
-			}
-			w.sample <- sample[:l]
-		}
-	}
-}
-
-// Sample return chan for audio sample
-func (w *WAV) Sample() <-chan []byte {
-	return w.sample
-}
-
-// Error return chan for error
-func (w *WAV) Error() <-chan error {
-	return w.err
+// Read audio bytes
+func (w *WAV) Read() ([]byte, error) {
+	//todo
+	//min 3
+	samples := make([]byte, 10*w.bytesPerSample*w.channels)
+	l, err := w.reader.Read(samples)
+	return samples[:l], err
 }
 
 // NewWAV return handler wav file
