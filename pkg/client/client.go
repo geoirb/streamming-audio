@@ -11,28 +11,22 @@ type connection interface {
 }
 
 type device interface {
-	Write([]int16)
-}
-
-type converter interface {
-	ToInt16([]byte) []int16
+	Write([]byte)
 }
 
 type cash interface {
-	Push([]int16)
-	Pop() []int16
+	Push([]byte)
+	Pop() []byte
 }
 
 type receive struct {
 	connection connection
-	cash       cash	
+	cash       cash
 }
 
 // Client audio receiver
 type Client struct {
 	pull map[device]receive
-
-	converter converter
 }
 
 // Add ...
@@ -60,7 +54,7 @@ func (m *Client) receiving(ctx context.Context, connection connection, cash cash
 	for {
 		select {
 		case data := <-connection.Data():
-			cash.Push(m.converter.ToInt16(data))
+			cash.Push(data)
 		case <-ctx.Done():
 			return
 		}
@@ -73,7 +67,7 @@ func (m *Client) play(ctx context.Context, device device, cash cash) {
 		case <-ctx.Done():
 			return
 		default:
-			if samples := cash.Pop(); samples != nil {
+			if samples := cash.Pop(); samples != nil && len(samples) > 0 {
 				device.Write(samples)
 			}
 		}
@@ -81,9 +75,8 @@ func (m *Client) play(ctx context.Context, device device, cash cash) {
 }
 
 // NewClient ...
-func NewClient(converter converter) *Client {
+func NewClient() *Client {
 	return &Client{
-		pull:      make(map[device]receive),
-		converter: converter,
+		pull: make(map[device]receive),
 	}
 }

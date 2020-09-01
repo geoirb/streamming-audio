@@ -7,7 +7,7 @@ type Cash struct {
 }
 
 // Push on back element
-func (c *Cash) Push(data []int16) {
+func (c *Cash) Push(data []byte) {
 	element := &element{
 		data: data,
 	}
@@ -24,7 +24,7 @@ func (c *Cash) Push(data []int16) {
 }
 
 // Pop return and delete element from top
-func (c *Cash) Pop() (data []int16) {
+func (c *Cash) Pop() (data []byte) {
 	if c.top != nil {
 		data = c.top.data
 		c.top = c.top.next

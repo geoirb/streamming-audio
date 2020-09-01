@@ -40,10 +40,11 @@ func (s *Server) streaming(ctx context.Context, connection connection, audio aud
 		case <-ctx.Done():
 			return
 		default:
-			samples, _ := audio.Read()
-			if err := connection.Send(samples); err != nil {
+			samples, err := audio.Read()
+			if err != nil {
 				return
 			}
+			connection.Send(samples)
 		}
 	}
 }

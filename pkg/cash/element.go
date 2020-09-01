@@ -1,6 +1,6 @@
 package cash
 
 type element struct {
-	data []int16
+	data []byte
 	next *element
 }

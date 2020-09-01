@@ -31,7 +31,7 @@ func (w *WAV) Parse(data []byte) (err error) {
 func (w *WAV) Read() ([]byte, error) {
 	//todo
 	//min 3
-	samples := make([]byte, 10*w.bytesPerSample*w.channels)
+	samples := make([]byte, 1024)
 	l, err := w.reader.Read(samples)
 	return samples[:l], err
 }

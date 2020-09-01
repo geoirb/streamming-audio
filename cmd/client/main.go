@@ -47,21 +47,22 @@ func main() {
 	}
 	defer udpClt.Disconnect()
 
-	p6k := playback.NewPlayback(
+	c7r := converter.NewConverter()
+	p6k, err := playback.NewPlayback(
 		cfg.PlaybackDeviceName,
 		cfg.PlaybackChannels,
 		cfg.PlaybackRate,
+		c7r,
 	)
-	if err = p6k.Device(); err != nil {
+	if err != nil {
 		_ = level.Error(logger).Log("msg", "failed to connect to playback device", "err", err)
 		os.Exit(1)
 	}
 	defer p6k.Disconnect()
 
-	c7r := converter.NewConverter()
 	c2h := cash.NewCash()
 
-	m := client.NewClient(c7r)
+	m := client.NewClient()
 
 	if err = m.Add(p6k, udpClt, c2h); err != nil {
 		_ = level.Error(logger).Log("msg", "failed to add in client", "err", err)

@@ -4,29 +4,21 @@ import (
 	alsa "github.com/cocoonlife/goalsa"
 )
 
-// Playback device
-type Playback struct {
-	out        *alsa.PlaybackDevice
-	deviceName string
-	channels   int
-	rate       int
+type converter interface {
+	ToInt16([]byte) []int16
 }
 
-// Device connect
-func (d *Playback) Device() (err error) {
-	d.out, err = alsa.NewPlaybackDevice(
-		d.deviceName,
-		d.channels,
-		alsa.FormatS16LE,
-		d.rate,
-		alsa.BufferParams{},
-	)
-	return
+// Playback device
+type Playback struct {
+	out       *alsa.PlaybackDevice
+	converter converter
 }
 
 // Write audio track
-func (d *Playback) Write(samples []int16) {
-	d.out.Write(samples)
+func (d *Playback) Write(samples []byte) {
+	d.out.Write(
+		d.converter.ToInt16(samples),
+	)
 }
 
 // Disconnect from device
@@ -39,10 +31,22 @@ func NewPlayback(
 	deviceName string,
 	channels int,
 	rate int,
-) *Playback {
-	return &Playback{
-		deviceName: deviceName,
-		channels:   channels,
-		rate:       rate,
+	converter converter,
+) (p *Playback, err error) {
+	out, err := alsa.NewPlaybackDevice(
+		deviceName,
+		channels,
+		alsa.FormatS16LE,
+		rate,
+		alsa.BufferParams{},
+	)
+	if err != nil {
+		return
 	}
+
+	p = &Playback{
+		out:       out,
+		converter: converter,
+	}
+	return
 }
