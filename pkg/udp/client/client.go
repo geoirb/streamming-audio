@@ -5,57 +5,55 @@ import (
 	"net"
 )
 
-// ClientUDP struct for receiving data over UDP connection
-type ClientUDP struct {
-	connection *net.UDPConn
-	port       string
-	buffSize   int
-
-	c chan []byte
+// Client struct for receiving data over UDP connection
+type Client struct {
+	buffSize int
 }
 
-// Connect to UDP server
-func (s *ClientUDP) Connect() (err error) {
-	var clientAddress *net.UDPAddr
-	if clientAddress, err = net.ResolveUDPAddr("udp", s.port); err == nil {
-		s.connection, err = net.ListenUDP("udp", clientAddress)
+// Receive start receiving data over port
+func (c *Client) Receive(ctx context.Context, port string) (<-chan []byte, error) {
+	var (
+		data          chan []byte
+		clientAddress *net.UDPAddr
+		connection    *net.UDPConn
+		err           error
+	)
+	if clientAddress, err = net.ResolveUDPAddr("udp", port); err != nil {
+		return data, err
 	}
-	return
-}
+	if connection, err = net.ListenUDP("udp", clientAddress); err != nil {
+		return data, err
+	}
 
-// StartReceive start receiving data over UDP connection
-func (s *ClientUDP) StartReceive(ctx context.Context) {
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			inputBytes := make([]byte, s.buffSize)
-			l, _, err := s.connection.ReadFromUDP(inputBytes)
-			if err != nil {
+	data = make(chan []byte, c.buffSize)
+
+	go func() {
+		defer func() {
+			close(data)
+			connection.Close()
+		}()
+
+		inputBytes := make([]byte, c.buffSize)
+		for {
+			select {
+			case <-ctx.Done():
 				return
+			default:
+				l, _, err := connection.ReadFromUDP(inputBytes)
+				if err != nil {
+					return
+				}
+				data <- inputBytes[:l]
 			}
-			s.c <- inputBytes[:l]
 		}
-	}
+	}()
+
+	return data, err
 }
 
-// Data return data chan
-func (s *ClientUDP) Data() <-chan []byte {
-	return s.c
-}
-
-// Disconnect udp connection
-func (s *ClientUDP) Disconnect() {
-	s.connection.Close()
-	close(s.c)
-}
-
-// NewClientUDP return UDP client
-func NewClientUDP(port string, buffSize int) *ClientUDP {
-	return &ClientUDP{
-		port:     port,
+// NewClient return UDP client
+func NewClient(port string, buffSize int) *Client {
+	return &Client{
 		buffSize: buffSize,
-		c:        make(chan []byte, 1),
 	}
 }

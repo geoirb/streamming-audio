@@ -45,8 +45,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	udpSrv := udp.NewServerUDP(cfg.DstAddress)
-	if err = udpSrv.TurnOn(); err != nil {
+	udpSrv, err := udp.NewServerUDP(cfg.DstAddress)
+	if err != nil {
 		_ = level.Error(logger).Log("msg", "failed to turn on udp server", "err", err)
 		os.Exit(1)
 	}

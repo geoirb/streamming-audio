@@ -40,8 +40,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	udpClt := udp.NewClientUDP(cfg.Port, cfg.UDPBufSize)
-	if err = udpClt.Connect(); err != nil {
+	udpClt, err := udp.NewClientUDP(cfg.Port, cfg.UDPBufSize)
+	if err != nil {
 		_ = level.Error(logger).Log("msg", "failed to connect udp server", "err", err)
 		os.Exit(1)
 	}
@@ -61,10 +61,9 @@ func main() {
 	defer p6k.Disconnect()
 
 	c2h := cash.NewCash()
+	c := client.NewClient()
 
-	m := client.NewClient()
-
-	if err = m.Add(p6k, udpClt, c2h); err != nil {
+	if err = c.Add(p6k, udpClt, c2h); err != nil {
 		_ = level.Error(logger).Log("msg", "failed to add in client", "err", err)
 		os.Exit(1)
 	}
@@ -77,6 +76,5 @@ func main() {
 
 	sig := <-c
 	_ = level.Error(logger).Log("msg", "received signal, exiting signal", "signal", sig)
-	p6k.Disconnect()
 	cancel()
 }
