@@ -2,63 +2,102 @@ package server
 
 import (
 	"context"
+	"fmt"
+	"io"
+	"io/ioutil"
 	"sync"
 )
 
-type audio interface {
-	Read() ([]byte, error)
+type file interface {
+	Audio(data []byte) (reader io.Reader, channels uint16, rate uint32, err error)
 }
 
-type connection interface {
-	Send(data []byte) error
+type udp interface {
+	Send(context.Context, string, io.Reader) (err error)
+}
+
+type media interface {
+	StartReceive(ctx context.Context, ip, port, deviceName string, channels, rate uint32) (err error)
+	StopReceive(ctx context.Context, ip, port string) (err error)
 }
 
 // Server audio server
 type Server struct {
-	rpcPort int
+	hostLayout string // "%s:%d"
+
+	file  file
+	media media
+	udp   udp
 
 	mutex  sync.Mutex
-	client map[string]audio
+	client map[string]context.CancelFunc
 }
 
-func (s *Server) AddClient(ctx context.Context) {
+// AddFileMedia add media client and sening audio on client from file
+func (s *Server) AddFileMedia(ctx context.Context, ip, port, deviceName, fileName string) (err error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
 
+	host := fmt.Sprintf(s.hostLayout, ip, port)
+	if _, isExist := s.client[host]; isExist {
+		err = fmt.Errorf("%s is busy", host)
+		return
+	}
+
+	data, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		return
+	}
+
+	audio, channels, rate, err := s.file.Audio(data)
+	if err != nil {
+		return
+	}
+
+	c, cancel := context.WithCancel(ctx)
+	if err = s.media.StartReceive(c, ip, port, deviceName, uint32(channels), rate); err != nil {
+		cancel()
+		return
+	}
+	if err = s.udp.Send(c, host, audio); err != nil {
+		cancel()
+		s.media.StopReceive(c, ip, port)
+		return
+	}
+
+	s.client[host] = cancel
+	return
 }
 
-// // AddStreaming audio over connection
-// func (s *Server) AddStreaming(connection connection, audio audio) (err error) {
-// 	if _, isExist := s.pull[connection]; isExist {
-// 		return fmt.Errorf("connection is exist: %v", connection)
-// 	}
-// 	s.pull[connection] = audio
-// 	return
-// }
+// DeleteMedia delete media client
+func (s *Server) DeleteMedia(ctx context.Context, ip, port string) (err error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
 
-// // Start server
-// func (s *Server) Start(ctx context.Context) {
-// 	for connection, audio := range s.pull {
-// 		go s.streaming(ctx, connection, audio)
-// 	}
-// }
+	host := fmt.Sprintf(s.hostLayout, ip, port)
+	cancel, isExist := s.client[host]
+	if !isExist {
+		err = fmt.Errorf("client %s not exist", host)
+		return
+	}
 
-// func (s *Server) streaming(ctx context.Context, connection connection, audio audio) {
-// 	for {
-// 		select {
-// 		case <-ctx.Done():
-// 			return
-// 		default:
-// 			samples, err := audio.Read()
-// 			if err != nil {
-// 				return
-// 			}
-// 			connection.Send(samples)
-// 		}
-// 	}
-// }
+	cancel()
+	s.media.StopReceive(ctx, ip, port)
+	return
+}
 
 // NewServer ...
-func NewServer() *Server {
+func NewServer(
+	hostLayout string,
+	file file,
+	media media,
+	udp udp,
+) *Server {
 	return &Server{
-		pull: make(map[connection]audio),
+		hostLayout: hostLayout,
+		file:       file,
+		media:      media,
+		udp:        udp,
+		client:     make(map[string]context.CancelFunc),
 	}
 }

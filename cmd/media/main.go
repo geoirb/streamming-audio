@@ -1,7 +1,7 @@
 package main
 
 import (
-	"context"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
@@ -9,7 +9,9 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/kelseyhightower/envconfig"
+	"google.golang.org/grpc"
 
+	controller "github.com/geoirb/sound-ethernet-streaming/pkg/controller/media"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/converter"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/media"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/playback"
@@ -17,7 +19,7 @@ import (
 )
 
 type configuration struct {
-	Port       string `envconfig:"PORT" default:":8080"`
+	Port       string `envconfig:"PORT" default:"8081"`
 	UDPBufSize int    `envconfig:"UDP_BUF_SIZE" default:"1024"`
 
 	PlaybackDeviceName string `envconfig:"PLAYBACK_DEVICE_NAME" default:"hw:1,0"`
@@ -49,13 +51,19 @@ func main() {
 		p6k,
 	)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	_ = level.Error(logger).Log("msg", "server start")
+	lis, err := net.Listen("tcp", ":"+cfg.Port)
+	if err != nil {
+		_ = level.Error(logger).Log("msg", "failed to turn up tcp connection", "err", err)
+		os.Exit(1)
+	}
+
+	server := grpc.NewServer()
+	controller.RegisterMediaServer(server, m3a)
+
+	_ = level.Error(logger).Log("msg", "server start", "port", cfg.Port)
+	server.Serve(lis)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
-
-	sig := <-c
-	_ = level.Error(logger).Log("msg", "received signal, exiting signal", "signal", sig)
-	cancel()
+	_ = level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 }
