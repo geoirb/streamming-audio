@@ -1,7 +1,11 @@
 package playback
 
 import (
+	"context"
+
 	alsa "github.com/cocoonlife/goalsa"
+
+	"github.com/geoirb/sound-ethernet-streaming/pkg/cash"
 )
 
 type converter interface {
@@ -10,29 +14,11 @@ type converter interface {
 
 // Playback device
 type Playback struct {
-	out       *alsa.PlaybackDevice
 	converter converter
 }
 
-// Write audio track
-func (d *Playback) Write(samples []byte) {
-	d.out.Write(
-		d.converter.ToInt16(samples),
-	)
-}
-
-// Disconnect from device
-func (d *Playback) Disconnect() {
-	d.out.Close()
-}
-
-// NewPlayback ...
-func NewPlayback(
-	deviceName string,
-	channels int,
-	rate int,
-	converter converter,
-) (p *Playback, err error) {
+// Play audio on deviceName
+func (d *Playback) Play(ctx context.Context, deviceName string, channels, rate int, c *cash.Cash) error {
 	out, err := alsa.NewPlaybackDevice(
 		deviceName,
 		channels,
@@ -41,12 +27,31 @@ func NewPlayback(
 		alsa.BufferParams{},
 	)
 	if err != nil {
-		return
+		return err
 	}
 
-	p = &Playback{
-		out:       out,
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				out.Close()
+				return
+			default:
+				if samples := c.Pop(); samples != nil && len(samples) > 0 {
+					out.Write(d.converter.ToInt16(samples))
+				}
+			}
+		}
+	}()
+
+	return nil
+}
+
+// NewPlayback ...
+func NewPlayback(
+	converter converter,
+) *Playback {
+	return &Playback{
 		converter: converter,
 	}
-	return
 }

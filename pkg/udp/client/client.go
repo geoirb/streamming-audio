@@ -3,6 +3,8 @@ package server
 import (
 	"context"
 	"net"
+
+	"github.com/geoirb/sound-ethernet-streaming/pkg/cash"
 )
 
 // Client struct for receiving data over UDP connection
@@ -11,25 +13,21 @@ type Client struct {
 }
 
 // Receive start receiving data over port
-func (c *Client) Receive(ctx context.Context, port string) (<-chan []byte, error) {
+func (c *Client) Receive(ctx context.Context, port string, ca *cash.Cash) (err error) {
 	var (
-		data          chan []byte
 		clientAddress *net.UDPAddr
 		connection    *net.UDPConn
-		err           error
 	)
+
 	if clientAddress, err = net.ResolveUDPAddr("udp", port); err != nil {
-		return data, err
+		return
 	}
 	if connection, err = net.ListenUDP("udp", clientAddress); err != nil {
-		return data, err
+		return
 	}
-
-	data = make(chan []byte, c.buffSize)
 
 	go func() {
 		defer func() {
-			close(data)
 			connection.Close()
 		}()
 
@@ -43,16 +41,16 @@ func (c *Client) Receive(ctx context.Context, port string) (<-chan []byte, error
 				if err != nil {
 					return
 				}
-				data <- inputBytes[:l]
+				ca.Push(inputBytes[:l])
 			}
 		}
 	}()
 
-	return data, err
+	return
 }
 
 // NewClient return UDP client
-func NewClient(port string, buffSize int) *Client {
+func NewClient(buffSize int) *Client {
 	return &Client{
 		buffSize: buffSize,
 	}

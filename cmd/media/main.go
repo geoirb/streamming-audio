@@ -10,9 +10,8 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/kelseyhightower/envconfig"
 
-	"github.com/geoirb/sound-ethernet-streaming/pkg/cash"
-	"github.com/geoirb/sound-ethernet-streaming/pkg/client"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/converter"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/media"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/playback"
 	udp "github.com/geoirb/sound-ethernet-streaming/pkg/udp/client"
 )
@@ -40,35 +39,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	udpClt, err := udp.NewClientUDP(cfg.Port, cfg.UDPBufSize)
-	if err != nil {
-		_ = level.Error(logger).Log("msg", "failed to connect udp server", "err", err)
-		os.Exit(1)
-	}
-	defer udpClt.Disconnect()
+	udpClt := udp.NewClient(cfg.UDPBufSize)
 
 	c7r := converter.NewConverter()
-	p6k, err := playback.NewPlayback(
-		cfg.PlaybackDeviceName,
-		cfg.PlaybackChannels,
-		cfg.PlaybackRate,
-		c7r,
+	p6k := playback.NewPlayback(c7r)
+
+	m3a := media.NewMedia(
+		udpClt,
+		p6k,
 	)
-	if err != nil {
-		_ = level.Error(logger).Log("msg", "failed to connect to playback device", "err", err)
-		os.Exit(1)
-	}
-	defer p6k.Disconnect()
 
-	c2h := cash.NewCash()
-	c := client.NewClient()
-
-	if err = c.Add(p6k, udpClt, c2h); err != nil {
-		_ = level.Error(logger).Log("msg", "failed to add in client", "err", err)
-		os.Exit(1)
-	}
 	ctx, cancel := context.WithCancel(context.Background())
-	m.Start(ctx)
 	_ = level.Error(logger).Log("msg", "server start")
 
 	c := make(chan os.Signal, 1)

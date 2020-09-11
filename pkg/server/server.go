@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"fmt"
+	"sync"
 )
 
 type audio interface {
@@ -15,39 +15,46 @@ type connection interface {
 
 // Server audio server
 type Server struct {
-	pull map[connection]audio
+	rpcPort int
+
+	mutex  sync.Mutex
+	client map[string]audio
 }
 
-// AddStreaming audio over connection
-func (s *Server) AddStreaming(connection connection, audio audio) (err error) {
-	if _, isExist := s.pull[connection]; isExist {
-		return fmt.Errorf("connection is exist: %v", connection)
-	}
-	s.pull[connection] = audio
-	return
+func (s *Server) AddClient(ctx context.Context) {
+
 }
 
-// Start server
-func (s *Server) Start(ctx context.Context) {
-	for connection, audio := range s.pull {
-		go s.streaming(ctx, connection, audio)
-	}
-}
+// // AddStreaming audio over connection
+// func (s *Server) AddStreaming(connection connection, audio audio) (err error) {
+// 	if _, isExist := s.pull[connection]; isExist {
+// 		return fmt.Errorf("connection is exist: %v", connection)
+// 	}
+// 	s.pull[connection] = audio
+// 	return
+// }
 
-func (s *Server) streaming(ctx context.Context, connection connection, audio audio) {
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			samples, err := audio.Read()
-			if err != nil {
-				return
-			}
-			connection.Send(samples)
-		}
-	}
-}
+// // Start server
+// func (s *Server) Start(ctx context.Context) {
+// 	for connection, audio := range s.pull {
+// 		go s.streaming(ctx, connection, audio)
+// 	}
+// }
+
+// func (s *Server) streaming(ctx context.Context, connection connection, audio audio) {
+// 	for {
+// 		select {
+// 		case <-ctx.Done():
+// 			return
+// 		default:
+// 			samples, err := audio.Read()
+// 			if err != nil {
+// 				return
+// 			}
+// 			connection.Send(samples)
+// 		}
+// 	}
+// }
 
 // NewServer ...
 func NewServer() *Server {
