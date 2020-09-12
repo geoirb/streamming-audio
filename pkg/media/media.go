@@ -5,16 +5,20 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/geoirb/sound-ethernet-streaming/pkg/cash"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/controller/media"
+	s "github.com/geoirb/sound-ethernet-streaming/pkg/storage"
 )
 
+type storage interface {
+	NewList() s.List
+}
+
 type client interface {
-	Receive(context.Context, string, *cash.Cash) error
+	Receive(context.Context, string, s.List) error
 }
 
 type device interface {
-	Play(context.Context, string, int, int, *cash.Cash) error
+	Play(context.Context, string, int, int, s.List) error
 }
 
 // Media audio receiver
@@ -23,6 +27,7 @@ type Media struct {
 	receive map[string]context.CancelFunc
 	client  client
 	device  device
+	storage storage
 }
 
 // StartReceive audio data from port
@@ -35,22 +40,23 @@ func (m *Media) StartReceive(ctx context.Context, in *media.StartReceiveRequest)
 		return
 	}
 
-	c2h := cash.NewCash()
-	c, cancel := context.WithCancel(ctx)
+	list := m.storage.NewList()
+	c, cancel := context.WithCancel(context.Background())
 
-	err = m.client.Receive(c, in.Port, c2h)
+	err = m.client.Receive(c, in.Port, list)
 	if err != nil {
 		cancel()
 		return
 	}
 
-	err = m.device.Play(c, in.DeviceName, int(in.Channels), int(in.Rate), c2h)
+	err = m.device.Play(c, in.DeviceName, int(in.Channels), int(in.Rate), list)
 	if err != nil {
 		cancel()
 		return
 	}
 
 	m.receive[in.Port] = cancel
+	out = &media.StartReceiveResponse{}
 	return
 }
 
@@ -73,10 +79,12 @@ func (m *Media) StopReceive(ctx context.Context, in *media.StopReceiveRequest) (
 func NewMedia(
 	client client,
 	device device,
+	storage storage,
 ) *Media {
 	return &Media{
 		receive: make(map[string]context.CancelFunc),
 		client:  client,
 		device:  device,
+		storage: storage,
 	}
 }

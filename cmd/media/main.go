@@ -15,6 +15,7 @@ import (
 	"github.com/geoirb/sound-ethernet-streaming/pkg/converter"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/media"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/playback"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/storage"
 	udp "github.com/geoirb/sound-ethernet-streaming/pkg/udp/client"
 )
 
@@ -29,7 +30,7 @@ type configuration struct {
 
 func main() {
 	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
-	_ = level.Info(logger).Log("msg", "initializing")
+	level.Info(logger).Log("msg", "initializing")
 
 	var (
 		err error
@@ -37,7 +38,7 @@ func main() {
 	)
 
 	if err = envconfig.Process("", &cfg); err != nil {
-		_ = level.Error(logger).Log("msg", "failed to load configuration", "err", err)
+		level.Error(logger).Log("msg", "failed to load configuration", "err", err)
 		os.Exit(1)
 	}
 
@@ -46,24 +47,27 @@ func main() {
 	c7r := converter.NewConverter()
 	p6k := playback.NewPlayback(c7r)
 
+	s5e := storage.NewStorageFactory()
+
 	m3a := media.NewMedia(
 		udpClt,
 		p6k,
+		s5e,
 	)
 
 	lis, err := net.Listen("tcp", ":"+cfg.Port)
 	if err != nil {
-		_ = level.Error(logger).Log("msg", "failed to turn up tcp connection", "err", err)
+		level.Error(logger).Log("msg", "failed to turn up tcp connection", "err", err)
 		os.Exit(1)
 	}
 
 	server := grpc.NewServer()
 	controller.RegisterMediaServer(server, m3a)
 
-	_ = level.Error(logger).Log("msg", "server start", "port", cfg.Port)
+	level.Error(logger).Log("msg", "server start", "port", cfg.Port)
 	server.Serve(lis)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
-	_ = level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
+	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 }

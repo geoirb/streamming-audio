@@ -75,8 +75,9 @@ func (c *Controller) StopReceive(ctx context.Context, ip, port string) (err erro
 }
 
 // NewMediaController ...
-func NewMediaController(port string) *Controller {
+func NewMediaController(hostLayout, port string) *Controller {
 	return &Controller{
+		hostLayout: hostLayout,
 		port:       port,
 		connection: make(map[string]*grpc.ClientConn),
 	}
