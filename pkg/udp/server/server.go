@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net"
 )
@@ -12,7 +13,7 @@ type Server struct {
 }
 
 // Send start sendinging data over port
-func (s *Server) Send(ctx context.Context, dstAddr string, src io.Reader) (err error) {
+func (s *Server) Send(ctx context.Context, dstAddr string, r io.Reader) (err error) {
 	var (
 		destinationAddress *net.UDPAddr
 		connection         *net.UDPConn
@@ -36,10 +37,11 @@ func (s *Server) Send(ctx context.Context, dstAddr string, src io.Reader) (err e
 			case <-ctx.Done():
 				return
 			default:
-				l, err := src.Read(outputBytes)
+				l, err := r.Read(outputBytes)
 				if err != nil {
 					return
 				}
+				fmt.Println(outputBytes)
 				connection.Write(outputBytes[:l])
 			}
 		}

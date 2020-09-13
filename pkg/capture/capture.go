@@ -1,41 +1,26 @@
 package capture
 
 import (
+	"context"
+	"fmt"
+	"io"
+
 	alsa "github.com/cocoonlife/goalsa"
 )
 
 type converter interface {
 	ToByte([]int16) []byte
-	ToInt16([]byte) []int16
 }
 
 // Capture device
 type Capture struct {
-	in *alsa.CaptureDevice
-
 	converter converter
+
+	buffSize int
 }
 
-// Read audio bytes
-func (c *Capture) Read() ([]byte, error) {
-	//todo
-	samples := make([]int16, 8)
-	l, err := c.in.Read(samples)
-	return c.converter.ToByte(samples[:l]), err
-}
-
-// Disconnect from capture device
-func (c *Capture) Disconnect() {
-	c.in.Close()
-}
-
-// NewCapture ..
-func NewCapture(
-	deviceName string,
-	channels int,
-	rate int,
-	converter converter,
-) (c *Capture, err error) {
+// Recode audio signals
+func (c *Capture) Recode(ctx context.Context, deviceName string, channels, rate int, w io.Writer) (err error) {
 	in, err := alsa.NewCaptureDevice(
 		deviceName,
 		channels,
@@ -47,9 +32,25 @@ func NewCapture(
 		return
 	}
 
-	c = &Capture{
-		in:        in,
-		converter: converter,
-	}
+	samples := make([]int16, c.buffSize)
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				in.Close()
+				return
+			default:
+				if _, err := in.Read(samples); err != nil {
+					fmt.Println(samples)
+					w.Write(c.converter.ToByte(samples))
+				}
+			}
+		}
+	}()
 	return
+}
+
+// NewCapture ..
+func NewCapture() *Capture {
+	return &Capture{}
 }

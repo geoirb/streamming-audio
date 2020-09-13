@@ -11,7 +11,7 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/kelseyhightower/envconfig"
 
-	"github.com/geoirb/sound-ethernet-streaming/pkg/controller/media"
+	player "github.com/geoirb/sound-ethernet-streaming/pkg/player/grpc"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/server"
 	udp "github.com/geoirb/sound-ethernet-streaming/pkg/udp/server"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/wav"
@@ -38,19 +38,22 @@ func main() {
 	}
 
 	w1v := wav.NewWAV()
-	m3a := media.NewMediaController(cfg.HostLayout, cfg.Port)
+	p4r := player.NewClient(cfg.HostLayout, cfg.Port)
 	u1p := udp.NewServer(cfg.UDPBuffSize)
 	s4r := server.NewServer(
-		cfg.HostLayout,
 		w1v,
-		m3a,
+		p4r,
 		u1p,
+
+		cfg.HostLayout,
 	)
-	fmt.Println(s4r.AddFileMedia(context.Background(), "127.0.0.1", "8082", "hw:0,0", cfg.File))
+	fmt.Println(s4r.AddFilePlayer(context.Background(), "127.0.0.1", "8082", "hw:0,0", cfg.File))
 
 	level.Error(logger).Log("msg", "server start")
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
+
+	fmt.Println(s4r.DeletePlayer(context.Background(), "127.0.0.1", "8082"))
 }

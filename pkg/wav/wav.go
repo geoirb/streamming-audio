@@ -8,8 +8,7 @@ import (
 )
 
 // WAV audio file
-type WAV struct {
-}
+type WAV struct{}
 
 // Audio parse wav file
 func (w *WAV) Audio(data []byte) (reader io.Reader, channels uint16, rate uint32, err error) {

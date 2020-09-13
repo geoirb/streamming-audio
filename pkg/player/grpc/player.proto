@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+// protoc --go_out=plugins=grpc:. *.proto
+
+package grpc;
+
+message  StartPlayRequest{
+  string port = 1;
+  string deviceName = 2; 
+  uint32 channels = 3;
+  uint32 rate = 4;
+}
+
+message StartPlayResponse{
+}
+
+message StopPlayRequest {
+    string port = 1;
+}
+
+message StopPlayResponse{
+}
+
+// grpc service to play audio
+service Player {
+    rpc StartPlay (StartPlayRequest) returns (StartPlayResponse) {}
+    rpc StopPlay (StopPlayRequest) returns (StopPlayResponse) {}
+}
+

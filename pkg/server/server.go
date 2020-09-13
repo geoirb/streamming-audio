@@ -16,25 +16,25 @@ type udp interface {
 	Send(context.Context, string, io.Reader) (err error)
 }
 
-type media interface {
-	StartReceive(ctx context.Context, ip, port, deviceName string, channels, rate uint32) (err error)
-	StopReceive(ctx context.Context, ip, port string) (err error)
+type player interface {
+	StartPlay(ctx context.Context, ip, port, deviceName string, channels, rate uint32) (err error)
+	StopPlay(ctx context.Context, ip, port string) (err error)
 }
 
 // Server audio server
 type Server struct {
-	hostLayout string // "%s:%d"
-
-	file  file
-	media media
-	udp   udp
-
 	mutex  sync.Mutex
 	client map[string]context.CancelFunc
+
+	file   file
+	player player
+	udp    udp
+
+	hostLayout string
 }
 
-// AddFileMedia add media client and sening audio on client from file
-func (s *Server) AddFileMedia(ctx context.Context, ip, port, deviceName, fileName string) (err error) {
+// AddFilePlayer add player client and sening audio on client from file
+func (s *Server) AddFilePlayer(ctx context.Context, ip, port, deviceName, fileName string) (err error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
@@ -55,13 +55,13 @@ func (s *Server) AddFileMedia(ctx context.Context, ip, port, deviceName, fileNam
 	}
 
 	c, cancel := context.WithCancel(ctx)
-	if err = s.media.StartReceive(c, ip, port, deviceName, uint32(channels), rate); err != nil {
+	if err = s.player.StartPlay(c, ip, port, deviceName, uint32(channels), rate); err != nil {
 		cancel()
 		return
 	}
 	if err = s.udp.Send(c, host, audio); err != nil {
 		cancel()
-		s.media.StopReceive(c, ip, port)
+		s.player.StopPlay(c, ip, port)
 		return
 	}
 
@@ -69,8 +69,8 @@ func (s *Server) AddFileMedia(ctx context.Context, ip, port, deviceName, fileNam
 	return
 }
 
-// DeleteMedia delete media client
-func (s *Server) DeleteMedia(ctx context.Context, ip, port string) (err error) {
+// DeletePlayer delete player client
+func (s *Server) DeletePlayer(ctx context.Context, ip, port string) (err error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
@@ -82,22 +82,25 @@ func (s *Server) DeleteMedia(ctx context.Context, ip, port string) (err error) {
 	}
 
 	cancel()
-	s.media.StopReceive(ctx, ip, port)
+	s.player.StopPlay(ctx, ip, port)
 	return
 }
 
 // NewServer ...
 func NewServer(
-	hostLayout string,
 	file file,
-	media media,
+	player player,
 	udp udp,
+
+	hostLayout string,
 ) *Server {
 	return &Server{
+		client: make(map[string]context.CancelFunc),
+
+		file:   file,
+		player: player,
+		udp:    udp,
+
 		hostLayout: hostLayout,
-		file:       file,
-		media:      media,
-		udp:        udp,
-		client:     make(map[string]context.CancelFunc),
 	}
 }

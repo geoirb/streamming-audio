@@ -1,20 +1,21 @@
 package storage
 
+import (
+	"container/list"
+	"io"
+)
+
+// Storage ...
+type Storage struct{}
+
 // List storage
-type List interface {
-	Push([]byte)
-	Pop() []byte
+func (s *Storage) List() io.ReadWriteCloser {
+	return &queue{
+		list: list.New(),
+	}
 }
 
-// StorageFactory ...
-type StorageFactory struct{}
-
-// NewList storage
-func (s *StorageFactory) NewList() List {
-	return &list{}
-}
-
-// NewStorageFactory ...
-func NewStorageFactory() *StorageFactory {
-	return &StorageFactory{}
+// NewStorage ...
+func NewStorage() *Storage {
+	return &Storage{}
 }

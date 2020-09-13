@@ -2,9 +2,8 @@ package server
 
 import (
 	"context"
+	"io"
 	"net"
-
-	"github.com/geoirb/sound-ethernet-streaming/pkg/storage"
 )
 
 // Client struct for receiving data over UDP connection
@@ -13,7 +12,7 @@ type Client struct {
 }
 
 // Receive start receiving data over port
-func (c *Client) Receive(ctx context.Context, port string, s storage.List) (err error) {
+func (c *Client) Receive(ctx context.Context, port string, w io.Writer) (err error) {
 	var (
 		clientAddress *net.UDPAddr
 		connection    *net.UDPConn
@@ -41,7 +40,7 @@ func (c *Client) Receive(ctx context.Context, port string, s storage.List) (err 
 				if err != nil {
 					return
 				}
-				s.Push(inputBytes[:l])
+				w.Write(inputBytes[:l])
 			}
 		}
 	}()

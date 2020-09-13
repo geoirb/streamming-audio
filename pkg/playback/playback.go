@@ -2,10 +2,9 @@ package playback
 
 import (
 	"context"
+	"io"
 
 	alsa "github.com/cocoonlife/goalsa"
-
-	"github.com/geoirb/sound-ethernet-streaming/pkg/storage"
 )
 
 type converter interface {
@@ -15,10 +14,12 @@ type converter interface {
 // Playback device
 type Playback struct {
 	converter converter
+
+	buffSize int
 }
 
 // Play audio on deviceName
-func (d *Playback) Play(ctx context.Context, deviceName string, channels, rate int, s storage.List) error {
+func (d *Playback) Play(ctx context.Context, deviceName string, channels, rate int, r io.Reader) (err error) {
 	out, err := alsa.NewPlaybackDevice(
 		deviceName,
 		channels,
@@ -27,9 +28,10 @@ func (d *Playback) Play(ctx context.Context, deviceName string, channels, rate i
 		alsa.BufferParams{},
 	)
 	if err != nil {
-		return err
+		return
 	}
 
+	samples := make([]byte, d.buffSize)
 	go func() {
 		for {
 			select {
@@ -37,20 +39,24 @@ func (d *Playback) Play(ctx context.Context, deviceName string, channels, rate i
 				out.Close()
 				return
 			default:
-				if samples := s.Pop(); samples != nil && len(samples) > 0 {
+				if _, err := r.Read(samples); err == nil {
 					out.Write(d.converter.ToInt16(samples))
 				}
 			}
 		}
 	}()
-	return nil
+	return
 }
 
 // NewPlayback ...
 func NewPlayback(
 	converter converter,
+
+	buffSize int,
 ) *Playback {
 	return &Playback{
 		converter: converter,
+
+		buffSize: buffSize,
 	}
 }

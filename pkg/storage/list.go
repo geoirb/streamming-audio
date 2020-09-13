@@ -1,40 +1,34 @@
 package storage
 
-type element struct {
-	data []byte
-	next *element
+import (
+	"container/list"
+	"io"
+)
+
+// Queue FIFO data struct
+type queue struct {
+	list *list.List
 }
 
-// List data struct
-type list struct {
-	top  *element
-	back *element
+// Write on back element
+func (q *queue) Write(data []byte) (n int, err error) {
+	q.list.PushBack(data)
+	return
 }
 
-// Push on back element
-func (l *list) Push(data []byte) {
-	element := &element{
-		data: make([]byte, len(data)),
+// Read return and delete element from top
+func (q *queue) Read(data []byte) (n int, err error) {
+	if q.list.Len() == 0 {
+		err = io.EOF
+		return
 	}
-	copy(element.data, data)
-
-	if l.back != nil {
-		l.back.next = element
-	}
-
-	l.back = element
-
-	if l.top == nil {
-		l.top = element
-	}
+	element := q.list.Front()
+	data = element.Value.([]byte)
+	q.list.Remove(element)
+	return
 }
 
-// Pop return and delete element from top
-func (l *list) Pop() (data []byte) {
-	if l.top != nil {
-		data = l.top.data
-		l.top = l.top.next
-	}
-
+func (q *queue) Close() (err error) {
+	q.list = nil
 	return
 }

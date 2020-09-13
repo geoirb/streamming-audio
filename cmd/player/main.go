@@ -11,17 +11,17 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"google.golang.org/grpc"
 
-	controller "github.com/geoirb/sound-ethernet-streaming/pkg/controller/media"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/converter"
-	"github.com/geoirb/sound-ethernet-streaming/pkg/media"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/playback"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/player"
+	playerserver "github.com/geoirb/sound-ethernet-streaming/pkg/player/grpc"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/storage"
 	udp "github.com/geoirb/sound-ethernet-streaming/pkg/udp/client"
 )
 
 type configuration struct {
-	Port       string `envconfig:"PORT" default:"8081"`
-	UDPBufSize int    `envconfig:"UDP_BUF_SIZE" default:"1024"`
+	Port        string `envconfig:"PORT" default:"8081"`
+	UDPBuffSize int    `envconfig:"UDP_BUFF_SIZE" default:"1024"`
 
 	PlaybackDeviceName string `envconfig:"PLAYBACK_DEVICE_NAME" default:"hw:1,0"`
 	PlaybackChannels   int    `envconfig:"PLAYBACK_CHANELS" default:"2"`
@@ -42,14 +42,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	udpClt := udp.NewClient(cfg.UDPBufSize)
+	udpClt := udp.NewClient(cfg.UDPBuffSize)
 
 	c7r := converter.NewConverter()
-	p6k := playback.NewPlayback(c7r)
+	p6k := playback.NewPlayback(
+		c7r,
+		cfg.UDPBuffSize,
+	)
 
-	s5e := storage.NewStorageFactory()
+	s5e := storage.NewStorage()
 
-	m3a := media.NewMedia(
+	m3a := player.NewPlayer(
 		udpClt,
 		p6k,
 		s5e,
@@ -62,7 +65,7 @@ func main() {
 	}
 
 	server := grpc.NewServer()
-	controller.RegisterMediaServer(server, m3a)
+	playerserver.RegisterPlayerServer(server, m3a)
 
 	level.Error(logger).Log("msg", "server start", "port", cfg.Port)
 	server.Serve(lis)
