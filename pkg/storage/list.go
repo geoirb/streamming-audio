@@ -2,6 +2,7 @@ package storage
 
 import (
 	"container/list"
+	"fmt"
 	"io"
 )
 
@@ -18,12 +19,13 @@ func (q *queue) Write(data []byte) (n int, err error) {
 
 // Read return and delete element from top
 func (q *queue) Read(data []byte) (n int, err error) {
-	if q.list.Len() == 0 {
+	element := q.list.Front()
+	if element == nil {
 		err = io.EOF
 		return
 	}
-	element := q.list.Front()
-	data = element.Value.([]byte)
+	fmt.Println(element)
+	copy(data, element.Value.([]byte))
 	q.list.Remove(element)
 	return
 }

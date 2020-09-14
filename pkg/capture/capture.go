@@ -2,7 +2,6 @@ package capture
 
 import (
 	"context"
-	"fmt"
 	"io"
 
 	alsa "github.com/cocoonlife/goalsa"
@@ -41,7 +40,6 @@ func (c *Capture) Recode(ctx context.Context, deviceName string, channels, rate 
 				return
 			default:
 				if _, err := in.Read(samples); err != nil {
-					fmt.Println(samples)
 					w.Write(c.converter.ToByte(samples))
 				}
 			}
