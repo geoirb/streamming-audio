@@ -8,7 +8,7 @@ RUN apk update \
 
 RUN go build \
     -o /out/service \
-    ./cmd/client/main.go
+    ./cmd/player/main.go
 
 FROM alpine
 WORKDIR /app

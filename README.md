@@ -16,7 +16,7 @@ Server
         - [ ] с recoder
 
 - [X] Написание пакета для работы с микрофоном
-- [X] RPC система управление 
+- [X] RPC система управление
 
         - [X] player
         - [ ] recoder
@@ -38,10 +38,9 @@ Recoder
 - [X] Передача аудиосигнала на сервер
 - [ ] Управление с помощью RPC
 
+## Запуск server
 
-## Запуск сервера
-
-1. Скачать проект на машину, на которой будет развернут сервер
+1. Скачать проект на машину, на которой будет развернут server
 
         git clone git@github.com:GeoIrb/sound-ethernet-streaming.git
 2. Поместите аудиофайл, который необходимо будет стримить в папку `audio/`
@@ -63,17 +62,21 @@ Recoder
 - FILE=/audio/`FILE`.wav - файл для стримминга
 - DST_ADDRESS="IP:PORT" - на какой IP и на какой PORT будет рассылка, по умолчанию 255.255.255.255:8080 - рассылка по всей сети на порт 8080
 
-## Запуск клиент
+        make build-server server
+        docker run -d --rm -p 8081:8081 -p 8082:8082 -e FILE=/audio/test.wav server
 
-1. Скачать проект на машину, на которой будет развернут клиент
+## Запуск player
+
+1. Скачать проект на машину, на которой будет развернут player
 
         git clone git@github.com:GeoIrb/sound-ethernet-streaming.git
 2. Собрать образ клиент
 
-        make build-client tag=IMAGE-NAME
+        make build-player tag=IMAGE-NAME
 3. Запуск клиента
 
         docker run -d --rm \
+        -p 0.0.0.0:8081:8081/tcp \ 
         -p 0.0.0.0:PORT:PORT -p 0.0.0.0:PORT:PORT/udp \
         --device /dev/snd \
         -e ENVIROMENTS \
@@ -85,3 +88,6 @@ Recoder
 
 - PORT - порт, на котором будет работать клиент
 - PLAYBACK_DEVICE_NAME - устройство, на котором будет воспроизводиться принятый аудио сигнал
+
+        make build-player tag player
+        docker run -d --rm -p 0.0.0.0:8081:8081/tcp -p 0.0.0.0:8082:8082 -p 0.0.0.0:8082:8082/udp --device /dev/snd player
