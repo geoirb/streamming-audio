@@ -30,12 +30,12 @@ func (c *Client) Receive(ctx context.Context, port string, w io.Writer) (err err
 			connection.Close()
 		}()
 
-		inputBytes := make([]byte, c.buffSize)
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			default:
+				inputBytes := make([]byte, c.buffSize)
 				l, _, err := connection.ReadFromUDP(inputBytes)
 				if err != nil {
 					return

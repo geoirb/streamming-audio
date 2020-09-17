@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"container/list"
 	"io"
 )
 
@@ -10,9 +9,7 @@ type Storage struct{}
 
 // List storage
 func (s *Storage) List() io.ReadWriteCloser {
-	return &queue{
-		list: list.New(),
-	}
+	return &queue{}
 }
 
 // NewStorage ...

@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net"
 )
@@ -26,12 +25,12 @@ func (s *Server) Send(ctx context.Context, dstAddr string, r io.Reader) (err err
 		return
 	}
 
+	outputBytes := make([]byte, s.buffSize)
 	go func() {
 		defer func() {
 			connection.Close()
 		}()
 
-		outputBytes := make([]byte, s.buffSize)
 		for {
 			select {
 			case <-ctx.Done():
@@ -41,7 +40,6 @@ func (s *Server) Send(ctx context.Context, dstAddr string, r io.Reader) (err err
 				if err != nil {
 					return
 				}
-				fmt.Println(outputBytes)
 				connection.Write(outputBytes[:l])
 			}
 		}

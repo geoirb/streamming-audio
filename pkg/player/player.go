@@ -67,12 +67,13 @@ func (m *Player) StopPlay(ctx context.Context, in *grpc.StopPlayRequest) (out *g
 	defer m.mutex.Unlock()
 
 	cancel, isExist := m.port[in.Port]
-	if isExist {
+	if !isExist {
 		err = fmt.Errorf("receive port is exist: %v", in.Port)
 		return
 	}
 	cancel()
 	delete(m.port, in.Port)
+	out = &grpc.StopPlayResponse{}
 	return
 }
 
