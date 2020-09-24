@@ -5,7 +5,7 @@ syntax = "proto3";
 package grpc;
 
 message  StartRecodeRequest{
-  string port = 1;
+  string destAddr = 1;
   string deviceName = 2; 
   uint32 channels = 3;
   uint32 rate = 4;
@@ -15,7 +15,7 @@ message StartRecodeResponse{
 }
 
 message StopRecodeRequest {
-    string port = 1;
+  string destAddr = 1;
 }
 
 message StopRecodeResponse{

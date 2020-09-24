@@ -37,21 +37,19 @@ func (m *Player) StartPlay(ctx context.Context, in *grpc.StartPlayRequest) (out 
 	defer m.mutex.Unlock()
 
 	if _, isExist := m.port[in.Port]; isExist {
-		err = fmt.Errorf("receive port is exist: %v", in.Port)
+		err = fmt.Errorf("%v is exist", in.Port)
 		return
 	}
 
 	list := m.storage.List()
 	c, cancel := context.WithCancel(context.Background())
 
-	err = m.udp.Receive(c, in.Port, list)
-	if err != nil {
+	if err = m.udp.Receive(c, in.Port, list); err != nil {
 		cancel()
 		return
 	}
 
-	err = m.device.Play(c, in.DeviceName, int(in.Channels), int(in.Rate), list)
-	if err != nil {
+	if err = m.device.Play(c, in.DeviceName, int(in.Channels), int(in.Rate), list); err != nil {
 		cancel()
 		return
 	}
@@ -68,7 +66,7 @@ func (m *Player) StopPlay(ctx context.Context, in *grpc.StopPlayRequest) (out *g
 
 	cancel, isExist := m.port[in.Port]
 	if !isExist {
-		err = fmt.Errorf("receive port is exist: %v", in.Port)
+		err = fmt.Errorf("%v is exist", in.Port)
 		return
 	}
 	cancel()

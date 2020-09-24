@@ -11,22 +11,23 @@ type Server struct {
 	buffSize int
 }
 
+// TurnOn udp server
+func (s *Server) TurnOn(dstAddr string) (connection io.ReadWriteCloser, err error) {
+	if destinationAddress, err := net.ResolveUDPAddr("udp", dstAddr); err == nil {
+		connection, err = net.DialUDP("udp", nil, destinationAddress)
+	}
+	return
+}
+
 // Send start sendinging data over port
 func (s *Server) Send(ctx context.Context, dstAddr string, r io.Reader) (err error) {
-	var (
-		destinationAddress *net.UDPAddr
-		connection         *net.UDPConn
-	)
-
-	if destinationAddress, err = net.ResolveUDPAddr("udp", dstAddr); err != nil {
-		return
-	}
-	if connection, err = net.DialUDP("udp", nil, destinationAddress); err != nil {
+	connection, err := s.TurnOn(dstAddr)
+	if err != nil {
 		return
 	}
 
-	outputBytes := make([]byte, s.buffSize)
 	go func() {
+		outputBytes := make([]byte, s.buffSize)
 		defer func() {
 			connection.Close()
 		}()

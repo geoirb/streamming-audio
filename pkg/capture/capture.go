@@ -19,7 +19,7 @@ type Capture struct {
 }
 
 // Recode audio signals
-func (c *Capture) Recode(ctx context.Context, deviceName string, channels, rate int, w io.Writer) (err error) {
+func (c *Capture) Recode(ctx context.Context, deviceName string, channels, rate int, w io.ReadWriteCloser) (err error) {
 	in, err := alsa.NewCaptureDevice(
 		deviceName,
 		channels,
@@ -31,15 +31,16 @@ func (c *Capture) Recode(ctx context.Context, deviceName string, channels, rate 
 		return
 	}
 
-	samples := make([]int16, c.buffSize)
 	go func() {
+		samples := make([]int16, c.buffSize)
 		for {
 			select {
 			case <-ctx.Done():
 				in.Close()
+				w.Close()
 				return
 			default:
-				if _, err := in.Read(samples); err != nil {
+				if n, err := in.Read(samples); err != nil && n != 0 {
 					w.Write(c.converter.ToByte(samples))
 				}
 			}

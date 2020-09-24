@@ -7,14 +7,11 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/geoirb/sound-ethernet-streaming/pkg/server"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/wav"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/kelseyhightower/envconfig"
-
-	player "github.com/geoirb/sound-ethernet-streaming/pkg/player/grpc"
-	"github.com/geoirb/sound-ethernet-streaming/pkg/server"
-	udp "github.com/geoirb/sound-ethernet-streaming/pkg/udp/server"
-	"github.com/geoirb/sound-ethernet-streaming/pkg/wav"
 )
 
 type configuration struct {

@@ -9,14 +9,14 @@ import (
 
 // Client rpc controller
 type Client struct {
-	hostLayout string
-	port       string
+	hostLayout  string
+	controlPort string
 }
 
 // StartRecode rpc request for start recode and send audio signal on server
-func (c *Client) StartRecode(ctx context.Context, ip, port, deviceName string, channels, rate uint32) (err error) {
+func (c *Client) StartRecode(ctx context.Context, destAddr, recoderIP, deviceName string, channels, rate int) (err error) {
 	conn, err := grpc.Dial(
-		fmt.Sprintf(c.hostLayout, ip, c.port),
+		fmt.Sprintf(c.hostLayout, recoderIP, c.controlPort),
 		// todo
 		grpc.WithInsecure(),
 	)
@@ -29,10 +29,10 @@ func (c *Client) StartRecode(ctx context.Context, ip, port, deviceName string, c
 		StartRecode(
 			ctx,
 			&StartRecodeRequest{
-				Port:       port,
+				DestAddr:   destAddr,
 				DeviceName: deviceName,
 				Channels:   uint32(channels),
-				Rate:       rate,
+				Rate:       uint32(rate),
 			})
 	if err != nil {
 		return
@@ -40,10 +40,10 @@ func (c *Client) StartRecode(ctx context.Context, ip, port, deviceName string, c
 	return
 }
 
-// StopPlay rpc request for stop receive and play audio signal
-func (c *Client) StopPlay(ctx context.Context, ip, port string) (err error) {
+// StopRecode rpc request for stop record and send audio signal
+func (c *Client) StopRecode(ctx context.Context, destAddr, recoderIP string) (err error) {
 	conn, err := grpc.Dial(
-		fmt.Sprintf(c.hostLayout, ip, c.port),
+		fmt.Sprintf(c.hostLayout, recoderIP, c.controlPort),
 		// todo
 		grpc.WithInsecure(),
 	)
@@ -56,7 +56,7 @@ func (c *Client) StopPlay(ctx context.Context, ip, port string) (err error) {
 		StopRecode(
 			ctx,
 			&StopRecodeRequest{
-				Port: port,
+				DestAddr: destAddr,
 			},
 		)
 	if err != nil {
@@ -66,9 +66,9 @@ func (c *Client) StopPlay(ctx context.Context, ip, port string) (err error) {
 }
 
 // NewClient ...
-func NewClient(hostLayout, port string) *Client {
+func NewClient(hostLayout, controlPort string) *Client {
 	return &Client{
-		hostLayout: hostLayout,
-		port:       port,
+		hostLayout:  hostLayout,
+		controlPort: controlPort,
 	}
 }

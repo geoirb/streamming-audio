@@ -9,14 +9,14 @@ import (
 
 // Client rpc controller
 type Client struct {
-	hostLayout string
-	port       string
+	hostLayout  string
+	controlPort string
 }
 
 // StartPlay rpc request for start receive and play audio signal
 func (c *Client) StartPlay(ctx context.Context, ip, port, deviceName string, channels, rate uint32) (err error) {
 	conn, err := grpc.Dial(
-		fmt.Sprintf(c.hostLayout, ip, c.port),
+		fmt.Sprintf(c.hostLayout, ip, c.controlPort),
 		// todo
 		grpc.WithInsecure(),
 	)
@@ -43,7 +43,7 @@ func (c *Client) StartPlay(ctx context.Context, ip, port, deviceName string, cha
 // StopPlay rpc request for stop receive and play audio signal
 func (c *Client) StopPlay(ctx context.Context, ip, port string) (err error) {
 	conn, err := grpc.Dial(
-		fmt.Sprintf(c.hostLayout, ip, c.port),
+		fmt.Sprintf(c.hostLayout, ip, c.controlPort),
 		// todo
 		grpc.WithInsecure(),
 	)
@@ -66,9 +66,9 @@ func (c *Client) StopPlay(ctx context.Context, ip, port string) (err error) {
 }
 
 // NewClient ...
-func NewClient(hostLayout, port string) *Client {
+func NewClient(hostLayout, controlPort string) *Client {
 	return &Client{
-		hostLayout: hostLayout,
-		port:       port,
+		hostLayout:  hostLayout,
+		controlPort: controlPort,
 	}
 }
