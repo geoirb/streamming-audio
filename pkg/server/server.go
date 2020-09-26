@@ -116,6 +116,12 @@ func (s *Server) AddFileRecoder(ctx context.Context, receivePort, fileName, reco
 	return
 }
 
+// AddRecoderPlayer add recoder client and player client
+func (s *Server) AddRecoderPlayer(ctx context.Context, playerIP, playerPort, playerDeviceName, recoderIP, recoderDeviceName string, channels, rate int) (err error) {
+	// todo
+	return
+}
+
 // DeleteRecoder delete recoder client
 func (s *Server) DeleteRecoder(ctx context.Context, recoderIP, receivePort string) error {
 	s.mutexRecoder.Lock()
@@ -150,9 +156,9 @@ func (s *Server) DeletePlayer(ctx context.Context, ip, port string) error {
 }
 
 // NewServer ...
-// todo
 func NewServer(
-	file audio,
+	audio audio,
+	recoder recoder,
 	player player,
 	udp udp,
 
@@ -161,9 +167,10 @@ func NewServer(
 	return &Server{
 		playerClient: make(map[string]context.CancelFunc),
 
-		audio:  file,
-		player: player,
-		udp:    udp,
+		audio:   audio,
+		recoder: recoder,
+		player:  player,
+		udp:     udp,
 
 		hostLayout: hostLayout,
 	}

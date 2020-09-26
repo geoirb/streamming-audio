@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"io"
 	"sync"
-
-	"github.com/geoirb/sound-ethernet-streaming/pkg/recoder/grpc"
 )
 
 type udp interface {
-	TurnOn(string) (io.ReadWriteCloser, error)
+	TurnOnSender(string) (io.ReadWriteCloser, error)
 }
 
 type device interface {
@@ -27,7 +25,7 @@ type Recoder struct {
 }
 
 // StartRecode ...
-func (r *Recoder) StartRecode(ctx context.Context, in *grpc.StartRecodeRequest) (out *grpc.StartRecodeResponse, err error) {
+func (r *Recoder) StartRecode(ctx context.Context, in *StartRecodeRequest) (out *StartRecodeResponse, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
@@ -36,7 +34,7 @@ func (r *Recoder) StartRecode(ctx context.Context, in *grpc.StartRecodeRequest) 
 		return
 	}
 
-	conn, err := r.udp.TurnOn(in.DestAddr)
+	conn, err := r.udp.TurnOnSender(in.DestAddr)
 	if err != nil {
 		return
 	}
@@ -48,12 +46,12 @@ func (r *Recoder) StartRecode(ctx context.Context, in *grpc.StartRecodeRequest) 
 	}
 
 	r.server[in.DestAddr] = cancel
-	out = &grpc.StartRecodeResponse{}
+	out = &StartRecodeResponse{}
 	return
 }
 
 // StopRecode ...
-func (r *Recoder) StopRecode(ctx context.Context, in *grpc.StopRecodeRequest) (out *grpc.StopRecodeResponse, err error) {
+func (r *Recoder) StopRecode(ctx context.Context, in *StopRecodeRequest) (out *StopRecodeResponse, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 	cancel, isExist := r.server[in.DestAddr]
@@ -63,6 +61,19 @@ func (r *Recoder) StopRecode(ctx context.Context, in *grpc.StopRecodeRequest) (o
 	}
 	cancel()
 	delete(r.server, in.DestAddr)
-	out = &grpc.StopRecodeResponse{}
+	out = &StopRecodeResponse{}
 	return
+}
+
+// NewRecoder ...
+func NewRecoder(
+	udp udp,
+	device device,
+) RecoderServer {
+	return &Recoder{
+		server: make(map[string]context.CancelFunc),
+
+		udp:    udp,
+		device: device,
+	}
 }

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 // protoc --go_out=plugins=grpc:. *.proto
 
-package grpc;
+package recoder;
 
 message  StartRecodeRequest{
   string destAddr = 1;

@@ -14,8 +14,7 @@ type converter interface {
 // Playback device
 type Playback struct {
 	converter converter
-
-	buffSize int
+	buffSize  int
 }
 
 // Play audio on deviceName
@@ -31,8 +30,8 @@ func (d *Playback) Play(ctx context.Context, deviceName string, channels, rate i
 		return
 	}
 
-	samples := make([]byte, d.buffSize)
 	go func() {
+		samples := make([]byte, d.buffSize)
 		for {
 			select {
 			case <-ctx.Done():
@@ -51,12 +50,10 @@ func (d *Playback) Play(ctx context.Context, deviceName string, channels, rate i
 // NewPlayback ...
 func NewPlayback(
 	converter converter,
-
 	buffSize int,
 ) *Playback {
 	return &Playback{
 		converter: converter,
-
-		buffSize: buffSize,
+		buffSize:  buffSize,
 	}
 }

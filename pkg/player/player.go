@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"sync"
-
-	"github.com/geoirb/sound-ethernet-streaming/pkg/player/grpc"
 )
 
 type storage interface {
@@ -32,7 +30,7 @@ type Player struct {
 }
 
 // StartPlay play audio on device from server
-func (m *Player) StartPlay(ctx context.Context, in *grpc.StartPlayRequest) (out *grpc.StartPlayResponse, err error) {
+func (m *Player) StartPlay(ctx context.Context, in *StartPlayRequest) (out *StartPlayResponse, err error) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
@@ -55,12 +53,12 @@ func (m *Player) StartPlay(ctx context.Context, in *grpc.StartPlayRequest) (out 
 	}
 
 	m.port[in.Port] = cancel
-	out = &grpc.StartPlayResponse{}
+	out = &StartPlayResponse{}
 	return
 }
 
 // StopPlay stop play audio on device
-func (m *Player) StopPlay(ctx context.Context, in *grpc.StopPlayRequest) (out *grpc.StopPlayResponse, err error) {
+func (m *Player) StopPlay(ctx context.Context, in *StopPlayRequest) (out *StopPlayResponse, err error) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
@@ -71,7 +69,7 @@ func (m *Player) StopPlay(ctx context.Context, in *grpc.StopPlayRequest) (out *g
 	}
 	cancel()
 	delete(m.port, in.Port)
-	out = &grpc.StopPlayResponse{}
+	out = &StopPlayResponse{}
 	return
 }
 
@@ -80,7 +78,7 @@ func NewPlayer(
 	udp udp,
 	device device,
 	storage storage,
-) *Player {
+) PlayerServer {
 	return &Player{
 		port: make(map[string]context.CancelFunc),
 

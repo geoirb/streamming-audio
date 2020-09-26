@@ -11,15 +11,13 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"google.golang.org/grpc"
 
-	"github.com/geoirb/sound-ethernet-streaming/pkg/converter"
-	"github.com/geoirb/sound-ethernet-streaming/pkg/playback"
-	"github.com/geoirb/sound-ethernet-streaming/pkg/player"
-	"github.com/geoirb/sound-ethernet-streaming/pkg/storage"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/capture"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/recoder"
 	udp "github.com/geoirb/sound-ethernet-streaming/pkg/udp"
 )
 
 type configuration struct {
-	Port        string `envconfig:"PORT" default:"8081"`
+	Port        string `envconfig:"PORT" default:"8082"`
 	UDPBuffSize int    `envconfig:"UDP_BUFF_SIZE" default:"1024"`
 }
 
@@ -39,20 +37,12 @@ func main() {
 
 	udp := udp.NewUDP(cfg.UDPBuffSize)
 
-	converter := converter.NewConverter()
-	playback := playback.NewPlayback(
-		converter,
-		cfg.UDPBuffSize,
-	)
-
-	storage := storage.NewStorage()
-
-	p4r := player.NewPlayer(
+	capture := capture.NewCapture()
+	r5r := recoder.NewRecoder(
 		udp,
-		playback,
-		storage,
+		capture,
 	)
-	p4r = player.NewLoggerMiddleware(logger, p4r)
+	r5r = recoder.NewLoggerMiddleware(logger, r5r)
 
 	lis, err := net.Listen("tcp", ":"+cfg.Port)
 	if err != nil {
@@ -61,7 +51,7 @@ func main() {
 	}
 
 	server := grpc.NewServer()
-	player.RegisterPlayerServer(server, p4r)
+	recoder.RegisterRecoderServer(server, r5r)
 
 	level.Error(logger).Log("msg", "server start", "port", cfg.Port)
 	server.Serve(lis)
