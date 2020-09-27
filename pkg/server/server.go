@@ -23,22 +23,27 @@ type udp interface {
 }
 
 type player interface {
+	StartReceive(ctx context.Context, playerIP, receivePort string) error
+	StopReceive(ctx context.Context, playerIP, receivePort string) error
 	StartPlay(ctx context.Context, playerIP, playerPort, deviceName string, channels, rate uint32) (err error)
-	StopPlay(ctx context.Context, playerIP, playerPort string) (err error)
+	StopPlay(ctx context.Context, playerIP, deviceName string) (err error)
 }
 
 type recoder interface {
-	StartRecode(ctx context.Context, serverAddr, recoderIP, deviceName string, channels, rate int) (err error)
-	StopRecode(ctx context.Context, serverAddr, recoderIP string) (err error)
+	StartRecode(ctx context.Context, serverAddr, recoderIP, deviceName string, channels, rate int) error
+	StopRecode(ctx context.Context, serverAddr, recoderIP string) error
 }
 
 // Server audio server
 type Server struct {
-	mutexPlayer  sync.Mutex
-	playerClient map[string]context.CancelFunc
+	mutexSending sync.Mutex
+	sending      map[string]context.CancelFunc
 
-	mutexRecoder  sync.Mutex
-	recoderClient map[string]context.CancelFunc
+	mutexPlaying sync.Mutex
+	playing      map[string]context.CancelFunc
+
+	mutexRecoder sync.Mutex
+	recoding     map[string]context.CancelFunc
 
 	audio   audio
 	player  player
@@ -47,16 +52,17 @@ type Server struct {
 	udp     udp
 
 	hostLayout string
+	playLayout string
 }
 
-// AddFilePlayer add player client and sening audio on client from file
-func (s *Server) AddFilePlayer(ctx context.Context, playerIP, playerPort, deviceName, fileName string) (err error) {
-	s.mutexPlayer.Lock()
-	defer s.mutexPlayer.Unlock()
+// StartSendingFile on player
+func (s *Server) StartSendingFile(c context.Context, playerIP, playerPort, fileName string) (channels uint16, rate uint32, err error) {
+	s.mutexSending.Lock()
+	defer s.mutexSending.Unlock()
 
 	host := fmt.Sprintf(s.hostLayout, playerIP, playerPort)
-	if _, isExist := s.playerClient[host]; isExist {
-		err = fmt.Errorf("%s is busy", host)
+	if _, isExist := s.sending[host]; isExist {
+		err = fmt.Errorf("StartSendingFile: %s is busy", host)
 		return
 	}
 
@@ -70,8 +76,8 @@ func (s *Server) AddFilePlayer(ctx context.Context, playerIP, playerPort, device
 		return
 	}
 
-	c, cancel := context.WithCancel(context.Background())
-	if err = s.player.StartPlay(ctx, playerIP, playerPort, deviceName, uint32(channels), rate); err != nil {
+	ctx, cancel := context.WithCancel(c)
+	if err = s.player.StartReceive(ctx, playerIP, playerPort); err != nil {
 		cancel()
 		return
 	}
@@ -81,79 +87,112 @@ func (s *Server) AddFilePlayer(ctx context.Context, playerIP, playerPort, device
 		return
 	}
 
-	s.playerClient[host] = cancel
+	s.sending[host] = cancel
 	return
 }
 
-// AddFileRecoder add recoder client and receive audio signal and write on file
-func (s *Server) AddFileRecoder(ctx context.Context, receivePort, fileName, recoderIP, deviceName string, channels, rate int) (err error) {
-	s.mutexRecoder.Lock()
-	defer s.mutexRecoder.Unlock()
+// StopSending on player
+func (s *Server) StopSending(c context.Context, playerIP, playerPort string) error {
+	s.mutexSending.Lock()
+	defer s.mutexSending.Unlock()
 
-	if _, isExist := s.playerClient[recoderIP]; isExist {
-		err = fmt.Errorf("%s is busy", recoderIP)
+	host := fmt.Sprintf(s.hostLayout, playerIP, playerPort)
+	if stop, isExist := s.sending[host]; isExist {
+		stop()
+		s.player.StopReceive(c, playerIP, playerPort)
+		delete(s.sending, host)
+		return nil
+	}
+	return fmt.Errorf("StopSending: %s is busy", host)
+}
+
+// StartPlaying on player
+func (s *Server) StartPlaying(c context.Context, playerIP, playerPort, deviceName string, channels uint16, rate uint32) (err error) {
+	s.mutexPlaying.Lock()
+	defer s.mutexPlaying.Unlock()
+
+	player := fmt.Sprintf(s.playLayout, playerIP, deviceName)
+	if _, isExist := s.playing[player]; !isExist {
+		ctx, cancel := context.WithCancel(c)
+		if err = s.player.StartPlay(ctx, playerIP, playerPort, deviceName, uint32(channels), rate); err != nil {
+			cancel()
+			return
+		}
+		s.playing[player] = cancel
 		return
 	}
-
-	list := s.storage.List()
-	c, cancel := context.WithCancel(context.Background())
-
-	if err = s.udp.Receive(c, receivePort, list); err != nil {
-		cancel()
-		return
-	}
-
-	if err = s.audio.Recode(c, fileName, uint16(channels), uint32(rate), list); err != nil {
-		cancel()
-		return
-	}
-
-	if err = s.recoder.StartRecode(ctx, "TODO", recoderIP, deviceName, channels, rate); err != nil {
-		cancel()
-		return
-	}
-	s.playerClient[recoderIP] = cancel
+	err = fmt.Errorf("StartPlaying: %s is busy", player)
 	return
 }
 
-// AddRecoderPlayer add recoder client and player client
-func (s *Server) AddRecoderPlayer(ctx context.Context, playerIP, playerPort, playerDeviceName, recoderIP, recoderDeviceName string, channels, rate int) (err error) {
-	// todo
+// StopPlaying on player
+func (s *Server) StopPlaying(c context.Context, playerIP, deviceName string) (err error) {
+	s.mutexPlaying.Lock()
+	defer s.mutexPlaying.Unlock()
+
+	player := fmt.Sprintf(s.playLayout, playerIP, deviceName)
+	if stop, isExist := s.playing[player]; isExist {
+		stop()
+		s.player.StopPlay(c, playerIP, deviceName)
+		delete(s.playing, player)
+		return
+	}
+	err = fmt.Errorf("StopPlaying: %s is not exist", player)
 	return
 }
 
-// DeleteRecoder delete recoder client
-func (s *Server) DeleteRecoder(ctx context.Context, recoderIP, receivePort string) error {
-	s.mutexRecoder.Lock()
-	defer s.mutexRecoder.Unlock()
+// // AddFileRecoder add recoder client and receive audio signal and write on file
+// func (s *Server) AddFileRecoder(ctx context.Context, receivePort, fileName, recoderIP, deviceName string, channels, rate int) (err error) {
+// 	s.mutexRecoder.Lock()
+// 	defer s.mutexRecoder.Unlock()
 
-	cancel, isExist := s.recoderClient[recoderIP]
-	if !isExist {
-		return fmt.Errorf("recoder %s not exist", recoderIP)
-	}
+// 	if _, isExist := s.playerClient[recoderIP]; isExist {
+// 		err = fmt.Errorf("%s is busy", recoderIP)
+// 		return
+// 	}
 
-	cancel()
-	s.recoder.StopRecode(ctx, "TODO", recoderIP)
-	delete(s.recoderClient, recoderIP)
-	return nil
-}
+// 	list := s.storage.List()
+// 	c, cancel := context.WithCancel(context.Background())
 
-// DeletePlayer delete player client
-func (s *Server) DeletePlayer(ctx context.Context, ip, port string) error {
-	s.mutexPlayer.Lock()
-	defer s.mutexPlayer.Unlock()
+// 	if err = s.udp.Receive(c, receivePort, list); err != nil {
+// 		cancel()
+// 		return
+// 	}
 
-	host := fmt.Sprintf(s.hostLayout, ip, port)
-	cancel, isExist := s.playerClient[host]
-	if !isExist {
-		return fmt.Errorf("player %s not exist", host)
-	}
+// 	if err = s.audio.Recode(c, fileName, uint16(channels), uint32(rate), list); err != nil {
+// 		cancel()
+// 		return
+// 	}
 
-	cancel()
-	s.player.StopPlay(ctx, ip, port)
-	delete(s.playerClient, host)
-	return nil
-}
+// 	if err = s.recoder.StartRecode(ctx, "TODO", recoderIP, deviceName, channels, rate); err != nil {
+// 		cancel()
+// 		return
+// 	}
+// 	s.playerClient[recoderIP] = cancel
+// 	return
+// }
+
+// // AddRecoderPlayer add recoder client and player client
+// func (s *Server) AddRecoderPlayer(ctx context.Context, playerIP, playerPort, playerDeviceName, recoderIP, recoderDeviceName string, channels, rate int) (err error) {
+// 	// todo
+// 	return
+// }
+
+// // DeleteRecoder delete recoder client
+// func (s *Server) DeleteRecoder(ctx context.Context, recoderIP, receivePort string) error {
+// 	s.mutexRecoder.Lock()
+// 	defer s.mutexRecoder.Unlock()
+
+// 	cancel, isExist := s.recoderClient[recoderIP]
+// 	if !isExist {
+// 		return fmt.Errorf("recoder %s not exist", recoderIP)
+// 	}
+
+// 	cancel()
+// 	s.recoder.StopRecode(ctx, "TODO", recoderIP)
+// 	delete(s.recoderClient, recoderIP)
+// 	return nil
+// }
 
 // NewServer ...
 func NewServer(
@@ -163,9 +202,12 @@ func NewServer(
 	udp udp,
 
 	hostLayout string,
+	playLayout string,
 ) *Server {
 	return &Server{
-		playerClient: make(map[string]context.CancelFunc),
+		sending:  make(map[string]context.CancelFunc),
+		playing:  make(map[string]context.CancelFunc),
+		recoding: make(map[string]context.CancelFunc),
 
 		audio:   audio,
 		recoder: recoder,
@@ -173,5 +215,6 @@ func NewServer(
 		udp:     udp,
 
 		hostLayout: hostLayout,
+		playLayout: playLayout,
 	}
 }

@@ -2,6 +2,7 @@ package udp
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"net"
 )
@@ -43,6 +44,7 @@ func (u *UDP) Send(ctx context.Context, dstAddr string, r io.Reader) (err error)
 				if err != nil {
 					return
 				}
+				fmt.Println(outputBytes)
 				connection.Write(outputBytes[:l])
 			}
 		}
@@ -82,6 +84,7 @@ func (u *UDP) Receive(ctx context.Context, receivePort string, w io.Writer) (err
 				if err != nil {
 					return
 				}
+				fmt.Println(inputBytes)
 				w.Write(inputBytes[:l])
 			}
 		}

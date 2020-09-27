@@ -4,24 +4,26 @@ syntax = "proto3";
 
 package player;
 
-message  StartRecieveRequest{
+message  StartReceiveRequest{
   string port = 1;
 }
 
-message StartRecieveResponse{
+message StartReceiveResponse{
 }
 
-message StopRecieveRequest {
+message StopReceiveRequest {
   string port = 1;
+  bool force = 2;
 }
 
-message StopRecieveResponse{
+message StopReceiveResponse{
 }
 
 message  StartPlayRequest{
-  string deviceName = 1; 
-  uint32 channels = 2;
-  uint32 rate = 3;
+  string port = 2;
+  string deviceName = 3; 
+  uint32 channels = 4;
+  uint32 rate = 5;
 }
 
 message StartPlayResponse{
@@ -36,8 +38,8 @@ message StopPlayResponse{
 
 // grpc service to play audio
 service Player {
-  rpc StartRecieve (StartRecieveRequest) returns (StartRecieveRequest) {}
-  rpc StopRecieve (StopRecieveRequest) returns (StopRecieveRequest) {}
+  rpc StartReceive (StartReceiveRequest) returns (StartReceiveRequest) {}
+  rpc StopReceive (StopReceiveRequest) returns (StopReceiveRequest) {}
   rpc StartPlay (StartPlayRequest) returns (StartPlayResponse) {}
   rpc StopPlay (StopPlayRequest) returns (StopPlayResponse) {}
 }

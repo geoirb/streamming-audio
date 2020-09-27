@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/geoirb/sound-ethernet-streaming/pkg/recoder"
 
@@ -22,9 +23,13 @@ import (
 type configuration struct {
 	PlayerPort  string `envconfig:"PLAYER_PORT" default:"8081"`
 	RecoderPort string `envconfig:"RECODER_PORT" default:"8082"`
-	UDPBuffSize int    `envconfig:"UDP_BUF_SIZE" default:"1024"`
-	HostLayout  string `envconfig:"HOST_LAYOUT" default:"%s:%s"`
-	File        string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/test.wav"`
+
+	UDPBuffSize int `envconfig:"UDP_BUF_SIZE" default:"1024"`
+
+	HostLayout string `envconfig:"HOST_LAYOUT" default:"%s:%s"`
+	PlayLayout string `envconfig:"PLAY_LAYOUT" default:"%s:%s"`
+
+	File string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/test.wav"`
 }
 
 func main() {
@@ -57,8 +62,12 @@ func main() {
 		udp,
 
 		cfg.HostLayout,
+		cfg.PlayLayout,
 	)
-	fmt.Println(server.AddFilePlayer(context.Background(), "127.0.0.1", "8083", "hw:1,0", cfg.File))
+	channels, rate, err := server.StartSendingFile(context.Background(), "127.0.0.1", "8083", cfg.File)
+	fmt.Println(err)
+	time.Sleep(time.Second * 10)
+	fmt.Println(server.StartPlaying(context.Background(), "127.0.0.1", "8083", "hw:1,0", channels, rate))
 
 	level.Error(logger).Log("msg", "server start")
 
@@ -66,5 +75,6 @@ func main() {
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 
-	fmt.Println(server.DeletePlayer(context.Background(), "127.0.0.1", "8083"))
+	fmt.Println(server.StopSending(context.Background(), "127.0.0.1", "8083"))
+	fmt.Println(server.StopPlaying(context.Background(), "127.0.0.1", "hw:1,0"))
 }

@@ -9,16 +9,15 @@
 package player
 
 import (
-	"context"
-	"reflect"
-	"sync"
-
-	"github.com/golang/protobuf/proto"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/runtime/protoimpl"
+	context "context"
+	proto "github.com/golang/protobuf/proto"
+	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	reflect "reflect"
+	sync "sync"
 )
 
 const (
@@ -32,7 +31,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
-type StartRecieveRequest struct {
+type StartReceiveRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -40,8 +39,8 @@ type StartRecieveRequest struct {
 	Port string `protobuf:"bytes,1,opt,name=port,proto3" json:"port,omitempty"`
 }
 
-func (x *StartRecieveRequest) Reset() {
-	*x = StartRecieveRequest{}
+func (x *StartReceiveRequest) Reset() {
+	*x = StartReceiveRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_player_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -49,13 +48,13 @@ func (x *StartRecieveRequest) Reset() {
 	}
 }
 
-func (x *StartRecieveRequest) String() string {
+func (x *StartReceiveRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*StartRecieveRequest) ProtoMessage() {}
+func (*StartReceiveRequest) ProtoMessage() {}
 
-func (x *StartRecieveRequest) ProtoReflect() protoreflect.Message {
+func (x *StartReceiveRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_player_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -67,26 +66,26 @@ func (x *StartRecieveRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StartRecieveRequest.ProtoReflect.Descriptor instead.
-func (*StartRecieveRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use StartReceiveRequest.ProtoReflect.Descriptor instead.
+func (*StartReceiveRequest) Descriptor() ([]byte, []int) {
 	return file_player_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *StartRecieveRequest) GetPort() string {
+func (x *StartReceiveRequest) GetPort() string {
 	if x != nil {
 		return x.Port
 	}
 	return ""
 }
 
-type StartRecieveResponse struct {
+type StartReceiveResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *StartRecieveResponse) Reset() {
-	*x = StartRecieveResponse{}
+func (x *StartReceiveResponse) Reset() {
+	*x = StartReceiveResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_player_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -94,13 +93,13 @@ func (x *StartRecieveResponse) Reset() {
 	}
 }
 
-func (x *StartRecieveResponse) String() string {
+func (x *StartReceiveResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*StartRecieveResponse) ProtoMessage() {}
+func (*StartReceiveResponse) ProtoMessage() {}
 
-func (x *StartRecieveResponse) ProtoReflect() protoreflect.Message {
+func (x *StartReceiveResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_player_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -112,21 +111,22 @@ func (x *StartRecieveResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StartRecieveResponse.ProtoReflect.Descriptor instead.
-func (*StartRecieveResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use StartReceiveResponse.ProtoReflect.Descriptor instead.
+func (*StartReceiveResponse) Descriptor() ([]byte, []int) {
 	return file_player_proto_rawDescGZIP(), []int{1}
 }
 
-type StopRecieveRequest struct {
+type StopReceiveRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Port string `protobuf:"bytes,1,opt,name=port,proto3" json:"port,omitempty"`
+	Port  string `protobuf:"bytes,1,opt,name=port,proto3" json:"port,omitempty"`
+	Force bool   `protobuf:"varint,2,opt,name=force,proto3" json:"force,omitempty"`
 }
 
-func (x *StopRecieveRequest) Reset() {
-	*x = StopRecieveRequest{}
+func (x *StopReceiveRequest) Reset() {
+	*x = StopReceiveRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_player_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -134,13 +134,13 @@ func (x *StopRecieveRequest) Reset() {
 	}
 }
 
-func (x *StopRecieveRequest) String() string {
+func (x *StopReceiveRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*StopRecieveRequest) ProtoMessage() {}
+func (*StopReceiveRequest) ProtoMessage() {}
 
-func (x *StopRecieveRequest) ProtoReflect() protoreflect.Message {
+func (x *StopReceiveRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_player_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -152,26 +152,33 @@ func (x *StopRecieveRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StopRecieveRequest.ProtoReflect.Descriptor instead.
-func (*StopRecieveRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use StopReceiveRequest.ProtoReflect.Descriptor instead.
+func (*StopReceiveRequest) Descriptor() ([]byte, []int) {
 	return file_player_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *StopRecieveRequest) GetPort() string {
+func (x *StopReceiveRequest) GetPort() string {
 	if x != nil {
 		return x.Port
 	}
 	return ""
 }
 
-type StopRecieveResponse struct {
+func (x *StopReceiveRequest) GetForce() bool {
+	if x != nil {
+		return x.Force
+	}
+	return false
+}
+
+type StopReceiveResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *StopRecieveResponse) Reset() {
-	*x = StopRecieveResponse{}
+func (x *StopReceiveResponse) Reset() {
+	*x = StopReceiveResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_player_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -179,13 +186,13 @@ func (x *StopRecieveResponse) Reset() {
 	}
 }
 
-func (x *StopRecieveResponse) String() string {
+func (x *StopReceiveResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*StopRecieveResponse) ProtoMessage() {}
+func (*StopReceiveResponse) ProtoMessage() {}
 
-func (x *StopRecieveResponse) ProtoReflect() protoreflect.Message {
+func (x *StopReceiveResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_player_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -197,8 +204,8 @@ func (x *StopRecieveResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StopRecieveResponse.ProtoReflect.Descriptor instead.
-func (*StopRecieveResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use StopReceiveResponse.ProtoReflect.Descriptor instead.
+func (*StopReceiveResponse) Descriptor() ([]byte, []int) {
 	return file_player_proto_rawDescGZIP(), []int{3}
 }
 
@@ -207,9 +214,10 @@ type StartPlayRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	DeviceName string `protobuf:"bytes,1,opt,name=deviceName,proto3" json:"deviceName,omitempty"`
-	Channels   uint32 `protobuf:"varint,2,opt,name=channels,proto3" json:"channels,omitempty"`
-	Rate       uint32 `protobuf:"varint,3,opt,name=rate,proto3" json:"rate,omitempty"`
+	Port       string `protobuf:"bytes,2,opt,name=port,proto3" json:"port,omitempty"`
+	DeviceName string `protobuf:"bytes,3,opt,name=deviceName,proto3" json:"deviceName,omitempty"`
+	Channels   uint32 `protobuf:"varint,4,opt,name=channels,proto3" json:"channels,omitempty"`
+	Rate       uint32 `protobuf:"varint,5,opt,name=rate,proto3" json:"rate,omitempty"`
 }
 
 func (x *StartPlayRequest) Reset() {
@@ -242,6 +250,13 @@ func (x *StartPlayRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use StartPlayRequest.ProtoReflect.Descriptor instead.
 func (*StartPlayRequest) Descriptor() ([]byte, []int) {
 	return file_player_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *StartPlayRequest) GetPort() string {
+	if x != nil {
+		return x.Port
+	}
+	return ""
 }
 
 func (x *StartPlayRequest) GetDeviceName() string {
@@ -393,45 +408,48 @@ var File_player_proto protoreflect.FileDescriptor
 var file_player_proto_rawDesc = []byte{
 	0x0a, 0x0c, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06,
 	0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x22, 0x29, 0x0a, 0x13, 0x53, 0x74, 0x61, 0x72, 0x74, 0x52,
-	0x65, 0x63, 0x69, 0x65, 0x76, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a,
+	0x65, 0x63, 0x65, 0x69, 0x76, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a,
 	0x04, 0x70, 0x6f, 0x72, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x70, 0x6f, 0x72,
-	0x74, 0x22, 0x16, 0x0a, 0x14, 0x53, 0x74, 0x61, 0x72, 0x74, 0x52, 0x65, 0x63, 0x69, 0x65, 0x76,
-	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x28, 0x0a, 0x12, 0x53, 0x74, 0x6f,
-	0x70, 0x52, 0x65, 0x63, 0x69, 0x65, 0x76, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x74, 0x22, 0x16, 0x0a, 0x14, 0x53, 0x74, 0x61, 0x72, 0x74, 0x52, 0x65, 0x63, 0x65, 0x69, 0x76,
+	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x3e, 0x0a, 0x12, 0x53, 0x74, 0x6f,
+	0x70, 0x52, 0x65, 0x63, 0x65, 0x69, 0x76, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
 	0x12, 0x0a, 0x04, 0x70, 0x6f, 0x72, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x70,
-	0x6f, 0x72, 0x74, 0x22, 0x15, 0x0a, 0x13, 0x53, 0x74, 0x6f, 0x70, 0x52, 0x65, 0x63, 0x69, 0x65,
-	0x76, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x62, 0x0a, 0x10, 0x53, 0x74,
-	0x61, 0x72, 0x74, 0x50, 0x6c, 0x61, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1e,
-	0x0a, 0x0a, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x0a, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x1a,
-	0x0a, 0x08, 0x63, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d,
-	0x52, 0x08, 0x63, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x73, 0x12, 0x12, 0x0a, 0x04, 0x72, 0x61,
-	0x74, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x72, 0x61, 0x74, 0x65, 0x22, 0x13,
-	0x0a, 0x11, 0x53, 0x74, 0x61, 0x72, 0x74, 0x50, 0x6c, 0x61, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x22, 0x31, 0x0a, 0x0f, 0x53, 0x74, 0x6f, 0x70, 0x50, 0x6c, 0x61, 0x79, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1e, 0x0a, 0x0a, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65,
-	0x4e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x64, 0x65, 0x76, 0x69,
-	0x63, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x12, 0x0a, 0x10, 0x53, 0x74, 0x6f, 0x70, 0x50, 0x6c,
-	0x61, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xa2, 0x02, 0x0a, 0x06, 0x50,
-	0x6c, 0x61, 0x79, 0x65, 0x72, 0x12, 0x4a, 0x0a, 0x0c, 0x53, 0x74, 0x61, 0x72, 0x74, 0x52, 0x65,
-	0x63, 0x69, 0x65, 0x76, 0x65, 0x12, 0x1b, 0x2e, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x2e, 0x53,
-	0x74, 0x61, 0x72, 0x74, 0x52, 0x65, 0x63, 0x69, 0x65, 0x76, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x2e, 0x53, 0x74, 0x61, 0x72,
-	0x74, 0x52, 0x65, 0x63, 0x69, 0x65, 0x76, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22,
-	0x00, 0x12, 0x47, 0x0a, 0x0b, 0x53, 0x74, 0x6f, 0x70, 0x52, 0x65, 0x63, 0x69, 0x65, 0x76, 0x65,
-	0x12, 0x1a, 0x2e, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x2e, 0x53, 0x74, 0x6f, 0x70, 0x52, 0x65,
-	0x63, 0x69, 0x65, 0x76, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x70,
-	0x6c, 0x61, 0x79, 0x65, 0x72, 0x2e, 0x53, 0x74, 0x6f, 0x70, 0x52, 0x65, 0x63, 0x69, 0x65, 0x76,
-	0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x00, 0x12, 0x42, 0x0a, 0x09, 0x53, 0x74,
-	0x61, 0x72, 0x74, 0x50, 0x6c, 0x61, 0x79, 0x12, 0x18, 0x2e, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72,
-	0x2e, 0x53, 0x74, 0x61, 0x72, 0x74, 0x50, 0x6c, 0x61, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x1a, 0x19, 0x2e, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x2e, 0x53, 0x74, 0x61, 0x72, 0x74,
-	0x50, 0x6c, 0x61, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x3f,
-	0x0a, 0x08, 0x53, 0x74, 0x6f, 0x70, 0x50, 0x6c, 0x61, 0x79, 0x12, 0x17, 0x2e, 0x70, 0x6c, 0x61,
-	0x79, 0x65, 0x72, 0x2e, 0x53, 0x74, 0x6f, 0x70, 0x50, 0x6c, 0x61, 0x79, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x2e, 0x53, 0x74, 0x6f,
-	0x70, 0x50, 0x6c, 0x61, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6f, 0x72, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x66, 0x6f, 0x72, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x08, 0x52, 0x05, 0x66, 0x6f, 0x72, 0x63, 0x65, 0x22, 0x15, 0x0a, 0x13, 0x53, 0x74, 0x6f,
+	0x70, 0x52, 0x65, 0x63, 0x65, 0x69, 0x76, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x76, 0x0a, 0x10, 0x53, 0x74, 0x61, 0x72, 0x74, 0x50, 0x6c, 0x61, 0x79, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x6f, 0x72, 0x74, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x04, 0x70, 0x6f, 0x72, 0x74, 0x12, 0x1e, 0x0a, 0x0a, 0x64, 0x65, 0x76, 0x69,
+	0x63, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x64, 0x65,
+	0x76, 0x69, 0x63, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x63, 0x68, 0x61, 0x6e,
+	0x6e, 0x65, 0x6c, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x08, 0x63, 0x68, 0x61, 0x6e,
+	0x6e, 0x65, 0x6c, 0x73, 0x12, 0x12, 0x0a, 0x04, 0x72, 0x61, 0x74, 0x65, 0x18, 0x05, 0x20, 0x01,
+	0x28, 0x0d, 0x52, 0x04, 0x72, 0x61, 0x74, 0x65, 0x22, 0x13, 0x0a, 0x11, 0x53, 0x74, 0x61, 0x72,
+	0x74, 0x50, 0x6c, 0x61, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x31, 0x0a,
+	0x0f, 0x53, 0x74, 0x6f, 0x70, 0x50, 0x6c, 0x61, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x1e, 0x0a, 0x0a, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x4e, 0x61, 0x6d, 0x65,
+	0x22, 0x12, 0x0a, 0x10, 0x53, 0x74, 0x6f, 0x70, 0x50, 0x6c, 0x61, 0x79, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x32, 0xa2, 0x02, 0x0a, 0x06, 0x50, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x12,
+	0x4a, 0x0a, 0x0c, 0x53, 0x74, 0x61, 0x72, 0x74, 0x52, 0x65, 0x63, 0x65, 0x69, 0x76, 0x65, 0x12,
+	0x1b, 0x2e, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x2e, 0x53, 0x74, 0x61, 0x72, 0x74, 0x52, 0x65,
+	0x63, 0x65, 0x69, 0x76, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x70,
+	0x6c, 0x61, 0x79, 0x65, 0x72, 0x2e, 0x53, 0x74, 0x61, 0x72, 0x74, 0x52, 0x65, 0x63, 0x65, 0x69,
+	0x76, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x00, 0x12, 0x47, 0x0a, 0x0b, 0x53,
+	0x74, 0x6f, 0x70, 0x52, 0x65, 0x63, 0x65, 0x69, 0x76, 0x65, 0x12, 0x1a, 0x2e, 0x70, 0x6c, 0x61,
+	0x79, 0x65, 0x72, 0x2e, 0x53, 0x74, 0x6f, 0x70, 0x52, 0x65, 0x63, 0x65, 0x69, 0x76, 0x65, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x2e,
+	0x53, 0x74, 0x6f, 0x70, 0x52, 0x65, 0x63, 0x65, 0x69, 0x76, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x22, 0x00, 0x12, 0x42, 0x0a, 0x09, 0x53, 0x74, 0x61, 0x72, 0x74, 0x50, 0x6c, 0x61,
+	0x79, 0x12, 0x18, 0x2e, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x2e, 0x53, 0x74, 0x61, 0x72, 0x74,
+	0x50, 0x6c, 0x61, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x70, 0x6c,
+	0x61, 0x79, 0x65, 0x72, 0x2e, 0x53, 0x74, 0x61, 0x72, 0x74, 0x50, 0x6c, 0x61, 0x79, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x3f, 0x0a, 0x08, 0x53, 0x74, 0x6f, 0x70,
+	0x50, 0x6c, 0x61, 0x79, 0x12, 0x17, 0x2e, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x2e, 0x53, 0x74,
+	0x6f, 0x70, 0x50, 0x6c, 0x61, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e,
+	0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x2e, 0x53, 0x74, 0x6f, 0x70, 0x50, 0x6c, 0x61, 0x79, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -448,22 +466,22 @@ func file_player_proto_rawDescGZIP() []byte {
 
 var file_player_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_player_proto_goTypes = []interface{}{
-	(*StartRecieveRequest)(nil),  // 0: player.StartRecieveRequest
-	(*StartRecieveResponse)(nil), // 1: player.StartRecieveResponse
-	(*StopRecieveRequest)(nil),   // 2: player.StopRecieveRequest
-	(*StopRecieveResponse)(nil),  // 3: player.StopRecieveResponse
+	(*StartReceiveRequest)(nil),  // 0: player.StartReceiveRequest
+	(*StartReceiveResponse)(nil), // 1: player.StartReceiveResponse
+	(*StopReceiveRequest)(nil),   // 2: player.StopReceiveRequest
+	(*StopReceiveResponse)(nil),  // 3: player.StopReceiveResponse
 	(*StartPlayRequest)(nil),     // 4: player.StartPlayRequest
 	(*StartPlayResponse)(nil),    // 5: player.StartPlayResponse
 	(*StopPlayRequest)(nil),      // 6: player.StopPlayRequest
 	(*StopPlayResponse)(nil),     // 7: player.StopPlayResponse
 }
 var file_player_proto_depIdxs = []int32{
-	0, // 0: player.Player.StartRecieve:input_type -> player.StartRecieveRequest
-	2, // 1: player.Player.StopRecieve:input_type -> player.StopRecieveRequest
+	0, // 0: player.Player.StartReceive:input_type -> player.StartReceiveRequest
+	2, // 1: player.Player.StopReceive:input_type -> player.StopReceiveRequest
 	4, // 2: player.Player.StartPlay:input_type -> player.StartPlayRequest
 	6, // 3: player.Player.StopPlay:input_type -> player.StopPlayRequest
-	0, // 4: player.Player.StartRecieve:output_type -> player.StartRecieveRequest
-	2, // 5: player.Player.StopRecieve:output_type -> player.StopRecieveRequest
+	0, // 4: player.Player.StartReceive:output_type -> player.StartReceiveRequest
+	2, // 5: player.Player.StopReceive:output_type -> player.StopReceiveRequest
 	5, // 6: player.Player.StartPlay:output_type -> player.StartPlayResponse
 	7, // 7: player.Player.StopPlay:output_type -> player.StopPlayResponse
 	4, // [4:8] is the sub-list for method output_type
@@ -480,7 +498,7 @@ func file_player_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_player_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StartRecieveRequest); i {
+			switch v := v.(*StartReceiveRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -492,7 +510,7 @@ func file_player_proto_init() {
 			}
 		}
 		file_player_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StartRecieveResponse); i {
+			switch v := v.(*StartReceiveResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -504,7 +522,7 @@ func file_player_proto_init() {
 			}
 		}
 		file_player_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StopRecieveRequest); i {
+			switch v := v.(*StopReceiveRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -516,7 +534,7 @@ func file_player_proto_init() {
 			}
 		}
 		file_player_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StopRecieveResponse); i {
+			switch v := v.(*StopReceiveResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -608,8 +626,8 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type PlayerClient interface {
-	StartRecieve(ctx context.Context, in *StartRecieveRequest, opts ...grpc.CallOption) (*StartRecieveRequest, error)
-	StopRecieve(ctx context.Context, in *StopRecieveRequest, opts ...grpc.CallOption) (*StopRecieveRequest, error)
+	StartReceive(ctx context.Context, in *StartReceiveRequest, opts ...grpc.CallOption) (*StartReceiveRequest, error)
+	StopReceive(ctx context.Context, in *StopReceiveRequest, opts ...grpc.CallOption) (*StopReceiveRequest, error)
 	StartPlay(ctx context.Context, in *StartPlayRequest, opts ...grpc.CallOption) (*StartPlayResponse, error)
 	StopPlay(ctx context.Context, in *StopPlayRequest, opts ...grpc.CallOption) (*StopPlayResponse, error)
 }
@@ -622,18 +640,18 @@ func NewPlayerClient(cc grpc.ClientConnInterface) PlayerClient {
 	return &playerClient{cc}
 }
 
-func (c *playerClient) StartRecieve(ctx context.Context, in *StartRecieveRequest, opts ...grpc.CallOption) (*StartRecieveRequest, error) {
-	out := new(StartRecieveRequest)
-	err := c.cc.Invoke(ctx, "/player.Player/StartRecieve", in, out, opts...)
+func (c *playerClient) StartReceive(ctx context.Context, in *StartReceiveRequest, opts ...grpc.CallOption) (*StartReceiveRequest, error) {
+	out := new(StartReceiveRequest)
+	err := c.cc.Invoke(ctx, "/player.Player/StartReceive", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *playerClient) StopRecieve(ctx context.Context, in *StopRecieveRequest, opts ...grpc.CallOption) (*StopRecieveRequest, error) {
-	out := new(StopRecieveRequest)
-	err := c.cc.Invoke(ctx, "/player.Player/StopRecieve", in, out, opts...)
+func (c *playerClient) StopReceive(ctx context.Context, in *StopReceiveRequest, opts ...grpc.CallOption) (*StopReceiveRequest, error) {
+	out := new(StopReceiveRequest)
+	err := c.cc.Invoke(ctx, "/player.Player/StopReceive", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -660,8 +678,8 @@ func (c *playerClient) StopPlay(ctx context.Context, in *StopPlayRequest, opts .
 
 // PlayerServer is the server API for Player service.
 type PlayerServer interface {
-	StartRecieve(context.Context, *StartRecieveRequest) (*StartRecieveRequest, error)
-	StopRecieve(context.Context, *StopRecieveRequest) (*StopRecieveRequest, error)
+	StartReceive(context.Context, *StartReceiveRequest) (*StartReceiveRequest, error)
+	StopReceive(context.Context, *StopReceiveRequest) (*StopReceiveRequest, error)
 	StartPlay(context.Context, *StartPlayRequest) (*StartPlayResponse, error)
 	StopPlay(context.Context, *StopPlayRequest) (*StopPlayResponse, error)
 }
@@ -670,11 +688,11 @@ type PlayerServer interface {
 type UnimplementedPlayerServer struct {
 }
 
-func (*UnimplementedPlayerServer) StartRecieve(context.Context, *StartRecieveRequest) (*StartRecieveRequest, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StartRecieve not implemented")
+func (*UnimplementedPlayerServer) StartReceive(context.Context, *StartReceiveRequest) (*StartReceiveRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartReceive not implemented")
 }
-func (*UnimplementedPlayerServer) StopRecieve(context.Context, *StopRecieveRequest) (*StopRecieveRequest, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StopRecieve not implemented")
+func (*UnimplementedPlayerServer) StopReceive(context.Context, *StopReceiveRequest) (*StopReceiveRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StopReceive not implemented")
 }
 func (*UnimplementedPlayerServer) StartPlay(context.Context, *StartPlayRequest) (*StartPlayResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StartPlay not implemented")
@@ -687,38 +705,38 @@ func RegisterPlayerServer(s *grpc.Server, srv PlayerServer) {
 	s.RegisterService(&_Player_serviceDesc, srv)
 }
 
-func _Player_StartRecieve_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StartRecieveRequest)
+func _Player_StartReceive_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartReceiveRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PlayerServer).StartRecieve(ctx, in)
+		return srv.(PlayerServer).StartReceive(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/player.Player/StartRecieve",
+		FullMethod: "/player.Player/StartReceive",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlayerServer).StartRecieve(ctx, req.(*StartRecieveRequest))
+		return srv.(PlayerServer).StartReceive(ctx, req.(*StartReceiveRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Player_StopRecieve_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StopRecieveRequest)
+func _Player_StopReceive_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StopReceiveRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PlayerServer).StopRecieve(ctx, in)
+		return srv.(PlayerServer).StopReceive(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/player.Player/StopRecieve",
+		FullMethod: "/player.Player/StopReceive",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PlayerServer).StopRecieve(ctx, req.(*StopRecieveRequest))
+		return srv.(PlayerServer).StopReceive(ctx, req.(*StopReceiveRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -764,12 +782,12 @@ var _Player_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*PlayerServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "StartRecieve",
-			Handler:    _Player_StartRecieve_Handler,
+			MethodName: "StartReceive",
+			Handler:    _Player_StartReceive_Handler,
 		},
 		{
-			MethodName: "StopRecieve",
-			Handler:    _Player_StopRecieve_Handler,
+			MethodName: "StopReceive",
+			Handler:    _Player_StopReceive_Handler,
 		},
 		{
 			MethodName: "StartPlay",

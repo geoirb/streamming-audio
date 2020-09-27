@@ -13,10 +13,52 @@ type Client struct {
 	controlPort string
 }
 
-// StartPlay rpc request for start receive and play audio signal
-func (c *Client) StartPlay(ctx context.Context, ip, port, deviceName string, channels, rate uint32) (err error) {
+// StartReceive rpc request for start receive signal from server
+func (c *Client) StartReceive(ctx context.Context, playerIP, receivePort string) (err error) {
 	conn, err := grpc.Dial(
-		fmt.Sprintf(c.hostLayout, ip, c.controlPort),
+		fmt.Sprintf(c.hostLayout, playerIP, c.controlPort),
+		// todo
+		grpc.WithInsecure(),
+	)
+	defer conn.Close()
+	if err != nil {
+		return
+	}
+
+	_, err = NewPlayerClient(conn).
+		StartReceive(
+			ctx,
+			&StartReceiveRequest{
+				Port: receivePort,
+			})
+	return
+}
+
+// StopReceive rpc request for stop receive signal from server
+func (c *Client) StopReceive(ctx context.Context, playerIP, receivePort string) (err error) {
+	conn, err := grpc.Dial(
+		fmt.Sprintf(c.hostLayout, playerIP, c.controlPort),
+		// todo
+		grpc.WithInsecure(),
+	)
+	defer conn.Close()
+	if err != nil {
+		return
+	}
+
+	_, err = NewPlayerClient(conn).
+		StopReceive(
+			ctx,
+			&StopReceiveRequest{
+				Port: receivePort,
+			})
+	return
+}
+
+// StartPlay rpc request for play audio signal
+func (c *Client) StartPlay(ctx context.Context, playerIP, receivePort, deviceName string, channels, rate uint32) (err error) {
+	conn, err := grpc.Dial(
+		fmt.Sprintf(c.hostLayout, playerIP, c.controlPort),
 		// todo
 		grpc.WithInsecure(),
 	)
@@ -29,20 +71,18 @@ func (c *Client) StartPlay(ctx context.Context, ip, port, deviceName string, cha
 		StartPlay(
 			ctx,
 			&StartPlayRequest{
+				Port:       receivePort,
 				DeviceName: deviceName,
 				Channels:   uint32(channels),
 				Rate:       rate,
 			})
-	if err != nil {
-		return
-	}
 	return
 }
 
-// StopPlay rpc request for stop receive and play audio signal
-func (c *Client) StopPlay(ctx context.Context, ip, port string) (err error) {
+// StopPlay rpc request for play audio signal
+func (c *Client) StopPlay(ctx context.Context, playerIP, deviceName string) (err error) {
 	conn, err := grpc.Dial(
-		fmt.Sprintf(c.hostLayout, ip, c.controlPort),
+		fmt.Sprintf(c.hostLayout, playerIP, c.controlPort),
 		// todo
 		grpc.WithInsecure(),
 	)
@@ -55,12 +95,9 @@ func (c *Client) StopPlay(ctx context.Context, ip, port string) (err error) {
 		StopPlay(
 			ctx,
 			&StopPlayRequest{
-				Port: port,
+				DeviceName: deviceName,
 			},
 		)
-	if err != nil {
-		return
-	}
 	return
 }
 
