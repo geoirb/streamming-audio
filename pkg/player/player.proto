@@ -9,21 +9,21 @@ message  StartReceiveRequest{
 }
 
 message StartReceiveResponse{
+  string storageUUID = 1;
 }
 
 message StopReceiveRequest {
   string port = 1;
-  bool force = 2;
 }
 
 message StopReceiveResponse{
 }
 
 message  StartPlayRequest{
-  string port = 2;
-  string deviceName = 3; 
-  uint32 channels = 4;
-  uint32 rate = 5;
+  string deviceName = 1; 
+  uint32 channels = 2;
+  uint32 rate = 3;
+  string storageUUID = 4;
 }
 
 message StartPlayResponse{
@@ -38,8 +38,8 @@ message StopPlayResponse{
 
 // grpc service to play audio
 service Player {
-  rpc StartReceive (StartReceiveRequest) returns (StartReceiveRequest) {}
-  rpc StopReceive (StopReceiveRequest) returns (StopReceiveRequest) {}
+  rpc StartReceive (StartReceiveRequest) returns (StartReceiveResponse) {}
+  rpc StopReceive (StopReceiveRequest) returns (StopReceiveResponse) {}
   rpc StartPlay (StartPlayRequest) returns (StartPlayResponse) {}
   rpc StopPlay (StopPlayRequest) returns (StopPlayResponse) {}
 }

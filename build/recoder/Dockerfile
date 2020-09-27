@@ -1,6 +1,6 @@
 FROM golang:1.15-alpine AS build
 
-WORKDIR /go/src/player
+WORKDIR /go/src/recoder
 COPY . ./
 
 RUN apk update \
@@ -8,7 +8,7 @@ RUN apk update \
 
 RUN go build \
     -o /out/service \
-    ./cmd/player/main.go
+    ./cmd/recoder/main.go
 
 FROM alpine
 WORKDIR /app

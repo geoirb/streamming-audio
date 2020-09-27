@@ -2,7 +2,6 @@ package udp
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net"
 )
@@ -44,7 +43,6 @@ func (u *UDP) Send(ctx context.Context, dstAddr string, r io.Reader) (err error)
 				if err != nil {
 					return
 				}
-				fmt.Println(outputBytes)
 				connection.Write(outputBytes[:l])
 			}
 		}
@@ -70,26 +68,20 @@ func (u *UDP) Receive(ctx context.Context, receivePort string, w io.Writer) (err
 	}
 
 	go func() {
-		defer func() {
-			connection.Close()
-		}()
-
-		inputBytes := make([]byte, u.buffSize)
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-				l, err := connection.Read(inputBytes)
-				if err != nil {
-					return
-				}
-				fmt.Println(inputBytes)
-				w.Write(inputBytes[:l])
-			}
-		}
+		<-ctx.Done()
+		connection.Close()
 	}()
 
+	go func() {
+		for {
+			inputBytes := make([]byte, u.buffSize)
+			l, err := connection.Read(inputBytes)
+			if err != nil {
+				return
+			}
+			w.Write(inputBytes[:l])
+		}
+	}()
 	return
 }
 

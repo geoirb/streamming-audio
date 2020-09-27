@@ -8,13 +8,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/geoirb/sound-ethernet-streaming/pkg/recoder"
-
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/kelseyhightower/envconfig"
 
 	"github.com/geoirb/sound-ethernet-streaming/pkg/player"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/recoder"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/server"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/udp"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/wav"
@@ -55,7 +54,7 @@ func main() {
 		cfg.RecoderPort,
 	)
 	udp := udp.NewUDP(cfg.UDPBuffSize)
-	server := server.NewServer(
+	svc := server.NewServer(
 		wav,
 		recoder,
 		player,
@@ -64,17 +63,17 @@ func main() {
 		cfg.HostLayout,
 		cfg.PlayLayout,
 	)
-	channels, rate, err := server.StartSendingFile(context.Background(), "127.0.0.1", "8083", cfg.File)
-	fmt.Println(err)
-	time.Sleep(time.Second * 10)
-	fmt.Println(server.StartPlaying(context.Background(), "127.0.0.1", "8083", "hw:1,0", channels, rate))
+	svc = server.NewLoggerMiddleware(svc, logger)
+	storageUUID, channels, rate, err := svc.StartSendingFile(context.Background(), "127.0.0.1", "8083", cfg.File)
+	fmt.Println(storageUUID, channels, rate, err)
+	time.Sleep(time.Second * 5)
+	fmt.Println(svc.StartPlaying(context.Background(), "127.0.0.1", "hw:0,0", storageUUID, 2, 44100))
 
 	level.Error(logger).Log("msg", "server start")
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
-
-	fmt.Println(server.StopSending(context.Background(), "127.0.0.1", "8083"))
-	fmt.Println(server.StopPlaying(context.Background(), "127.0.0.1", "hw:1,0"))
+	fmt.Println(svc.StopSending(context.Background(), "127.0.0.1", "8083"))
+	fmt.Println(svc.StopPlaying(context.Background(), "127.0.0.1", "hw:0,0"))
 }

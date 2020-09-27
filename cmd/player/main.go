@@ -63,8 +63,8 @@ func main() {
 	server := grpc.NewServer()
 	player.RegisterPlayerServer(server, p4r)
 
-	level.Error(logger).Log("msg", "server start", "port", cfg.Port)
-	server.Serve(lis)
+	go server.Serve(lis)
+	level.Error(logger).Log("msg", "player start", "port", cfg.Port)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)

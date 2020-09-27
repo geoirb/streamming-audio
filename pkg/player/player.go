@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"sync"
+
+	"github.com/twinj/uuid"
 )
 
 type storage interface {
@@ -19,18 +21,21 @@ type device interface {
 	Play(context.Context, string, int, int, io.Reader) error
 }
 
-type receiving struct {
-	isStart bool
-	stop    context.CancelFunc
-	storage io.ReadWriteCloser
+type playing struct {
+	stop        context.CancelFunc
+	storageUUID string
 }
 
 // Player audio signal
 type Player struct {
 	receivingMutex sync.Mutex
-	receiving      map[string]receiving
-	playingMutex   sync.Mutex
-	playing        map[string]context.CancelFunc
+	receiving      map[string]context.CancelFunc
+
+	storagingMutex sync.Mutex
+	storaging      map[string]io.ReadWriteCloser
+
+	playingMutex sync.Mutex
+	playing      map[string]playing
 
 	udp     udp
 	device  device
@@ -38,24 +43,26 @@ type Player struct {
 }
 
 // StartReceive start receive data from server and save
-func (p *Player) StartReceive(c context.Context, in *StartReceiveRequest) (out *StartReceiveRequest, err error) {
+func (p *Player) StartReceive(c context.Context, in *StartReceiveRequest) (out *StartReceiveResponse, err error) {
 	p.receivingMutex.Lock()
 	defer p.receivingMutex.Unlock()
 
 	if _, isExist := p.receiving[in.Port]; !isExist {
-		list := p.storage.List()
-		ctx, cancel := context.WithCancel(context.Background())
-
-		if err = p.udp.Receive(ctx, in.Port, list); err != nil {
-			cancel()
+		storage := p.storage.List()
+		ctx, stop := context.WithCancel(context.Background())
+		if err = p.udp.Receive(ctx, in.Port, storage); err != nil {
+			stop()
 			return
 		}
-		p.receiving[in.Port] = receiving{
-			isStart: true,
-			stop:    cancel,
-			storage: list,
+
+		uuid := uuid.NewV4().String()
+		p.storagingMutex.Lock()
+		p.storaging[uuid] = storage
+		p.storagingMutex.Unlock()
+		p.receiving[in.Port] = stop
+		out = &StartReceiveResponse{
+			StorageUUID: uuid,
 		}
-		out = &StartReceiveRequest{}
 		return
 	}
 	err = fmt.Errorf("%v is busy", in.Port)
@@ -64,22 +71,14 @@ func (p *Player) StartReceive(c context.Context, in *StartReceiveRequest) (out *
 
 // StopReceive stop receive data from server
 // Force in StopReceiveRequest delete storage
-func (p *Player) StopReceive(c context.Context, in *StopReceiveRequest) (out *StopReceiveRequest, err error) {
+func (p *Player) StopReceive(c context.Context, in *StopReceiveRequest) (out *StopReceiveResponse, err error) {
 	p.receivingMutex.Lock()
 	defer p.receivingMutex.Unlock()
 
-	if r, isExist := p.receiving[in.Port]; isExist {
-		if r.isStart {
-			r.stop()
-		}
-		if in.Force {
-			delete(p.receiving, in.Port)
-		}
-		p.receiving[in.Port] = receiving{
-			isStart: true,
-			storage: r.storage,
-		}
-		out = &StopReceiveRequest{}
+	if stop, isExist := p.receiving[in.Port]; isExist {
+		stop()
+		delete(p.receiving, in.Port)
+		out = &StopReceiveResponse{}
 		return
 	}
 	err = fmt.Errorf("%v is not exist", in.Port)
@@ -88,29 +87,32 @@ func (p *Player) StopReceive(c context.Context, in *StopReceiveRequest) (out *St
 
 // StartPlay play audio on device
 func (p *Player) StartPlay(c context.Context, in *StartPlayRequest) (out *StartPlayResponse, err error) {
-	p.receivingMutex.Lock()
-	r, isExist := p.receiving[in.Port]
+	p.storagingMutex.Lock()
+	storage, isExist := p.storaging[in.StorageUUID]
 	if !isExist {
-		p.receivingMutex.Unlock()
-		err = fmt.Errorf("%v is not exist", in.Port)
+		p.storagingMutex.Unlock()
+		err = fmt.Errorf("%v is not exist", in.StorageUUID)
 		return
 	}
-	p.receivingMutex.Unlock()
+	p.storagingMutex.Unlock()
 
 	p.playingMutex.Lock()
-	p.playingMutex.Unlock()
+	defer p.playingMutex.Unlock()
 
 	if _, isExist := p.playing[in.DeviceName]; !isExist {
 		ctx, cancel := context.WithCancel(context.Background())
-		if err = p.device.Play(ctx, in.DeviceName, int(in.Channels), int(in.Rate), r.storage); err != nil {
+		if err = p.device.Play(ctx, in.DeviceName, int(in.Channels), int(in.Rate), storage); err != nil {
 			cancel()
 			return
 		}
-		p.playing[in.DeviceName] = cancel
+		p.playing[in.DeviceName] = playing{
+			stop:        cancel,
+			storageUUID: in.StorageUUID,
+		}
 		out = &StartPlayResponse{}
 		return
 	}
-	err = fmt.Errorf("%v is busy", in.Port)
+	err = fmt.Errorf("%v is busy", in.DeviceName)
 	return
 }
 
@@ -119,9 +121,12 @@ func (p *Player) StopPlay(c context.Context, in *StopPlayRequest) (out *StopPlay
 	p.playingMutex.Lock()
 	defer p.playingMutex.Unlock()
 
-	if stop, isExist := p.playing[in.DeviceName]; isExist {
-		stop()
+	if playing, isExist := p.playing[in.DeviceName]; isExist {
+		playing.stop()
 		delete(p.playing, in.DeviceName)
+		p.storagingMutex.Lock()
+		delete(p.playing, playing.storageUUID)
+		p.storagingMutex.Unlock()
 		out = &StopPlayResponse{}
 		return
 	}
@@ -136,8 +141,9 @@ func NewPlayer(
 	storage storage,
 ) PlayerServer {
 	return &Player{
-		receiving: make(map[string]receiving),
-		playing:   make(map[string]context.CancelFunc),
+		receiving: make(map[string]context.CancelFunc),
+		storaging: make(map[string]io.ReadWriteCloser),
+		playing:   make(map[string]playing),
 
 		udp:     udp,
 		device:  device,

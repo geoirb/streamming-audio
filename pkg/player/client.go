@@ -14,7 +14,7 @@ type Client struct {
 }
 
 // StartReceive rpc request for start receive signal from server
-func (c *Client) StartReceive(ctx context.Context, playerIP, receivePort string) (err error) {
+func (c *Client) StartReceive(ctx context.Context, playerIP, receivePort string) (storageUUID string, err error) {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(c.hostLayout, playerIP, c.controlPort),
 		// todo
@@ -25,12 +25,15 @@ func (c *Client) StartReceive(ctx context.Context, playerIP, receivePort string)
 		return
 	}
 
-	_, err = NewPlayerClient(conn).
+	res, err := NewPlayerClient(conn).
 		StartReceive(
 			ctx,
 			&StartReceiveRequest{
 				Port: receivePort,
 			})
+	if err == nil {
+		storageUUID = res.StorageUUID
+	}
 	return
 }
 
@@ -56,7 +59,7 @@ func (c *Client) StopReceive(ctx context.Context, playerIP, receivePort string) 
 }
 
 // StartPlay rpc request for play audio signal
-func (c *Client) StartPlay(ctx context.Context, playerIP, receivePort, deviceName string, channels, rate uint32) (err error) {
+func (c *Client) StartPlay(ctx context.Context, playerIP, deviceName, storageUUID string, channels, rate uint32) (err error) {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(c.hostLayout, playerIP, c.controlPort),
 		// todo
@@ -71,10 +74,10 @@ func (c *Client) StartPlay(ctx context.Context, playerIP, receivePort, deviceNam
 		StartPlay(
 			ctx,
 			&StartPlayRequest{
-				Port:       receivePort,
-				DeviceName: deviceName,
-				Channels:   uint32(channels),
-				Rate:       rate,
+				DeviceName:  deviceName,
+				Channels:    uint32(channels),
+				Rate:        rate,
+				StorageUUID: storageUUID,
 			})
 	return
 }

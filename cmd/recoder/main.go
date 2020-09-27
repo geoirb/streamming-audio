@@ -53,8 +53,8 @@ func main() {
 	server := grpc.NewServer()
 	recoder.RegisterRecoderServer(server, r5r)
 
-	level.Error(logger).Log("msg", "server start", "port", cfg.Port)
-	server.Serve(lis)
+	go server.Serve(lis)
+	level.Error(logger).Log("msg", "recoder start", "port", cfg.Port)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)

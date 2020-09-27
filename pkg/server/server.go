@@ -23,9 +23,9 @@ type udp interface {
 }
 
 type player interface {
-	StartReceive(ctx context.Context, playerIP, receivePort string) error
-	StopReceive(ctx context.Context, playerIP, receivePort string) error
-	StartPlay(ctx context.Context, playerIP, playerPort, deviceName string, channels, rate uint32) (err error)
+	StartReceive(ctx context.Context, destIP, destPort string) (storageUUID string, err error)
+	StopReceive(ctx context.Context, destIP, destPort string) (err error)
+	StartPlay(ctx context.Context, playerIP, deviceName, storageUUID string, channels, rate uint32) (err error)
 	StopPlay(ctx context.Context, playerIP, deviceName string) (err error)
 }
 
@@ -34,8 +34,15 @@ type recoder interface {
 	StopRecode(ctx context.Context, serverAddr, recoderIP string) error
 }
 
-// Server audio server
-type Server struct {
+// Server ...
+type Server interface {
+	StartSendingFile(ctx context.Context, destIP, destPort, fileName string) (storageUUID string, channels uint16, rate uint32, err error)
+	StopSending(ctx context.Context, destIP, destPort string) (err error)
+	StartPlaying(ctx context.Context, playerIP, deviceName, storageUUID string, channels uint16, rate uint32) (err error)
+	StopPlaying(ctx context.Context, playerIP, deviceName string) (err error)
+}
+
+type server struct {
 	mutexSending sync.Mutex
 	sending      map[string]context.CancelFunc
 
@@ -56,13 +63,13 @@ type Server struct {
 }
 
 // StartSendingFile on player
-func (s *Server) StartSendingFile(c context.Context, playerIP, playerPort, fileName string) (channels uint16, rate uint32, err error) {
+func (s *server) StartSendingFile(c context.Context, destIP, destPort, fileName string) (storageUUID string, channels uint16, rate uint32, err error) {
 	s.mutexSending.Lock()
 	defer s.mutexSending.Unlock()
 
-	host := fmt.Sprintf(s.hostLayout, playerIP, playerPort)
+	host := fmt.Sprintf(s.hostLayout, destIP, destPort)
 	if _, isExist := s.sending[host]; isExist {
-		err = fmt.Errorf("StartSendingFile: %s is busy", host)
+		err = fmt.Errorf("%s is busy", host)
 		return
 	}
 
@@ -77,13 +84,13 @@ func (s *Server) StartSendingFile(c context.Context, playerIP, playerPort, fileN
 	}
 
 	ctx, cancel := context.WithCancel(c)
-	if err = s.player.StartReceive(ctx, playerIP, playerPort); err != nil {
+	if storageUUID, err = s.player.StartReceive(ctx, destIP, destPort); err != nil {
 		cancel()
 		return
 	}
 	if err = s.udp.Send(c, host, audio); err != nil {
 		cancel()
-		s.player.StopPlay(c, playerIP, playerPort)
+		s.player.StopPlay(c, destIP, destPort)
 		return
 	}
 
@@ -92,41 +99,41 @@ func (s *Server) StartSendingFile(c context.Context, playerIP, playerPort, fileN
 }
 
 // StopSending on player
-func (s *Server) StopSending(c context.Context, playerIP, playerPort string) error {
+func (s *server) StopSending(c context.Context, destIP, destPort string) error {
 	s.mutexSending.Lock()
 	defer s.mutexSending.Unlock()
 
-	host := fmt.Sprintf(s.hostLayout, playerIP, playerPort)
+	host := fmt.Sprintf(s.hostLayout, destIP, destPort)
 	if stop, isExist := s.sending[host]; isExist {
 		stop()
-		s.player.StopReceive(c, playerIP, playerPort)
+		s.player.StopReceive(c, destIP, destPort)
 		delete(s.sending, host)
 		return nil
 	}
-	return fmt.Errorf("StopSending: %s is busy", host)
+	return fmt.Errorf("%s is not exist", host)
 }
 
 // StartPlaying on player
-func (s *Server) StartPlaying(c context.Context, playerIP, playerPort, deviceName string, channels uint16, rate uint32) (err error) {
+func (s *server) StartPlaying(c context.Context, playerIP, deviceName, storageUUID string, channels uint16, rate uint32) (err error) {
 	s.mutexPlaying.Lock()
 	defer s.mutexPlaying.Unlock()
 
 	player := fmt.Sprintf(s.playLayout, playerIP, deviceName)
 	if _, isExist := s.playing[player]; !isExist {
 		ctx, cancel := context.WithCancel(c)
-		if err = s.player.StartPlay(ctx, playerIP, playerPort, deviceName, uint32(channels), rate); err != nil {
+		if err = s.player.StartPlay(ctx, playerIP, deviceName, storageUUID, uint32(channels), rate); err != nil {
 			cancel()
 			return
 		}
 		s.playing[player] = cancel
 		return
 	}
-	err = fmt.Errorf("StartPlaying: %s is busy", player)
+	err = fmt.Errorf("%s is busy", player)
 	return
 }
 
 // StopPlaying on player
-func (s *Server) StopPlaying(c context.Context, playerIP, deviceName string) (err error) {
+func (s *server) StopPlaying(c context.Context, playerIP, deviceName string) (err error) {
 	s.mutexPlaying.Lock()
 	defer s.mutexPlaying.Unlock()
 
@@ -137,7 +144,7 @@ func (s *Server) StopPlaying(c context.Context, playerIP, deviceName string) (er
 		delete(s.playing, player)
 		return
 	}
-	err = fmt.Errorf("StopPlaying: %s is not exist", player)
+	err = fmt.Errorf("%s is not exist", player)
 	return
 }
 
@@ -203,8 +210,8 @@ func NewServer(
 
 	hostLayout string,
 	playLayout string,
-) *Server {
-	return &Server{
+) Server {
+	return &server{
 		sending:  make(map[string]context.CancelFunc),
 		playing:  make(map[string]context.CancelFunc),
 		recoding: make(map[string]context.CancelFunc),
