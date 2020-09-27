@@ -29,6 +29,11 @@ type Player struct {
 	storage storage
 }
 
+func (m *Player) StartRecieve(context.Context, *StartRecieveRequest) (*StartRecieveRequest, error) {}
+func (m *Player) StopRecieve(context.Context, *StopRecieveRequest) (*StopRecieveRequest, error)    {}
+func (m *Player) StartPlay(context.Context, *StartPlayRequest) (*StartPlayResponse, error)         {}
+func (m *Player) StopPlay(context.Context, *StopPlayRequest) (*StopPlayResponse, error)            {}
+
 // StartPlay play audio on device from server
 func (m *Player) StartPlay(ctx context.Context, in *StartPlayRequest) (out *StartPlayResponse, err error) {
 	m.mutex.Lock()

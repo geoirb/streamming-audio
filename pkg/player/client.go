@@ -29,7 +29,6 @@ func (c *Client) StartPlay(ctx context.Context, ip, port, deviceName string, cha
 		StartPlay(
 			ctx,
 			&StartPlayRequest{
-				Port:       port,
 				DeviceName: deviceName,
 				Channels:   uint32(channels),
 				Rate:       rate,

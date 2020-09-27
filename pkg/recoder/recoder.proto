@@ -3,6 +3,7 @@ syntax = "proto3";
 // protoc --go_out=plugins=grpc:. *.proto
 
 package recoder;
+// option go_package = "github.com/monkrus/grpc-from0;grpc_from0";
 
 message  StartRecodeRequest{
   string destAddr = 1;
@@ -23,7 +24,7 @@ message StopRecodeResponse{
 
 // grpc service to recode audio
 service Recoder {
-    rpc StartRecode (StartRecodeRequest) returns (StartRecodeResponse) {}
-    rpc StopRecode (StopRecodeRequest) returns (StopRecodeResponse) {}
+  rpc StartRecode (StartRecodeRequest) returns (StartRecodeResponse) {}
+  rpc StopRecode (StopRecodeRequest) returns (StopRecodeResponse) {}
 }
 

@@ -35,7 +35,7 @@ require (
 	golang.org/x/tools v0.0.0-20200917050209-655488c8ae71 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/grpc v1.27.0
-	google.golang.org/protobuf v1.25.0 // indirect
+	google.golang.org/protobuf v1.25.0
 	gopkg.in/ini.v1 v1.61.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 	mvdan.cc/gofumpt v0.0.0-20200802201014-ab5a8192947d // indirect
