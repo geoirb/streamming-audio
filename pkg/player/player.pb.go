@@ -9,15 +9,16 @@
 package player
 
 import (
-	context "context"
-	proto "github.com/golang/protobuf/proto"
-	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	reflect "reflect"
-	sync "sync"
+	"context"
+	"reflect"
+	"sync"
+
+	"github.com/golang/protobuf/proto"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (

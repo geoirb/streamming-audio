@@ -50,19 +50,21 @@ func (p *Player) StartReceive(c context.Context, in *StartReceiveRequest) (out *
 	if _, isExist := p.receiving[in.Port]; !isExist {
 		storage := p.storage.List()
 		ctx, stop := context.WithCancel(context.Background())
-		if err = p.udp.Receive(ctx, in.Port, storage); err != nil {
-			stop()
+		if err = p.udp.Receive(ctx, in.Port, storage); err == nil {
+			uuid := uuid.NewV4().String()
+
+			p.storagingMutex.Lock()
+			p.storaging[uuid] = storage
+			p.storagingMutex.Unlock()
+			
+			p.receiving[in.Port] = stop
+			
+			out = &StartReceiveResponse{
+				StorageUUID: uuid,
+			}
 			return
 		}
-
-		uuid := uuid.NewV4().String()
-		p.storagingMutex.Lock()
-		p.storaging[uuid] = storage
-		p.storagingMutex.Unlock()
-		p.receiving[in.Port] = stop
-		out = &StartReceiveResponse{
-			StorageUUID: uuid,
-		}
+		stop()
 		return
 	}
 	err = fmt.Errorf("%v is busy", in.Port)
@@ -91,7 +93,7 @@ func (p *Player) StartPlay(c context.Context, in *StartPlayRequest) (out *StartP
 	storage, isExist := p.storaging[in.StorageUUID]
 	if !isExist {
 		p.storagingMutex.Unlock()
-		err = fmt.Errorf("%v is not exist", in.StorageUUID)
+		err = fmt.Errorf("storage %v is not exist", in.StorageUUID)
 		return
 	}
 	p.storagingMutex.Unlock()
@@ -100,19 +102,19 @@ func (p *Player) StartPlay(c context.Context, in *StartPlayRequest) (out *StartP
 	defer p.playingMutex.Unlock()
 
 	if _, isExist := p.playing[in.DeviceName]; !isExist {
-		ctx, cancel := context.WithCancel(context.Background())
-		if err = p.device.Play(ctx, in.DeviceName, int(in.Channels), int(in.Rate), storage); err != nil {
-			cancel()
+		ctx, stop := context.WithCancel(context.Background())
+		if err = p.device.Play(ctx, in.DeviceName, int(in.Channels), int(in.Rate), storage); err == nil {
+			p.playing[in.DeviceName] = playing{
+				stop:        stop,
+				storageUUID: in.StorageUUID,
+			}
+			out = &StartPlayResponse{}
 			return
 		}
-		p.playing[in.DeviceName] = playing{
-			stop:        cancel,
-			storageUUID: in.StorageUUID,
-		}
-		out = &StartPlayResponse{}
+		stop()
 		return
 	}
-	err = fmt.Errorf("%v is busy", in.DeviceName)
+	err = fmt.Errorf("%s is busy", in.DeviceName)
 	return
 }
 
@@ -124,13 +126,15 @@ func (p *Player) StopPlay(c context.Context, in *StopPlayRequest) (out *StopPlay
 	if playing, isExist := p.playing[in.DeviceName]; isExist {
 		playing.stop()
 		delete(p.playing, in.DeviceName)
+
 		p.storagingMutex.Lock()
 		delete(p.playing, playing.storageUUID)
 		p.storagingMutex.Unlock()
+
 		out = &StopPlayResponse{}
 		return
 	}
-	err = fmt.Errorf("%v is not exist", in.DeviceName)
+	err = fmt.Errorf("%s is not exist", in.DeviceName)
 	return
 }
 

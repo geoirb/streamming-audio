@@ -2,33 +2,32 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/kelseyhightower/envconfig"
 
 	"github.com/geoirb/sound-ethernet-streaming/pkg/player"
-	"github.com/geoirb/sound-ethernet-streaming/pkg/recoder"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/recorder"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/server"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/udp"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/wav"
 )
 
 type configuration struct {
-	PlayerPort  string `envconfig:"PLAYER_PORT" default:"8081"`
-	RecoderPort string `envconfig:"RECODER_PORT" default:"8082"`
+	PlayerPort   string `envconfig:"PLAYER_PORT" default:"8081"`
+	RecorderPort string `envconfig:"RECODER_PORT" default:"8082"`
 
 	UDPBuffSize int `envconfig:"UDP_BUF_SIZE" default:"1024"`
 
-	HostLayout string `envconfig:"HOST_LAYOUT" default:"%s:%s"`
-	PlayLayout string `envconfig:"PLAY_LAYOUT" default:"%s:%s"`
+	HostLayout   string `envconfig:"HOST_LAYOUT" default:"%s:%s"`
+	DeviceLayout string `envconfig:"DEVICE_LAYOUT" default:"%s:%s"`
 
-	File string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/test.wav"`
+	PlayFile   string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/test.wav"`
+	RecodeFile string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/testRecode.wav"`
 }
 
 func main() {
@@ -49,31 +48,36 @@ func main() {
 		cfg.HostLayout,
 		cfg.PlayerPort,
 	)
-	recoder := recoder.NewClient(
+	recorder := recorder.NewClient(
 		cfg.HostLayout,
-		cfg.RecoderPort,
+		cfg.RecorderPort,
 	)
 	udp := udp.NewUDP(cfg.UDPBuffSize)
 	svc := server.NewServer(
 		wav,
-		recoder,
+		recorder,
 		player,
 		udp,
 
 		cfg.HostLayout,
-		cfg.PlayLayout,
+		cfg.DeviceLayout,
 	)
 	svc = server.NewLoggerMiddleware(svc, logger)
-	storageUUID, channels, rate, err := svc.StartSendingFile(context.Background(), "127.0.0.1", "8083", cfg.File)
-	fmt.Println(storageUUID, channels, rate, err)
-	time.Sleep(time.Second * 5)
-	fmt.Println(svc.StartPlaying(context.Background(), "127.0.0.1", "hw:0,0", storageUUID, 2, 44100))
+
+	svc.StartRecordingOnPlayer(context.Background(), "127.0.0.1:8083", "127.0.0.1", "hw:0,0", 2, 44100)
 
 	level.Error(logger).Log("msg", "server start")
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
-	fmt.Println(svc.StopSending(context.Background(), "127.0.0.1", "8083"))
-	fmt.Println(svc.StopPlaying(context.Background(), "127.0.0.1", "hw:0,0"))
+
+	svc.StopRecoding(context.Background(), "127.0.0.1", "hw:0,0")
 }
+
+// storageUUID, channels, rate, err := svc.StartSendingFile(context.Background(), "127.0.0.1", "8083", cfg.File)
+//
+// time.Sleep(time.Second * 5)
+// svc.StartPlaying(context.Background(), "127.0.0.1", storageUUID, "hw:1,0", 2, 44100)
+// svc.StopSending(context.Background(), "127.0.0.1", "8083")
+// svc.StopPlaying(context.Background(), "127.0.0.1", "hw:1,0")

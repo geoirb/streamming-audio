@@ -12,7 +12,7 @@ type UDP struct {
 }
 
 // TurnOnSender udp sender
-func (u *UDP) TurnOnSender(dstAddr string) (connection io.ReadWriteCloser, err error) {
+func (u *UDP) TurnOnSender(dstAddr string) (connection io.WriteCloser, err error) {
 	var destinationAddress *net.UDPAddr
 	if destinationAddress, err = net.ResolveUDPAddr("udp", dstAddr); err != nil {
 		return
@@ -51,7 +51,7 @@ func (u *UDP) Send(ctx context.Context, dstAddr string, r io.Reader) (err error)
 }
 
 // TurnOnReceiver udp receiver
-func (u *UDP) TurnOnReceiver(receivePort string) (connection io.ReadWriteCloser, err error) {
+func (u *UDP) TurnOnReceiver(receivePort string) (connection io.ReadCloser, err error) {
 	var receiveAddress *net.UDPAddr
 	if receiveAddress, err = net.ResolveUDPAddr("udp", ":"+receivePort); err != nil {
 		return

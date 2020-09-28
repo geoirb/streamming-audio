@@ -28,41 +28,46 @@ func (w *WAV) Read(data []byte) (reader io.Reader, channels uint16, rate uint32,
 	return
 }
 
-// Recode wav file
-func (w *WAV) Recode(ctx context.Context, name string, channels uint16, rate uint32, r io.Reader) (err error) {
+// Record wav file
+func (w *WAV) Record(ctx context.Context, name string, channels uint16, rate uint32, r io.ReadCloser) (err error) {
 	if !strings.HasSuffix(name, ".wav") {
 		name = name + ".wav"
 	}
 	file, err := os.Create(name)
 	if err != nil {
+		r.Close()
 		return
 	}
-	defer file.Close()
 
 	meta := wav.File{
-		Channels:        channels,
+		Channels:        1,
 		SampleRate:      rate,
-		SignificantBits: 16,
+		SignificantBits: 32,
 	}
 
 	writer, err := meta.NewWriter(file)
 	if err != nil {
+		r.Close()
+		file.Close()
 		return
 	}
-	defer writer.Close()
 
-	buffer := make([]byte, w.bufferSize)
 	go func() {
+		<-ctx.Done()
+		r.Close()
+		file.Close()
+		writer.Close()
+	}()
+
+	go func() {
+		buffer := make([]byte, w.bufferSize)
 		for {
-			select {
-			case <-ctx.Done():
+			l, err := r.Read(buffer)
+			if err != nil {
 				return
-			default:
-				if l, err := r.Read(buffer); err == nil {
-					if _, err = writer.Write(buffer[:l]); err != nil {
-						return
-					}
-				}
+			}
+			if _, err = writer.Write(buffer[:l]); err != nil {
+				return
 			}
 		}
 	}()

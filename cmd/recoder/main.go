@@ -12,13 +12,14 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/geoirb/sound-ethernet-streaming/pkg/capture"
-	"github.com/geoirb/sound-ethernet-streaming/pkg/recoder"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/converter"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/recorder"
 	udp "github.com/geoirb/sound-ethernet-streaming/pkg/udp"
 )
 
 type configuration struct {
 	Port        string `envconfig:"PORT" default:"8082"`
-	UDPBuffSize int    `envconfig:"UDP_BUFF_SIZE" default:"1024"`
+	UDPBuffSize int    `envconfig:"UDP_BUFF_SIZE" default:"256"`
 }
 
 func main() {
@@ -37,12 +38,13 @@ func main() {
 
 	udp := udp.NewUDP(cfg.UDPBuffSize)
 
-	capture := capture.NewCapture()
-	r5r := recoder.NewRecoder(
+	converter := converter.NewConverter()
+	capture := capture.NewCapture(converter, cfg.UDPBuffSize)
+	r5r := recorder.NewRecorder(
 		udp,
 		capture,
 	)
-	r5r = recoder.NewLoggerMiddleware(logger, r5r)
+	r5r = recorder.NewLoggerMiddleware(logger, r5r)
 
 	lis, err := net.Listen("tcp", ":"+cfg.Port)
 	if err != nil {
@@ -51,10 +53,10 @@ func main() {
 	}
 
 	server := grpc.NewServer()
-	recoder.RegisterRecoderServer(server, r5r)
+	recorder.RegisterRecorderServer(server, r5r)
 
 	go server.Serve(lis)
-	level.Error(logger).Log("msg", "recoder start", "port", cfg.Port)
+	level.Error(logger).Log("msg", "recorder start", "port", cfg.Port)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
