@@ -8,10 +8,6 @@ import (
 	"sync"
 )
 
-type storage interface {
-	List() io.ReadWriteCloser
-}
-
 type audio interface {
 	Read(data []byte) (reader io.Reader, channels uint16, rate uint32, err error)
 	Record(ctx context.Context, name string, channels uint16, rate uint32, r io.ReadCloser) error
@@ -58,7 +54,6 @@ type server struct {
 	audio    audio
 	player   player
 	recorder recorder
-	storage  storage
 	udp      udp
 
 	hostLayout   string
@@ -254,13 +249,17 @@ func (s *server) stopSending(c context.Context, destIP, destPort string) (err er
 // }
 
 func (s *server) StopRecoding(c context.Context, recoderIP, deviceName string) (err error) {
-	s.mutexRecording.Lock()
-	defer s.mutexRecording.Unlock()
+	s.mutexRecording.RLock()
 
 	recoder := fmt.Sprintf(s.deviceLayout, recoderIP, deviceName)
 	if _, isExist := s.recoding[recoder]; isExist {
+		s.mutexRecording.RUnlock()
+
 		s.recorder.StopRecord(c, recoderIP, deviceName)
+
+		s.mutexRecording.Lock()
 		delete(s.recoding, recoder)
+		s.mutexRecording.Unlock()
 		return
 	}
 	err = fmt.Errorf("%s is not exist", recoder)

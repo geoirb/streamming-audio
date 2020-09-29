@@ -14,7 +14,7 @@ require (
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/twinj/uuid v1.0.0
 	golang.org/x/net v0.0.0-20200927032502-5d4f70055728 // indirect
-	golang.org/x/sys v0.0.0-20200926100807-9d91bd62050c // indirect
+	golang.org/x/sys v0.0.0-20200929083018-4d22bbb62b3c // indirect
 	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/genproto v0.0.0-20200925023002-c2d885f95484 // indirect
