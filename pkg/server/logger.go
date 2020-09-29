@@ -11,56 +11,40 @@ type loggerMiddleware struct {
 	logger log.Logger
 }
 
-func (l *loggerMiddleware) StartSendingFile(ctx context.Context, destIP, destPort, fileName string) (storageUUID string, channels uint16, rate uint32, err error) {
+func (l *loggerMiddleware) PlayAudioFile(ctx context.Context, playerIP, playerPort, fileName, deviceName string) (storageUUID string, channels uint16, rate uint32, err error) {
 	l.logger.Log(
-		"StartSendingFile", "start",
-		"destIP", destIP,
-		"destIP", destPort,
+		"PlayAudioFile", "start",
+		"playerIP", playerIP,
+		"playerPort", playerPort,
 		"fileName", fileName,
+		"deviceName", deviceName,
 	)
-	if storageUUID, channels, rate, err = l.svc.StartSendingFile(ctx, destIP, destPort, fileName); err != nil {
+	if storageUUID, channels, rate, err = l.svc.PlayAudioFile(ctx, playerIP, playerPort, fileName, deviceName); err != nil {
 		l.logger.Log(
-			"StartSendingFile", "err",
-			"destIP", destIP,
-			"destPort", destPort,
+			"PlayAudioFile", "err",
+			"playerIP", playerIP,
+			"playerPort", playerPort,
 			"fileName", fileName,
+			"deviceName", deviceName,
 			"err", err,
 		)
 	}
-	l.logger.Log("StartSendingFile", "end")
+	l.logger.Log("PlayAudioFile", "end")
 	return
 }
 
-func (l *loggerMiddleware) StopSending(ctx context.Context, destIP, destPort string) (err error) {
+func (l *loggerMiddleware) Play(ctx context.Context, playerIP, storageUUID, deviceName string, channels uint16, rate uint32) (err error) {
 	l.logger.Log(
-		"StopSending", "start",
-		"destIP", destIP,
-		"destIP", destPort,
-	)
-	if err = l.svc.StopSending(ctx, destIP, destPort); err != nil {
-		l.logger.Log(
-			"StopSending", "err",
-			"destIP", destIP,
-			"destPort", destPort,
-			"err", err,
-		)
-	}
-	l.logger.Log("StopSending", "end")
-	return
-}
-
-func (l *loggerMiddleware) StartPlaying(ctx context.Context, playerIP, storageUUID, deviceName string, channels uint16, rate uint32) (err error) {
-	l.logger.Log(
-		"StartPlaying", "start",
+		"Play", "start",
 		"playerIP", playerIP,
 		"storageUUID", storageUUID,
 		"deviceName", deviceName,
 		"channels", channels,
 		"rate", rate,
 	)
-	if err = l.svc.StartPlaying(ctx, playerIP, deviceName, storageUUID, channels, rate); err != nil {
+	if err = l.svc.Play(ctx, playerIP, storageUUID, deviceName, channels, rate); err != nil {
 		l.logger.Log(
-			"StartPlaying", "err",
+			"Play", "err",
 			"playerIP", playerIP,
 			"storageUUID", storageUUID,
 			"deviceName", deviceName,
@@ -69,91 +53,75 @@ func (l *loggerMiddleware) StartPlaying(ctx context.Context, playerIP, storageUU
 			"err", err,
 		)
 	}
-	l.logger.Log("StartPlaying", "end")
+	l.logger.Log("Play", "end")
 	return
 }
 
-func (l *loggerMiddleware) StopPlaying(ctx context.Context, playerIP, deviceName string) (err error) {
+func (l *loggerMiddleware) Pause(ctx context.Context, playerIP, deviceName string) (err error) {
 	l.logger.Log(
-		"StopPlaying", "start",
+		"Pause", "start",
 		"playerIP", playerIP,
 		"deviceName", deviceName,
 	)
-	if err = l.svc.StopPlaying(ctx, playerIP, deviceName); err != nil {
+	if err = l.svc.Pause(ctx, playerIP, deviceName); err != nil {
 		l.logger.Log(
-			"StopPlaying", "err",
+			"Pause", "err",
 			"playerIP", playerIP,
 			"deviceName", deviceName,
 			"err", err,
 		)
 	}
-	l.logger.Log("StopPlaying", "end")
+	l.logger.Log("Pause", "end")
 	return
 }
 
-func (l *loggerMiddleware) StartRecordingInFile(ctx context.Context, fileName, receivePort, recoderIP, deviceName string, channels, rate int) (err error) {
+func (l *loggerMiddleware) Stop(ctx context.Context, playerIP, playerPort, deviceName, storageUUID string) (err error) {
 	l.logger.Log(
-		"StartRecordingInFile", "start",
-		"fileName", fileName,
-		"receivePort", receivePort,
-		"recoderIP", recoderIP,
+		"Stop", "start",
+		"playerIP", playerIP,
+		"playerPort", playerPort,
 		"deviceName", deviceName,
+		"storageUUID", storageUUID,
+	)
+	if err = l.svc.Stop(ctx, playerIP, playerPort, deviceName, storageUUID); err != nil {
+		l.logger.Log(
+			"Stop", "err",
+			"playerIP", playerIP,
+			"playerPort", playerPort,
+			"deviceName", deviceName,
+			"storageUUID", storageUUID,
+			"err", err,
+		)
+	}
+	l.logger.Log("Stop", "end")
+	return
+}
+
+func (l *loggerMiddleware) StartRecordingOnPlayer(ctx context.Context, playerIP, playerPort, playerDeviceName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error) {
+	l.logger.Log(
+		"StartRecordingOnPlayer", "start",
+		"playerIP", playerIP,
+		"playerPort", playerPort,
+		"playerDeviceName", playerDeviceName,
+		"recoderIP", recoderIP,
+		"recorderDeviceName", recorderDeviceName,
 		"channels", channels,
 		"rate", rate,
 	)
-	if err = l.svc.StartRecordingInFile(ctx, fileName, receivePort, recoderIP, deviceName, channels, rate); err != nil {
+	if storageUUID, err = l.svc.StartRecordingOnPlayer(ctx, playerIP, playerPort, playerDeviceName, recoderIP, recorderDeviceName, channels, rate); err != nil {
 		l.logger.Log(
 			"StartRecordingInFile", "err",
-			"fileName", fileName,
-			"receivePort", receivePort,
+			"playerIP", playerIP,
+			"playerPort", playerPort,
+			"playerDeviceName", playerDeviceName,
 			"recoderIP", recoderIP,
-			"deviceName", deviceName,
+			"recorderDeviceName", recorderDeviceName,
 			"channels", channels,
 			"rate", rate,
 			"err", err,
 		)
 	}
-	l.logger.Log("StartRecordingInFile", "end")
-	return
-}
-func (l *loggerMiddleware) StopRecoding(ctx context.Context, recoderIP, deviceName string) (err error) {
-	l.logger.Log(
-		"StopRecoding", "start",
-		"recoderIP", recoderIP,
-		"deviceName", deviceName,
-	)
-	if err = l.svc.StopRecoding(ctx, recoderIP, deviceName); err != nil {
-		l.logger.Log(
-			"StopRecoding", "err",
-			"recoderIP", recoderIP,
-			"deviceName", deviceName,
-			"err", err,
-		)
-	}
-	l.logger.Log("StopRecoding", "end")
-	return
-}
-
-func (l *loggerMiddleware) StartRecordingOnPlayer(ctx context.Context, playerIP, recoderIP, deviceName string, channels, rate int) (err error) {
-	l.logger.Log(
-		"StopRecoding", "start",
-		"playerIP", playerIP,
-		"recoderIP", recoderIP,
-		"deviceName", deviceName,
-		"channels", channels,
-		"rate", rate,
-	)
-	if err = l.svc.StartRecordingOnPlayer(ctx, playerIP, recoderIP, deviceName, channels, rate); err != nil {
-		l.logger.Log(
-			"StopRecoding", "start",
-			"playerIP", playerIP,
-			"recoderIP", recoderIP,
-			"deviceName", deviceName,
-			"channels", channels,
-			"err", err,
-		)
-	}
-	l.logger.Log("StopRecoding", "end")
+	l.logger.Log("StartRecordingOnPlayer", "end")
 	return
 }
 

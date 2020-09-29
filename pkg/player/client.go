@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 // Client rpc controller
@@ -14,7 +15,7 @@ type Client struct {
 }
 
 // StartReceive rpc request for start receive signal from server
-func (c *Client) StartReceive(ctx context.Context, playerIP, receivePort string) (storageUUID string, err error) {
+func (c *Client) StartReceive(ctx context.Context, playerIP, receivePort string, UUID *string) (storageUUID string, err error) {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(c.hostLayout, playerIP, c.controlPort),
 		// todo
@@ -24,13 +25,20 @@ func (c *Client) StartReceive(ctx context.Context, playerIP, receivePort string)
 	if err != nil {
 		return
 	}
+	req := &StartReceiveRequest{
+		Port: receivePort,
+	}
+	if UUID != nil {
+		req.StorageUUID = &wrapperspb.StringValue{
+			Value: *UUID,
+		}
+	}
 
 	res, err := NewPlayerClient(conn).
 		StartReceive(
 			ctx,
-			&StartReceiveRequest{
-				Port: receivePort,
-			})
+			req,
+		)
 	if err == nil {
 		storageUUID = res.StorageUUID
 	}
@@ -99,6 +107,28 @@ func (c *Client) StopPlay(ctx context.Context, playerIP, deviceName string) (err
 			ctx,
 			&StopPlayRequest{
 				DeviceName: deviceName,
+			},
+		)
+	return
+}
+
+// ClearStorage rpc request for clear audio storage pn player
+func (c *Client) ClearStorage(ctx context.Context, playerIP, storageUUID string) (err error) {
+	conn, err := grpc.Dial(
+		fmt.Sprintf(c.hostLayout, playerIP, c.controlPort),
+		// todo
+		grpc.WithInsecure(),
+	)
+	defer conn.Close()
+	if err != nil {
+		return
+	}
+
+	_, err = NewPlayerClient(conn).
+		ClearStorage(
+			ctx,
+			&ClearStorageRequest{
+				StorageUUID: storageUUID,
 			},
 		)
 	return

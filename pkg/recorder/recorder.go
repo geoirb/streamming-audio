@@ -17,7 +17,7 @@ type device interface {
 
 // Recorder audio signal
 type Recorder struct {
-	mutex    sync.Mutex
+	mutex    sync.RWMutex
 	recoding map[string]context.CancelFunc
 
 	udp    udp
@@ -26,15 +26,18 @@ type Recorder struct {
 
 // StartRecord ...
 func (r *Recorder) StartRecord(c context.Context, in *StartRecordRequest) (out *StartRecordResponse, err error) {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
+	r.mutex.RLock()
 
 	if _, isExist := r.recoding[in.DeviceName]; !isExist {
+		r.mutex.RUnlock()
+
 		var destination io.WriteCloser
 		if destination, err = r.udp.TurnOnSender(in.DestAddr); err == nil {
 			ctx, stop := context.WithCancel(context.Background())
 			if err = r.device.Record(ctx, in.DeviceName, int(in.Channels), int(in.Rate), destination); err == nil {
+				r.mutex.Lock()
 				r.recoding[in.DeviceName] = stop
+				r.mutex.Unlock()
 				out = &StartRecordResponse{}
 				return
 			}
@@ -42,21 +45,27 @@ func (r *Recorder) StartRecord(c context.Context, in *StartRecordRequest) (out *
 		}
 		return
 	}
+	r.mutex.RUnlock()
 	err = fmt.Errorf("%v is busy", in.DeviceName)
 	return
 }
 
 // StopRecord ...
 func (r *Recorder) StopRecord(ctx context.Context, in *StopRecordRequest) (out *StopRecordResponse, err error) {
-	r.mutex.Lock()
-	defer r.mutex.Unlock()
+	r.mutex.RLock()
 
 	if stop, isExist := r.recoding[in.DeviceName]; isExist {
+		r.mutex.RUnlock()
+
 		stop()
+
+		r.mutex.Lock()
 		delete(r.recoding, in.DeviceName)
+		r.mutex.Unlock()
 		out = &StopRecordResponse{}
 		return
 	}
+	r.mutex.RUnlock()
 	err = fmt.Errorf("%v is not exist", in.DeviceName)
 	return
 }

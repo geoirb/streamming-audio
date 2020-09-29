@@ -3,9 +3,11 @@ syntax = "proto3";
 // protoc --go_out=plugins=grpc:. *.proto
 
 package player;
+import "google/protobuf/wrappers.proto";
 
 message  StartReceiveRequest{
   string port = 1;
+  google.protobuf.StringValue storageUUID = 2;
 }
 
 message StartReceiveResponse{
@@ -36,11 +38,19 @@ message StopPlayRequest {
 message StopPlayResponse{
 }
 
+message ClearStorageRequest{
+  string storageUUID = 1;
+}
+
+message ClearStorageResponse{
+}
+
 // grpc service to play audio
 service Player {
   rpc StartReceive (StartReceiveRequest) returns (StartReceiveResponse) {}
   rpc StopReceive (StopReceiveRequest) returns (StopReceiveResponse) {}
   rpc StartPlay (StartPlayRequest) returns (StartPlayResponse) {}
   rpc StopPlay (StopPlayRequest) returns (StopPlayResponse) {}
+  rpc ClearStorage(ClearStorageRequest) returns (ClearStorageResponse) {}
 }
 

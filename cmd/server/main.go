@@ -63,8 +63,7 @@ func main() {
 		cfg.DeviceLayout,
 	)
 	svc = server.NewLoggerMiddleware(svc, logger)
-
-	svc.StartRecordingOnPlayer(context.Background(), "127.0.0.1:8083", "127.0.0.1", "hw:0,0", 2, 44100)
+	svc.StartRecordingOnPlayer(context.Background(), "127.0.0.1", "8083", "hw:1,0", "127.0.0.1", "hw:0,0", 2, 44100)
 
 	level.Error(logger).Log("msg", "server start")
 
@@ -72,12 +71,13 @@ func main() {
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 
-	svc.StopRecoding(context.Background(), "127.0.0.1", "hw:0,0")
 }
 
-// storageUUID, channels, rate, err := svc.StartSendingFile(context.Background(), "127.0.0.1", "8083", cfg.File)
-//
-// time.Sleep(time.Second * 5)
-// svc.StartPlaying(context.Background(), "127.0.0.1", storageUUID, "hw:1,0", 2, 44100)
-// svc.StopSending(context.Background(), "127.0.0.1", "8083")
-// svc.StopPlaying(context.Background(), "127.0.0.1", "hw:1,0")
+// uuid, channels, rate, _ := svc.PlayAudioFile(context.Background(), "127.0.0.1", "8083", cfg.PlayFile, "hw:1,0")
+// time.Sleep(5 * time.Second)
+// svc.Pause(context.Background(), "127.0.0.1", "hw:1,0")
+// time.Sleep(10 * time.Second)
+// svc.Play(context.Background(), "127.0.0.1", uuid, "hw:1,0", channels, rate)
+// time.Sleep(5 * time.Second)
+// svc.Stop(context.Background(), "127.0.0.1", "8083", "hw:1,0", uuid)
+// svc.Play(context.Background(), "127.0.0.1", uuid, "hw:1,0", channels, rate)
