@@ -28,49 +28,32 @@ func (w *WAV) Read(data []byte) (reader io.Reader, channels uint16, rate uint32,
 	return
 }
 
-// Record wav file
-func (w *WAV) Record(ctx context.Context, name string, channels uint16, rate uint32, r io.ReadCloser) (err error) {
+// Write wav file
+func (w *WAV) Write(ctx context.Context, name string, channels uint16, rate uint32) (writer io.Writer, err error) {
 	if !strings.HasSuffix(name, ".wav") {
 		name = name + ".wav"
 	}
 	file, err := os.Create(name)
 	if err != nil {
-		r.Close()
 		return
 	}
 
 	meta := wav.File{
 		Channels:        1,
-		SampleRate:      rate,
-		SignificantBits: 32,
+		SampleRate:      44100,
+		SignificantBits: 16,
 	}
 
-	writer, err := meta.NewWriter(file)
+	audio, err := meta.NewWriter(file)
 	if err != nil {
-		r.Close()
 		file.Close()
-		return
 	}
 
 	go func() {
 		<-ctx.Done()
-		r.Close()
-		file.Close()
-		writer.Close()
+		audio.Close()
 	}()
-
-	go func() {
-		buffer := make([]byte, w.bufferSize)
-		for {
-			l, err := r.Read(buffer)
-			if err != nil {
-				return
-			}
-			if _, err = writer.Write(buffer[:l]); err != nil {
-				return
-			}
-		}
-	}()
+	writer = audio
 	return
 }
 

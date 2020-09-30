@@ -10,12 +10,12 @@ import (
 
 type audio interface {
 	Read(data []byte) (reader io.Reader, channels uint16, rate uint32, err error)
-	Record(ctx context.Context, name string, channels uint16, rate uint32, r io.ReadCloser) error
+	Write(ctx context.Context, name string, channels uint16, rate uint32) (writer io.Writer, err error)
 }
 
 type udp interface {
 	Send(context.Context, string, io.Reader) error
-	TurnOnReceiver(receivePort string) (connection io.ReadCloser, err error)
+	Receive(ctx context.Context, receivePort string, w io.Writer) (err error)
 }
 
 type player interface {
@@ -38,7 +38,9 @@ type Server interface {
 	Pause(ctx context.Context, playerIP, deviceName string) (err error)
 	Stop(c context.Context, playerIP, playerPort, deviceName, storageUUID string) (err error)
 
-	StartRecordingOnPlayer(ctx context.Context, playerIP, playerPort, playerDeviceName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error)
+	RecordingOnPlayer(ctx context.Context, playerIP, playerPort, playerDeviceName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error)
+	RecordingInFile(c context.Context, fileName, receivePort, recoderIP, deviceName string, channels, rate int) (err error)
+	StopRecoding(c context.Context, recoderIP, deviceName string) (err error)
 }
 
 type server struct {
@@ -49,7 +51,7 @@ type server struct {
 	playing      map[string]struct{}
 
 	mutexRecording sync.RWMutex
-	recoding       map[string]struct{}
+	recoding       map[string]context.CancelFunc
 
 	audio    audio
 	player   player
@@ -144,8 +146,7 @@ func (s *server) Stop(c context.Context, playerIP, playerPort, deviceName, stora
 }
 
 // StartRecordingInFile start recoding player and save on file
-// todo
-func (s *server) StartRecordingOnPlayer(c context.Context, playerIP, playerPort, playerDeviceName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error) {
+func (s *server) RecordingOnPlayer(c context.Context, playerIP, playerPort, playerDeviceName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error) {
 	s.mutexRecording.RLock()
 
 	recoder := fmt.Sprintf(s.deviceLayout, recoderIP, recorderDeviceName)
@@ -166,13 +167,57 @@ func (s *server) StartRecordingOnPlayer(c context.Context, playerIP, playerPort,
 			s.recorder.StopRecord(c, recoderIP, recorderDeviceName)
 			return
 		}
+		var stop context.CancelFunc
 		s.mutexRecording.Lock()
-		s.recoding[recoder] = struct{}{}
+		s.recoding[recoder] = stop
 		s.mutexRecording.Unlock()
 		return
 	}
 	s.mutexRecording.RUnlock()
 	err = fmt.Errorf("%s is busy", recoder)
+	return
+}
+
+// StartRecordingInFile start recoding player and save on file
+func (s *server) RecordingInFile(c context.Context, fileName, receivePort, recoderIP, deviceName string, channels, rate int) (err error) {
+	s.mutexRecording.Lock()
+	defer s.mutexRecording.Unlock()
+
+	recoder := fmt.Sprintf(s.deviceLayout, recoderIP, deviceName)
+	if _, isExist := s.recoding[recoder]; !isExist {
+		var writer io.Writer
+		ctx, stop := context.WithCancel(context.Background())
+		if writer, err = s.audio.Write(ctx, fileName, uint16(channels), uint32(rate)); err == nil {
+			if err = s.udp.Receive(ctx, receivePort, writer); err == nil {
+				if err = s.recorder.StartRecord(c, fmt.Sprintf(s.hostLayout, "127.0.0.1", receivePort), recoderIP, deviceName, uint32(channels), uint32(rate)); err == nil {
+					s.recoding[recoder] = stop
+					return
+				}
+			}
+		}
+		stop()
+		return
+	}
+	err = fmt.Errorf("%s is busy", recoder)
+	return
+}
+
+// StopRecording ...
+func (s *server) StopRecoding(c context.Context, recoderIP, deviceName string) (err error) {
+	s.mutexRecording.RLock()
+
+	recoder := fmt.Sprintf(s.deviceLayout, recoderIP, deviceName)
+	if _, isExist := s.recoding[recoder]; isExist {
+		s.mutexRecording.RUnlock()
+
+		s.recorder.StopRecord(c, recoderIP, deviceName)
+
+		s.mutexRecording.Lock()
+		delete(s.recoding, recoder)
+		s.mutexRecording.Unlock()
+		return
+	}
+	err = fmt.Errorf("%s is not exist", recoder)
 	return
 }
 
@@ -223,49 +268,6 @@ func (s *server) stopSending(c context.Context, destIP, destPort string) (err er
 	return
 }
 
-// // StartRecordingInFile start recoding player and save on file
-// func (s *server) StartRecordingInFile(c context.Context, fileName, receivePort, recoderIP, deviceName string, channels, rate int) (err error) {
-// 	s.mutexRecording.Lock()
-// 	defer s.mutexRecording.Unlock()
-
-// 	recoder := fmt.Sprintf(s.deviceLayout, recoderIP, deviceName)
-// 	if _, isExist := s.recoding[recoder]; !isExist {
-// 		var connection io.ReadCloser
-// 		if connection, err = s.udp.TurnOnReceiver(receivePort); err == nil {
-// 			ctx, stop := context.WithCancel(context.Background())
-// 			if err = s.audio.Record(ctx, fileName, uint16(channels), uint32(rate), connection); err == nil {
-// 				//todo
-// 				if err = s.recorder.StartRecord(ctx, "127.0.0.1:"+receivePort, recoderIP, deviceName, uint32(channels), uint32(rate)); err == nil {
-// 					s.recoding[recoder] = stop
-// 					return
-// 				}
-// 			}
-// 			stop()
-// 		}
-// 		return
-// 	}
-// 	err = fmt.Errorf("%s is busy", recoder)
-// 	return
-// }
-
-func (s *server) StopRecoding(c context.Context, recoderIP, deviceName string) (err error) {
-	s.mutexRecording.RLock()
-
-	recoder := fmt.Sprintf(s.deviceLayout, recoderIP, deviceName)
-	if _, isExist := s.recoding[recoder]; isExist {
-		s.mutexRecording.RUnlock()
-
-		s.recorder.StopRecord(c, recoderIP, deviceName)
-
-		s.mutexRecording.Lock()
-		delete(s.recoding, recoder)
-		s.mutexRecording.Unlock()
-		return
-	}
-	err = fmt.Errorf("%s is not exist", recoder)
-	return
-}
-
 // NewServer ...
 func NewServer(
 	audio audio,
@@ -279,7 +281,7 @@ func NewServer(
 	return &server{
 		sending:  make(map[string]context.CancelFunc),
 		playing:  make(map[string]struct{}),
-		recoding: make(map[string]struct{}),
+		recoding: make(map[string]context.CancelFunc),
 
 		audio:    audio,
 		recorder: recorder,

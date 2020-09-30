@@ -2,7 +2,6 @@ package capture
 
 import (
 	"context"
-	"fmt"
 	"io"
 
 	alsa "github.com/cocoonlife/goalsa"
@@ -34,19 +33,26 @@ func (c *Capture) Record(ctx context.Context, deviceName string, channels, rate 
 
 	go func() {
 		<-ctx.Done()
-		in.Close()
-		dest.Close()
+
 	}()
 
 	go func() {
-		samples := make([]int16, c.buffSize)
+		defer func() {
+			in.Close()
+			dest.Close()
+		}()
 		for {
-			n, _ := in.Read(samples)
-			fmt.Println(samples)
-			if _, err := dest.Write(c.converter.ToByte(samples[:n])); err != nil {
+			select {
+			case <-ctx.Done():
 				return
+			default:
+				samples := make([]int16, c.buffSize)
+				if n, err := in.Read(samples); err == nil {
+					if _, err := dest.Write(c.converter.ToByte(samples[:n])); err != nil {
+						return
+					}
+				}
 			}
-
 		}
 	}()
 	return

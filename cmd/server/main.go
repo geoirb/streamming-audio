@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -63,7 +64,9 @@ func main() {
 		cfg.DeviceLayout,
 	)
 	svc = server.NewLoggerMiddleware(svc, logger)
-	svc.StartRecordingOnPlayer(context.Background(), "127.0.0.1", "8083", "hw:1,0", "127.0.0.1", "hw:0,0", 2, 44100)
+	svc.RecordingInFile(context.Background(), cfg.RecodeFile, "8083", "127.0.0.1", "hw:0,0", 2, 44100)
+	time.Sleep(time.Second * 5)
+	svc.StopRecoding(context.Background(), "127.0.0.1", "hw:0,0")
 
 	level.Error(logger).Log("msg", "server start")
 
