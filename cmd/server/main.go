@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -64,10 +63,7 @@ func main() {
 		cfg.DeviceLayout,
 	)
 	svc = server.NewLoggerMiddleware(svc, logger)
-	svc.RecordingInFile(context.Background(), cfg.RecodeFile, "8083", "127.0.0.1", "hw:0,0", 2, 44100)
-	time.Sleep(time.Second * 5)
-	svc.StopRecoding(context.Background(), "127.0.0.1", "hw:0,0")
-
+	svc.RecordingOnPlayer(context.Background(), "127.0.0.1", "8083", "hw:1,0", "127.0.0.1", "hw:0,0", 2, 44100)
 	level.Error(logger).Log("msg", "server start")
 
 	c := make(chan os.Signal, 1)
@@ -75,6 +71,9 @@ func main() {
 	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 
 }
+
+// svc.RecordingInFile(context.Background(), cfg.RecodeFile, "8083", "127.0.0.1", "hw:0,0", 2, 44100)
+// svc.StopRecoding(context.Background(), "127.0.0.1", "hw:0,0")
 
 // uuid, channels, rate, _ := svc.PlayAudioFile(context.Background(), "127.0.0.1", "8083", cfg.PlayFile, "hw:1,0")
 // time.Sleep(5 * time.Second)

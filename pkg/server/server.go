@@ -44,13 +44,13 @@ type Server interface {
 }
 
 type server struct {
-	mutexSending sync.RWMutex
+	mutexSending sync.Mutex
 	sending      map[string]context.CancelFunc
 
-	mutexPlaying sync.RWMutex
+	mutexPlaying sync.Mutex
 	playing      map[string]struct{}
 
-	mutexRecording sync.RWMutex
+	mutexRecording sync.Mutex
 	recoding       map[string]context.CancelFunc
 
 	audio    audio
@@ -62,6 +62,7 @@ type server struct {
 	deviceLayout string
 }
 
+// PlayAudioFile send file on player client and play then
 func (s *server) PlayAudioFile(c context.Context, playerIP, playerPort, fileName, deviceName string) (storageUUID string, channels uint16, rate uint32, err error) {
 	data, err := ioutil.ReadFile(fileName)
 	if err != nil {
@@ -79,80 +80,69 @@ func (s *server) PlayAudioFile(c context.Context, playerIP, playerPort, fileName
 	return
 }
 
-// Play on player
+// Play audio from storage on player client
 func (s *server) Play(c context.Context, playerIP, storageUUID, deviceName string, channels uint16, rate uint32) (err error) {
-	s.mutexPlaying.RLock()
+	s.mutexPlaying.Lock()
+	defer s.mutexPlaying.Unlock()
+
 	player := fmt.Sprintf(s.deviceLayout, playerIP, deviceName)
 	if _, isExist := s.playing[player]; !isExist {
-		s.mutexPlaying.RUnlock()
-
 		if err = s.player.StartPlay(c, playerIP, deviceName, storageUUID, uint32(channels), rate); err == nil {
-			s.mutexPlaying.Lock()
 			s.playing[player] = struct{}{}
-			s.mutexPlaying.Unlock()
 		}
 		return
 	}
-	s.mutexPlaying.RUnlock()
 	err = fmt.Errorf("%s is busy", player)
 	return
 }
 
-// Stop on player
+//  Pause audio from storage on player client
 func (s *server) Pause(c context.Context, playerIP, deviceName string) (err error) {
-	s.mutexPlaying.RLock()
+	s.mutexPlaying.Lock()
+	defer s.mutexPlaying.Unlock()
+	
 	player := fmt.Sprintf(s.deviceLayout, playerIP, deviceName)
 	if _, isExist := s.playing[player]; isExist {
-		s.mutexPlaying.RUnlock()
-
 		if err = s.player.StopPlay(c, playerIP, deviceName); err == nil {
-			s.mutexPlaying.Lock()
 			delete(s.playing, player)
-			s.mutexPlaying.Unlock()
 		}
 		return
 	}
-	s.mutexPlaying.RUnlock()
 	err = fmt.Errorf("%s is not exist", player)
 	return
 }
 
-// Stop on player
+// Stop audio from storage on player client
 func (s *server) Stop(c context.Context, playerIP, playerPort, deviceName, storageUUID string) (err error) {
 	if err = s.stopSending(c, playerIP, playerPort); err != nil {
 		return
 	}
 
-	s.mutexPlaying.RLock()
+	s.mutexPlaying.Lock()
+	defer s.mutexPlaying.Unlock()
+
 	player := fmt.Sprintf(s.deviceLayout, playerIP, deviceName)
 	if _, isExist := s.playing[player]; isExist {
-		s.mutexPlaying.RUnlock()
-
 		if err = s.player.StopPlay(c, playerIP, deviceName); err != nil {
 			return
 		}
 		if err = s.player.ClearStorage(c, playerIP, storageUUID); err != nil {
 			return
 		}
-
-		s.mutexPlaying.Lock()
 		delete(s.playing, player)
-		s.mutexPlaying.Unlock()
 		return
 	}
-	s.mutexPlaying.RUnlock()
 	err = fmt.Errorf("%s is not exist", player)
 	return
 }
 
 // StartRecordingInFile start recoding player and save on file
 func (s *server) RecordingOnPlayer(c context.Context, playerIP, playerPort, playerDeviceName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error) {
-	s.mutexRecording.RLock()
+	s.mutexRecording.Lock()
+	defer s.mutexRecording.Unlock()
 
 	recoder := fmt.Sprintf(s.deviceLayout, recoderIP, recorderDeviceName)
 	if _, isExist := s.recoding[recoder]; !isExist {
-		s.mutexRecording.RUnlock()
-
 		if storageUUID, err = s.player.StartReceive(c, playerIP, playerPort, nil); err != nil {
 			return
 		}
@@ -168,12 +158,9 @@ func (s *server) RecordingOnPlayer(c context.Context, playerIP, playerPort, play
 			return
 		}
 		var stop context.CancelFunc
-		s.mutexRecording.Lock()
 		s.recoding[recoder] = stop
-		s.mutexRecording.Unlock()
 		return
 	}
-	s.mutexRecording.RUnlock()
 	err = fmt.Errorf("%s is busy", recoder)
 	return
 }
@@ -204,17 +191,13 @@ func (s *server) RecordingInFile(c context.Context, fileName, receivePort, recod
 
 // StopRecording ...
 func (s *server) StopRecoding(c context.Context, recoderIP, deviceName string) (err error) {
-	s.mutexRecording.RLock()
+	s.mutexRecording.Lock()
+	defer s.mutexRecording.Unlock()
 
 	recoder := fmt.Sprintf(s.deviceLayout, recoderIP, deviceName)
 	if _, isExist := s.recoding[recoder]; isExist {
-		s.mutexRecording.RUnlock()
-
 		s.recorder.StopRecord(c, recoderIP, deviceName)
-
-		s.mutexRecording.Lock()
 		delete(s.recoding, recoder)
-		s.mutexRecording.Unlock()
 		return
 	}
 	err = fmt.Errorf("%s is not exist", recoder)
@@ -222,48 +205,43 @@ func (s *server) StopRecoding(c context.Context, recoderIP, deviceName string) (
 }
 
 func (s *server) startSending(c context.Context, destIP, destPort string, r io.Reader) (storageUUID string, err error) {
-	s.mutexSending.RLock()
+	s.mutexSending.Lock()
+	defer s.mutexSending.Unlock()
+
 	host := fmt.Sprintf(s.hostLayout, destIP, destPort)
 	if _, isExist := s.sending[host]; isExist {
-		s.mutexSending.RUnlock()
 		err = fmt.Errorf("%s is busy", host)
 		return
 	}
-	s.mutexSending.RUnlock()
-
-	ctx, cancel := context.WithCancel(context.Background())
+	
+	ctx, stop := context.WithCancel(context.Background())
 	if storageUUID, err = s.player.StartReceive(c, destIP, destPort, nil); err != nil {
-		cancel()
+		stop()
 		return
 	}
 	if err = s.udp.Send(ctx, host, r); err == nil {
-		s.mutexSending.Lock()
-		s.sending[host] = cancel
-		s.mutexSending.Unlock()
+		s.sending[host] = stop
 		return
 	}
 
-	cancel()
+	stop()
 	s.player.StopPlay(c, destIP, destPort)
 	return
 }
 
 // StopSending on player
 func (s *server) stopSending(c context.Context, destIP, destPort string) (err error) {
-	s.mutexSending.RLock()
+	s.mutexSending.Lock()
+	defer s.mutexSending.Unlock()
+
 	host := fmt.Sprintf(s.hostLayout, destIP, destPort)
 	if stop, isExist := s.sending[host]; isExist {
-		s.mutexSending.RUnlock()
-
 		stop()
 		if err = s.player.StopReceive(c, destIP, destPort); err == nil {
-			s.mutexSending.Lock()
 			delete(s.sending, host)
-			s.mutexSending.Unlock()
 		}
 		return
 	}
-	s.mutexSending.RUnlock()
 	err = fmt.Errorf("%s is not exist", host)
 	return
 }

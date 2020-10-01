@@ -19,7 +19,7 @@ import (
 
 type configuration struct {
 	Port        string `envconfig:"PORT" default:"8082"`
-	UDPBuffSize int    `envconfig:"UDP_BUFF_SIZE" default:"64"`
+	UDPBuffSize int    `envconfig:"UDP_BUFF_SIZE" default:"32"`
 }
 
 func main() {

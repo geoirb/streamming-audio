@@ -2,7 +2,6 @@ package udp
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net"
 )
@@ -24,7 +23,6 @@ func (u *UDP) TurnOnSender(dstAddr string) (connection io.WriteCloser, err error
 
 // Send start sendinging data over port
 func (u *UDP) Send(ctx context.Context, dstAddr string, r io.Reader) (err error) {
-	fmt.Println(dstAddr)
 	connection, err := u.TurnOnSender(dstAddr)
 	if err != nil {
 		return
@@ -53,7 +51,7 @@ func (u *UDP) Send(ctx context.Context, dstAddr string, r io.Reader) (err error)
 }
 
 // TurnOnReceiver udp receiver
-func (u *UDP) TurnOnReceiver(receivePort string) (connection io.ReadCloser, err error) {
+func (u *UDP) TurnOnReceiver(receivePort string) (connection io.ReadWriteCloser, err error) {
 	var receiveAddress *net.UDPAddr
 	if receiveAddress, err = net.ResolveUDPAddr("udp", ":"+receivePort); err != nil {
 		return
@@ -78,7 +76,6 @@ func (u *UDP) Receive(ctx context.Context, receivePort string, w io.Writer) (err
 		for {
 			inputBytes := make([]byte, u.buffSize)
 			l, err := connection.Read(inputBytes)
-			fmt.Println(inputBytes[:l])
 			if err != nil {
 				return
 			}

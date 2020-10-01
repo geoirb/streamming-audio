@@ -38,8 +38,8 @@ func (d *Playback) Play(ctx context.Context, deviceName string, channels, rate i
 				out.Close()
 				return
 			default:
-				if _, err := r.Read(samples); err == nil {
-					if _, err = out.Write(d.converter.ToInt16(samples)); err != nil {
+				if l, err := r.Read(samples); err == nil {
+					if _, err = out.Write(d.converter.ToInt16(samples[:l])); err != nil {
 						return
 					}
 				}

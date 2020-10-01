@@ -32,21 +32,16 @@ func (c *Capture) Record(ctx context.Context, deviceName string, channels, rate 
 	}
 
 	go func() {
-		<-ctx.Done()
-
-	}()
-
-	go func() {
 		defer func() {
 			in.Close()
 			dest.Close()
 		}()
+		samples := make([]int16, c.buffSize)
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			default:
-				samples := make([]int16, c.buffSize)
 				if n, err := in.Read(samples); err == nil {
 					if _, err := dest.Write(c.converter.ToByte(samples[:n])); err != nil {
 						return
