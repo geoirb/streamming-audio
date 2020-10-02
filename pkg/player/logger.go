@@ -49,9 +49,9 @@ func (l *loggerMiddleware) StopPlay(ctx context.Context, in *StopPlayRequest) (o
 
 // ClearStorage log
 func (l *loggerMiddleware) ClearStorage(ctx context.Context, in *ClearStorageRequest) (out *ClearStorageResponse, err error) {
-	l.logger.Log("StopPlay", "start", "in", in.String())
+	l.logger.Log("ClearStorage", "start", "in", in.String())
 	if out, err = l.player.ClearStorage(ctx, in); err != nil {
-		l.logger.Log("StopPlay", "err", "in", in.String(), "err", err.Error())
+		l.logger.Log("ClearStorage", "err", "in", in.String(), "err", err.Error())
 	}
 	return
 }

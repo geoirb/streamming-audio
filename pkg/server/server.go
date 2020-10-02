@@ -100,7 +100,7 @@ func (s *server) Play(c context.Context, playerIP, storageUUID, deviceName strin
 func (s *server) Pause(c context.Context, playerIP, deviceName string) (err error) {
 	s.mutexPlaying.Lock()
 	defer s.mutexPlaying.Unlock()
-	
+
 	player := fmt.Sprintf(s.deviceLayout, playerIP, deviceName)
 	if _, isExist := s.playing[player]; isExist {
 		if err = s.player.StopPlay(c, playerIP, deviceName); err == nil {
@@ -213,7 +213,7 @@ func (s *server) startSending(c context.Context, destIP, destPort string, r io.R
 		err = fmt.Errorf("%s is busy", host)
 		return
 	}
-	
+
 	ctx, stop := context.WithCancel(context.Background())
 	if storageUUID, err = s.player.StartReceive(c, destIP, destPort, nil); err != nil {
 		stop()
