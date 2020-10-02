@@ -99,7 +99,7 @@ func (l *loggerMiddleware) Stop(ctx context.Context, playerIP, playerPort, devic
 
 func (l *loggerMiddleware) RecordingOnPlayer(ctx context.Context, playerIP, playerPort, playerDeviceNameName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error) {
 	l.logger.Log(
-		"StartRecordingOnPlayer", "start",
+		"StartSendingOnPlayer", "start",
 		"playerIP", playerIP,
 		"playerPort", playerPort,
 		"playerDeviceNameName", playerDeviceNameName,
@@ -110,7 +110,7 @@ func (l *loggerMiddleware) RecordingOnPlayer(ctx context.Context, playerIP, play
 	)
 	if storageUUID, err = l.svc.RecordingOnPlayer(ctx, playerIP, playerPort, playerDeviceNameName, recoderIP, recorderDeviceName, channels, rate); err != nil {
 		l.logger.Log(
-			"StartRecordingInFile", "err",
+			"StartSendingInFile", "err",
 			"playerIP", playerIP,
 			"playerPort", playerPort,
 			"playerDeviceNameName", playerDeviceNameName,
@@ -121,7 +121,7 @@ func (l *loggerMiddleware) RecordingOnPlayer(ctx context.Context, playerIP, play
 			"err", err,
 		)
 	}
-	l.logger.Log("StartRecordingOnPlayer", "end")
+	l.logger.Log("StartSendingOnPlayer", "end")
 	return
 }
 

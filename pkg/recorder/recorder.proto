@@ -4,26 +4,26 @@ syntax = "proto3";
 
 package recorder;
 
-message  StartRecordRequest{
+message  StartSendRequest{
   string deviceName = 1; 
   uint32 channels = 2;
   uint32 rate = 3;
   string destAddr = 4;
 }
 
-message StartRecordResponse{
+message StartSendResponse{
 }
 
-message StopRecordRequest {
+message StopSendRequest {
   string deviceName = 1;
 }
 
-message StopRecordResponse{
+message StopSendResponse{
 }
 
 // grpc service to record audio
 service Recorder {
-  rpc StartRecord (StartRecordRequest) returns (StartRecordResponse) {}
-  rpc StopRecord (StopRecordRequest) returns (StopRecordResponse) {}
+  rpc StartSend (StartSendRequest) returns (StartSendResponse) {}
+  rpc StopSend (StopSendRequest) returns (StopSendResponse) {}
 }
 
