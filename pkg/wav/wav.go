@@ -1,30 +1,28 @@
 package wav
 
 import (
-	"bytes"
 	"context"
 	"io"
 	"os"
 	"strings"
 
-	"github.com/cryptix/wav"
+	"github.com/geoirb/wav"
 )
 
 // WAV audio file
 type WAV struct {
+	cd
 	bufferSize int
 }
 
 // Read wav file
 func (w *WAV) Read(data []byte) (reader io.Reader, channels uint16, rate uint32, err error) {
-	f := bytes.NewReader(data)
-	wavReader, err := wav.NewReader(f, f.Size())
+	wav, err := wav.NewReader(data)
 	if err != nil {
 		return
 	}
-	channels = wavReader.GetNumChannels()
-	rate = wavReader.GetSampleRate()
-	reader, err = wavReader.GetDumbReader()
+	channels = wav.GetNumChannels()
+	rate = wav.GetSampleRate()
 	return
 }
 
@@ -38,22 +36,12 @@ func (w *WAV) Write(ctx context.Context, name string, channels uint16, rate uint
 		return
 	}
 
-	meta := wav.File{
-		Channels:        1,
-		SampleRate:      44100,
-		SignificantBits: 16,
-	}
-
-	audio, err := meta.NewWriter(file)
-	if err != nil {
-		file.Close()
-	}
-
+	writer = wav.NewWriter(file)
 	go func() {
 		<-ctx.Done()
 		audio.Close()
 	}()
-	writer = audio
+
 	return
 }
 
