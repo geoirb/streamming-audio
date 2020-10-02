@@ -24,22 +24,22 @@ func (w *WAV) Read(data []byte) (reader io.Reader, channels uint16, rate uint32,
 }
 
 // Write wav file
-func (w *WAV) Write(ctx context.Context, name string, channels uint16, rate uint32) (writer io.Writer, err error) {
+func (w *WAV) Write(ctx context.Context, name string, channels uint16, rate uint32) (io.Writer, error) {
 	if !strings.HasSuffix(name, ".wav") {
 		name = name + ".wav"
 	}
 	file, err := os.Create(name)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	writer = wav.NewWriter(file)
+	wav := wav.NewWriter(file, channels, rate, wav.FormatS16LE)
 	go func() {
 		<-ctx.Done()
-		audio.Close()
+		wav.Close()
 	}()
 
-	return
+	return wav, nil
 }
 
 // NewWAV return handler wav file
