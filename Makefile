@@ -7,6 +7,9 @@ lint:
 	go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 	golangci-lint run -E gofmt -E golint -E vet
 
+build-server:
+	docker build -t $(tag) -f build/recorder/Dockerfile .
+
 build-player:
 	docker build -t $(tag) -f build/player/Dockerfile .
 

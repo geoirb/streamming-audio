@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,6 +11,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 
 	"github.com/geoirb/sound-ethernet-streaming/pkg/player"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/recorder"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/server"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/udp"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/wav"
@@ -45,10 +45,14 @@ func main() {
 		cfg.HostLayout,
 		cfg.PlayerPort,
 	)
+	recorder := recorder.NewClient(
+		cfg.HostLayout,
+		cfg.RecorderPort,
+	)
 	udp := udp.NewUDP(cfg.UDPBuffSize)
 	svc := server.NewServer(
 		wav,
-		nil,
+		recorder,
 		player,
 		udp,
 
@@ -56,18 +60,11 @@ func main() {
 		cfg.DeviceLayout,
 	)
 	svc = server.NewLoggerMiddleware(svc, logger)
+	svc.RecordingOnPlayer(context.Background(), "127.0.0.1", "8083", "hw:0,0", "127.0.0.1", "hw:0,0", 2, 44100)
 	level.Error(logger).Log("msg", "server start")
-
-	pwd, _ := os.Getwd()
-	file := fmt.Sprintf("%s/%s", pwd, "example/play-file/server/test.wav")
-	playerIP := "127.0.0.1"
-	playerPort := "8083"
-	playerDeviceName := "hw:0,0"
-	uuid, _, _, _ := svc.PlayAudioFile(context.Background(), playerIP, playerPort, file, playerDeviceName)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
-
-	svc.Stop(context.Background(), playerIP, playerPort, playerDeviceName, uuid)
+	svc.StopRecoding(context.Background(), "127.0.0.1", "hw:0,0")
 }

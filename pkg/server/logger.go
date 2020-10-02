@@ -97,23 +97,23 @@ func (l *loggerMiddleware) Stop(ctx context.Context, playerIP, playerPort, devic
 	return
 }
 
-func (l *loggerMiddleware) RecordingOnPlayer(ctx context.Context, playerIP, playerPort, playerDeviceName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error) {
+func (l *loggerMiddleware) RecordingOnPlayer(ctx context.Context, playerIP, playerPort, playerDeviceNameName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error) {
 	l.logger.Log(
 		"StartRecordingOnPlayer", "start",
 		"playerIP", playerIP,
 		"playerPort", playerPort,
-		"playerDeviceName", playerDeviceName,
+		"playerDeviceNameName", playerDeviceNameName,
 		"recoderIP", recoderIP,
 		"recorderDeviceName", recorderDeviceName,
 		"channels", channels,
 		"rate", rate,
 	)
-	if storageUUID, err = l.svc.RecordingOnPlayer(ctx, playerIP, playerPort, playerDeviceName, recoderIP, recorderDeviceName, channels, rate); err != nil {
+	if storageUUID, err = l.svc.RecordingOnPlayer(ctx, playerIP, playerPort, playerDeviceNameName, recoderIP, recorderDeviceName, channels, rate); err != nil {
 		l.logger.Log(
 			"StartRecordingInFile", "err",
 			"playerIP", playerIP,
 			"playerPort", playerPort,
-			"playerDeviceName", playerDeviceName,
+			"playerDeviceNameName", playerDeviceNameName,
 			"recoderIP", recoderIP,
 			"recorderDeviceName", recorderDeviceName,
 			"channels", channels,
@@ -125,25 +125,25 @@ func (l *loggerMiddleware) RecordingOnPlayer(ctx context.Context, playerIP, play
 	return
 }
 
-func (l *loggerMiddleware) RecordingInFile(c context.Context, fileName, receivePort, recoderIP, deviceName string, channels, rate int) (err error) {
+func (l *loggerMiddleware) RecordingInFile(c context.Context, fileName, receivePort, recoderIP, recoderDeviceName string, channels, rate int) (err error) {
 	l.logger.Log(
 		"RecordingInFile", "start",
 		"fileName", fileName,
 		"receivePort", receivePort,
 		"recoderIP", recoderIP,
 		"recoderIP", recoderIP,
-		"deviceName", deviceName,
+		"recoderDeviceName", recoderDeviceName,
 		"channels", channels,
 		"rate", rate,
 	)
-	if err = l.svc.RecordingInFile(c, fileName, receivePort, recoderIP, deviceName, channels, rate); err != nil {
+	if err = l.svc.RecordingInFile(c, fileName, receivePort, recoderIP, recoderDeviceName, channels, rate); err != nil {
 		l.logger.Log(
 			"RecordingInFile", "err",
 			"fileName", fileName,
 			"receivePort", receivePort,
 			"recoderIP", recoderIP,
 			"recoderIP", recoderIP,
-			"deviceName", deviceName,
+			"recoderDeviceName", recoderDeviceName,
 			"channels", channels,
 			"rate", rate,
 			"err", err,

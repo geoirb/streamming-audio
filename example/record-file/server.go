@@ -11,7 +11,7 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/kelseyhightower/envconfig"
 
-	"github.com/geoirb/sound-ethernet-streaming/pkg/player"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/recorder"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/server"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/udp"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/wav"
@@ -25,6 +25,8 @@ type configuration struct {
 
 	HostLayout   string `envconfig:"HOST_LAYOUT" default:"%s:%s"`
 	DeviceLayout string `envconfig:"DEVICE_LAYOUT" default:"%s:%s"`
+
+	RecodeFile string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/testRecode.wav"`
 }
 
 func main() {
@@ -41,33 +43,32 @@ func main() {
 	}
 
 	wav := wav.NewWAV()
-	player := player.NewClient(
+	recorder := recorder.NewClient(
 		cfg.HostLayout,
-		cfg.PlayerPort,
+		cfg.RecorderPort,
 	)
 	udp := udp.NewUDP(cfg.UDPBuffSize)
 	svc := server.NewServer(
 		wav,
+		recorder,
 		nil,
-		player,
 		udp,
 
 		cfg.HostLayout,
 		cfg.DeviceLayout,
 	)
-	svc = server.NewLoggerMiddleware(svc, logger)
-	level.Error(logger).Log("msg", "server start")
 
+	recorderIP := "127.0.0.1"
+	receivePort := "8083"
+	recorderDevice := "hw:0,0"
 	pwd, _ := os.Getwd()
 	file := fmt.Sprintf("%s/%s", pwd, "example/play-file/server/test.wav")
-	playerIP := "127.0.0.1"
-	playerPort := "8083"
-	playerDeviceName := "hw:0,0"
-	uuid, _, _, _ := svc.PlayAudioFile(context.Background(), playerIP, playerPort, file, playerDeviceName)
+	svc = server.NewLoggerMiddleware(svc, logger)
+	svc.RecordingInFile(context.Background(), file, receivePort, recorderIP, recorderDevice, 2, 44100)
+	level.Error(logger).Log("msg", "server start")
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 
-	svc.Stop(context.Background(), playerIP, playerPort, playerDeviceName, uuid)
 }

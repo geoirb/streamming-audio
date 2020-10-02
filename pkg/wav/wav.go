@@ -1,7 +1,6 @@
 package wav
 
 import (
-	"context"
 	"io"
 	"os"
 	"strings"
@@ -24,22 +23,17 @@ func (w *WAV) Read(data []byte) (reader io.Reader, channels uint16, rate uint32,
 }
 
 // Write wav file
-func (w *WAV) Write(ctx context.Context, name string, channels uint16, rate uint32) (io.Writer, error) {
+func (w *WAV) Write(name string, channels uint16, rate uint32) (writer io.WriteCloser, err error) {
 	if !strings.HasSuffix(name, ".wav") {
 		name = name + ".wav"
 	}
 	file, err := os.Create(name)
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	wav := wav.NewWriter(file, channels, rate, wav.FormatS16LE)
-	go func() {
-		<-ctx.Done()
-		wav.Close()
-	}()
-
-	return wav, nil
+	writer = wav.NewWriter(file, channels, rate, wav.FormatS16LE)
+	return
 }
 
 // NewWAV return handler wav file

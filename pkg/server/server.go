@@ -10,7 +10,7 @@ import (
 
 type audio interface {
 	Read(data []byte) (reader io.Reader, channels uint16, rate uint32, err error)
-	Write(ctx context.Context, name string, channels uint16, rate uint32) (writer io.Writer, err error)
+	Write(name string, channels uint16, rate uint32) (io.WriteCloser, error)
 }
 
 type udp interface {
@@ -38,8 +38,8 @@ type Server interface {
 	Pause(ctx context.Context, playerIP, deviceName string) (err error)
 	Stop(c context.Context, playerIP, playerPort, deviceName, storageUUID string) (err error)
 
-	RecordingOnPlayer(ctx context.Context, playerIP, playerPort, playerDeviceName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error)
-	RecordingInFile(c context.Context, fileName, receivePort, recoderIP, deviceName string, channels, rate int) (err error)
+	RecordingOnPlayer(ctx context.Context, playerIP, playerPort, playerDeviceNameName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error)
+	RecordingInFile(c context.Context, fileName, receivePort, recoderIP, recoderDeviceName string, channels, rate int) (err error)
 	StopRecoding(c context.Context, recoderIP, deviceName string) (err error)
 }
 
@@ -137,7 +137,7 @@ func (s *server) Stop(c context.Context, playerIP, playerPort, deviceName, stora
 }
 
 // StartRecordingInFile start recoding player and save on file
-func (s *server) RecordingOnPlayer(c context.Context, playerIP, playerPort, playerDeviceName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error) {
+func (s *server) RecordingOnPlayer(c context.Context, playerIP, playerPort, playerDeviceNameName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error) {
 	s.mutexRecording.Lock()
 	defer s.mutexRecording.Unlock()
 
@@ -151,7 +151,7 @@ func (s *server) RecordingOnPlayer(c context.Context, playerIP, playerPort, play
 			s.player.ClearStorage(c, playerIP, storageUUID)
 			return
 		}
-		if err = s.Play(c, playerIP, storageUUID, playerDeviceName, uint16(channels), uint32(rate)); err != nil {
+		if err = s.Play(c, playerIP, storageUUID, playerDeviceNameName, uint16(channels), uint32(rate)); err != nil {
 			s.player.StopReceive(c, playerIP, playerPort)
 			s.player.ClearStorage(c, playerIP, storageUUID)
 			s.recorder.StopRecord(c, recoderIP, recorderDeviceName)
@@ -166,18 +166,21 @@ func (s *server) RecordingOnPlayer(c context.Context, playerIP, playerPort, play
 }
 
 // StartRecordingInFile start recoding player and save on file
-func (s *server) RecordingInFile(c context.Context, fileName, receivePort, recoderIP, deviceName string, channels, rate int) (err error) {
+func (s *server) RecordingInFile(c context.Context, fileName, receivePort, recoderIP, recoderDeviceName string, channels, rate int) (err error) {
 	s.mutexRecording.Lock()
 	defer s.mutexRecording.Unlock()
 
-	recoder := fmt.Sprintf(s.deviceLayout, recoderIP, deviceName)
+	recoder := fmt.Sprintf(s.deviceLayout, recoderIP, recoderDeviceName)
 	if _, isExist := s.recoding[recoder]; !isExist {
-		var writer io.Writer
+		var writer io.WriteCloser
 		ctx, stop := context.WithCancel(context.Background())
-		if writer, err = s.audio.Write(ctx, fileName, uint16(channels), uint32(rate)); err == nil {
+		if writer, err = s.audio.Write(fileName, uint16(channels), uint32(rate)); err == nil {
 			if err = s.udp.Receive(ctx, receivePort, writer); err == nil {
-				if err = s.recorder.StartRecord(c, fmt.Sprintf(s.hostLayout, "127.0.0.1", receivePort), recoderIP, deviceName, uint32(channels), uint32(rate)); err == nil {
-					s.recoding[recoder] = stop
+				if err = s.recorder.StartRecord(c, fmt.Sprintf(s.hostLayout, "127.0.0.1", receivePort), recoderIP, recoderDeviceName, uint32(channels), uint32(rate)); err == nil {
+					s.recoding[recoder] = func() {
+						stop()
+						writer.Close()
+					}
 					return
 				}
 			}

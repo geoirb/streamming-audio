@@ -10,5 +10,4 @@ RUN go build \
 FROM alpine
 WORKDIR /app
 COPY --from=build /out/service /app/service
-COPY ./audio /audio
 CMD ["/app/service"]
