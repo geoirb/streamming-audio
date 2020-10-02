@@ -1,4 +1,5 @@
 lint:
+	go mod tidy
 	go fmt ./...
 	go vet ./...
 	go get -u golang.org/x/lint/golint	
@@ -6,8 +7,11 @@ lint:
 	go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 	golangci-lint run -E gofmt -E golint -E vet
 
-build-client:
-	docker build -t $(tag) -f build/client/Dockerfile .
+build-server:
+	docker build -t $(tag) -f build/recorder/Dockerfile .
+
+build-player:
+	docker build -t $(tag) -f build/player/Dockerfile .
 
 build-server:
 	docker build -t $(tag) -f build/server/Dockerfile .

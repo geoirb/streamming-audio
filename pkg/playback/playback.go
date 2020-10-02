@@ -1,6 +1,9 @@
 package playback
 
 import (
+	"context"
+	"io"
+
 	alsa "github.com/cocoonlife/goalsa"
 )
 
@@ -10,29 +13,12 @@ type converter interface {
 
 // Playback device
 type Playback struct {
-	out       *alsa.PlaybackDevice
 	converter converter
+	buffSize  int
 }
 
-// Write audio track
-func (d *Playback) Write(samples []byte) {
-	d.out.Write(
-		d.converter.ToInt16(samples),
-	)
-}
-
-// Disconnect from device
-func (d *Playback) Disconnect() {
-	d.out.Close()
-}
-
-// NewPlayback ...
-func NewPlayback(
-	deviceName string,
-	channels int,
-	rate int,
-	converter converter,
-) (p *Playback, err error) {
+// Play audio on deviceName
+func (d *Playback) Play(ctx context.Context, deviceName string, channels, rate int, r io.Reader) (err error) {
 	out, err := alsa.NewPlaybackDevice(
 		deviceName,
 		channels,
@@ -44,9 +30,32 @@ func NewPlayback(
 		return
 	}
 
-	p = &Playback{
-		out:       out,
-		converter: converter,
-	}
+	go func() {
+		samples := make([]byte, d.buffSize)
+		for {
+			select {
+			case <-ctx.Done():
+				out.Close()
+				return
+			default:
+				if l, err := r.Read(samples); err == nil {
+					if _, err = out.Write(d.converter.ToInt16(samples[:l])); err != nil {
+						return
+					}
+				}
+			}
+		}
+	}()
 	return
+}
+
+// NewPlayback ...
+func NewPlayback(
+	converter converter,
+	buffSize int,
+) *Playback {
+	return &Playback{
+		converter: converter,
+		buffSize:  buffSize,
+	}
 }

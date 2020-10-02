@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"io/ioutil"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,61 +10,76 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/kelseyhightower/envconfig"
 
+	"github.com/geoirb/sound-ethernet-streaming/pkg/player"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/recorder"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/server"
-	udp "github.com/geoirb/sound-ethernet-streaming/pkg/udp/server"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/udp"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/wav"
 )
 
 type configuration struct {
-	DstAddress string `envconfig:"DST_ADDRESS" default:"255.255.255.255:8080"`
-	File       string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/test.wav"`
+	PlayerPort   string `envconfig:"PLAYER_PORT" default:"8081"`
+	RecorderPort string `envconfig:"RECODER_PORT" default:"8082"`
+
+	UDPBuffSize int `envconfig:"UDP_BUF_SIZE" default:"1024"`
+
+	HostLayout   string `envconfig:"HOST_LAYOUT" default:"%s:%s"`
+	DeviceLayout string `envconfig:"DEVICE_LAYOUT" default:"%s:%s"`
+
+	PlayFile   string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/test.wav"`
+	RecodeFile string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/testRecode.wav"`
 }
 
 func main() {
 	logger := log.NewLogfmtLogger(log.NewSyncWriter(os.Stdout))
-	_ = level.Info(logger).Log("msg", "initializing")
+	level.Info(logger).Log("msg", "initializing")
 
 	var (
-		err  error
-		data []byte
-		cfg  configuration
+		err error
+		cfg configuration
 	)
 	if err = envconfig.Process("", &cfg); err != nil {
-		_ = level.Error(logger).Log("msg", "failed to load configuration", "err", err)
+		level.Error(logger).Log("msg", "failed to load configuration", "err", err)
 		os.Exit(1)
 	}
 
-	if data, err = ioutil.ReadFile(cfg.File); err != nil {
-		_ = level.Error(logger).Log("msg", "failed to read file", "file", cfg.File, "err", err)
-		os.Exit(1)
-	}
-	source := wav.NewWAV()
-	if err = source.Parse(data); err != nil {
-		_ = level.Error(logger).Log("msg", "failed to parse wav", "err", err)
-		os.Exit(1)
-	}
+	wav := wav.NewWAV()
+	player := player.NewClient(
+		cfg.HostLayout,
+		cfg.PlayerPort,
+	)
+	recorder := recorder.NewClient(
+		cfg.HostLayout,
+		cfg.RecorderPort,
+	)
+	udp := udp.NewUDP(cfg.UDPBuffSize)
+	svc := server.NewServer(
+		wav,
+		recorder,
+		player,
+		udp,
 
-	udpSrv := udp.NewServerUDP(cfg.DstAddress)
-	if err = udpSrv.TurnOn(); err != nil {
-		_ = level.Error(logger).Log("msg", "failed to turn on udp server", "err", err)
-		os.Exit(1)
-	}
-	defer udpSrv.Shutdown()
-
-	s4v := server.NewServer()
-	if err = s4v.AddStreaming(udpSrv, source); err != nil {
-		_ = level.Error(logger).Log("msg", "add streaming", "err", err)
-		os.Exit(1)
-	}
-
-	ctx, cancel := context.WithCancel(context.Background())
-	s4v.Start(ctx)
-	_ = level.Error(logger).Log("msg", "server start")
+		cfg.HostLayout,
+		cfg.DeviceLayout,
+	)
+	svc = server.NewLoggerMiddleware(svc, logger)
+	svc.RecordingOnPlayer(context.Background(), "127.0.0.1", "8083", "hw:1,0", "127.0.0.1", "hw:0,0", 2, 44100)
+	level.Error(logger).Log("msg", "server start")
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
+	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 
-	sig := <-c
-	_ = level.Error(logger).Log("msg", "received signal, exiting signal", "signal", sig)
-	cancel()
 }
+
+// svc.RecordingInFile(context.Background(), cfg.RecodeFile, "8083", "127.0.0.1", "hw:0,0", 2, 44100)
+// svc.StopRecoding(context.Background(), "127.0.0.1", "hw:0,0")
+
+// uuid, channels, rate, _ := svc.PlayAudioFile(context.Background(), "127.0.0.1", "8083", cfg.PlayFile, "hw:1,0")
+// time.Sleep(5 * time.Second)
+// svc.Pause(context.Background(), "127.0.0.1", "hw:1,0")
+// time.Sleep(10 * time.Second)
+// svc.Play(context.Background(), "127.0.0.1", uuid, "hw:1,0", channels, rate)
+// time.Sleep(5 * time.Second)
+// svc.Stop(context.Background(), "127.0.0.1", "8083", "hw:1,0", uuid)
+// svc.Play(context.Background(), "127.0.0.1", uuid, "hw:1,0", channels, rate)

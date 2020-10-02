@@ -1,39 +1,39 @@
 package wav
 
 import (
-	"bytes"
 	"io"
+	"os"
+	"strings"
 
-	"github.com/cryptix/wav"
+	"github.com/geoirb/wav"
 )
 
 // WAV audio file
-type WAV struct {
-	reader         io.Reader
-	channels       int
-	bytesPerSample int
-}
+type WAV struct{}
 
-// Parse wav file
-func (w *WAV) Parse(data []byte) (err error) {
-	f := bytes.NewReader(data)
-	wavReader, err := wav.NewReader(f, f.Size())
+// Read wav file
+func (w *WAV) Read(data []byte) (reader io.Reader, channels uint16, rate uint32, err error) {
+	wav, err := wav.NewReader(data)
 	if err != nil {
 		return
 	}
-	w.channels = int(wavReader.GetNumChannels())
-	w.bytesPerSample = int(wavReader.GetBitsPerSample() / 8)
-	w.reader, err = wavReader.GetDumbReader()
+	channels = wav.GetNumChannels()
+	rate = wav.GetSampleRate()
 	return
 }
 
-// Read audio bytes
-func (w *WAV) Read() ([]byte, error) {
-	//todo
-	//min 3
-	samples := make([]byte, 1024)
-	l, err := w.reader.Read(samples)
-	return samples[:l], err
+// Write wav file
+func (w *WAV) Write(name string, channels uint16, rate uint32) (writer io.WriteCloser, err error) {
+	if !strings.HasSuffix(name, ".wav") {
+		name = name + ".wav"
+	}
+	file, err := os.Create(name)
+	if err != nil {
+		return
+	}
+
+	writer = wav.NewWriter(file, channels, rate, wav.FormatS16LE)
+	return
 }
 
 // NewWAV return handler wav file
