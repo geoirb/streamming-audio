@@ -10,10 +10,7 @@ import (
 )
 
 // WAV audio file
-type WAV struct {
-	cd
-	bufferSize int
-}
+type WAV struct{}
 
 // Read wav file
 func (w *WAV) Read(data []byte) (reader io.Reader, channels uint16, rate uint32, err error) {
