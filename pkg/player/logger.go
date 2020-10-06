@@ -11,38 +11,38 @@ type loggerMiddleware struct {
 	player PlayerServer
 }
 
-// StartReceive log
-func (l *loggerMiddleware) StartReceive(ctx context.Context, in *StartReceiveRequest) (out *StartReceiveResponse, err error) {
-	l.logger.Log("StartReceive", "start", "in", in.String())
-	if out, err = l.player.StartReceive(ctx, in); err != nil {
-		l.logger.Log("StartReceive", "err", "in", in.String(), "err", err.Error())
+// ReceiveStart log
+func (l *loggerMiddleware) ReceiveStart(ctx context.Context, in *StartReceiveRequest) (out *StartReceiveResponse, err error) {
+	l.logger.Log("ReceiveStart", "start", "in", in.String())
+	if out, err = l.player.ReceiveStart(ctx, in); err != nil {
+		l.logger.Log("ReceiveStart", "err", "in", in.String(), "err", err.Error())
 	}
 	return
 }
 
-// StopReceive log
-func (l *loggerMiddleware) StopReceive(ctx context.Context, in *StopReceiveRequest) (out *StopReceiveResponse, err error) {
-	l.logger.Log("StopReceive", "start", "in", in.String())
-	if out, err = l.player.StopReceive(ctx, in); err != nil {
-		l.logger.Log("StopReceive", "err", "in", in.String(), "err", err.Error())
+// ReceiveStop log
+func (l *loggerMiddleware) ReceiveStop(ctx context.Context, in *StopReceiveRequest) (out *StopReceiveResponse, err error) {
+	l.logger.Log("ReceiveStop", "start", "in", in.String())
+	if out, err = l.player.ReceiveStop(ctx, in); err != nil {
+		l.logger.Log("ReceiveStop", "err", "in", in.String(), "err", err.Error())
 	}
 	return
 }
 
-// StartPlay log
-func (l *loggerMiddleware) StartPlay(ctx context.Context, in *StartPlayRequest) (out *StartPlayResponse, err error) {
-	l.logger.Log("StartPlay", "start", "in", in.String())
-	if out, err = l.player.StartPlay(ctx, in); err != nil {
-		l.logger.Log("StartPlay", "err", "in", in.String(), "err", err.Error())
+// Play log
+func (l *loggerMiddleware) Play(ctx context.Context, in *StartPlayRequest) (out *StartPlayResponse, err error) {
+	l.logger.Log("Play", "start", "in", in.String())
+	if out, err = l.player.Play(ctx, in); err != nil {
+		l.logger.Log("Play", "err", "in", in.String(), "err", err.Error())
 	}
 	return
 }
 
-// StopPlay log
-func (l *loggerMiddleware) StopPlay(ctx context.Context, in *StopPlayRequest) (out *StopPlayResponse, err error) {
-	l.logger.Log("StopPlay", "start", "in", in.String())
-	if out, err = l.player.StopPlay(ctx, in); err != nil {
-		l.logger.Log("StopPlay", "err", "in", in.String(), "err", err.Error())
+// Stop log
+func (l *loggerMiddleware) Stop(ctx context.Context, in *StopPlayRequest) (out *StopPlayResponse, err error) {
+	l.logger.Log("Stop", "start", "in", in.String())
+	if out, err = l.player.Stop(ctx, in); err != nil {
+		l.logger.Log("Stop", "err", "in", in.String(), "err", err.Error())
 	}
 	return
 }

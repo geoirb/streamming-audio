@@ -14,10 +14,13 @@ type Client struct {
 	controlPort string
 }
 
-// StartReceive rpc request for start receive signal from server
-func (c *Client) StartReceive(ctx context.Context, playerIP, receivePort string, UUID *string) (storageUUID string, err error) {
+// ReceiveStart rpc request to player with ip for start receive signal from server on port.
+// UUID of the storage existing on the player
+// if the storage with UUID does not exist or the UUID is zero, a new storage will be created on the player
+// The signal will be stored in the storage sUUID
+func (c *Client) ReceiveStart(ctx context.Context, ip, port string, uuid *string) (sUUID string, err error) {
 	conn, err := grpc.Dial(
-		fmt.Sprintf(c.hostLayout, playerIP, c.controlPort),
+		fmt.Sprintf(c.hostLayout, ip, c.controlPort),
 		// todo
 		grpc.WithInsecure(),
 	)
@@ -26,29 +29,28 @@ func (c *Client) StartReceive(ctx context.Context, playerIP, receivePort string,
 		return
 	}
 	req := &StartReceiveRequest{
-		Port: receivePort,
+		Port: port,
 	}
-	if UUID != nil {
+	if uuid != nil {
 		req.StorageUUID = &wrapperspb.StringValue{
-			Value: *UUID,
+			Value: *uuid,
 		}
 	}
 
-	res, err := NewPlayerClient(conn).
-		StartReceive(
+	if res, err := NewPlayerClient(conn).
+		ReceiveStart(
 			ctx,
 			req,
-		)
-	if err == nil {
-		storageUUID = res.StorageUUID
+		); err == nil {
+		sUUID = res.StorageUUID
 	}
 	return
 }
 
-// StopReceive rpc request for stop receive signal from server
-func (c *Client) StopReceive(ctx context.Context, playerIP, receivePort string) (err error) {
+// ReceiveStop rpc request to player with ip for stop receive signal from server on port.
+func (c *Client) ReceiveStop(ctx context.Context, ip, port string) (err error) {
 	conn, err := grpc.Dial(
-		fmt.Sprintf(c.hostLayout, playerIP, c.controlPort),
+		fmt.Sprintf(c.hostLayout, ip, c.controlPort),
 		// todo
 		grpc.WithInsecure(),
 	)
@@ -58,18 +60,19 @@ func (c *Client) StopReceive(ctx context.Context, playerIP, receivePort string) 
 	}
 
 	_, err = NewPlayerClient(conn).
-		StopReceive(
+		ReceiveStop(
 			ctx,
 			&StopReceiveRequest{
-				Port: receivePort,
+				Port: port,
 			})
 	return
 }
 
-// StartPlay rpc request for play audio signal
-func (c *Client) StartPlay(ctx context.Context, playerIP, deviceName, storageUUID string, channels, rate uint32) (err error) {
+// Play rpc request to player with ip for play audio signal from storage with UUID on deviceName
+// channels, rate - playback options
+func (c *Client) Play(ctx context.Context, ip, UUID, deviceName string, channels, rate uint32) (err error) {
 	conn, err := grpc.Dial(
-		fmt.Sprintf(c.hostLayout, playerIP, c.controlPort),
+		fmt.Sprintf(c.hostLayout, ip, c.controlPort),
 		// todo
 		grpc.WithInsecure(),
 	)
@@ -79,19 +82,19 @@ func (c *Client) StartPlay(ctx context.Context, playerIP, deviceName, storageUUI
 	}
 
 	_, err = NewPlayerClient(conn).
-		StartPlay(
+		Play(
 			ctx,
 			&StartPlayRequest{
 				DeviceName:  deviceName,
 				Channels:    uint32(channels),
 				Rate:        rate,
-				StorageUUID: storageUUID,
+				StorageUUID: UUID,
 			})
 	return
 }
 
-// StopPlay rpc request for play audio signal
-func (c *Client) StopPlay(ctx context.Context, playerIP, deviceName string) (err error) {
+// Stop rpc request to player with ip for stop audio
+func (c *Client) Stop(ctx context.Context, playerIP, deviceName string) (err error) {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(c.hostLayout, playerIP, c.controlPort),
 		// todo
@@ -103,7 +106,7 @@ func (c *Client) StopPlay(ctx context.Context, playerIP, deviceName string) (err
 	}
 
 	_, err = NewPlayerClient(conn).
-		StopPlay(
+		Stop(
 			ctx,
 			&StopPlayRequest{
 				DeviceName: deviceName,
@@ -112,10 +115,10 @@ func (c *Client) StopPlay(ctx context.Context, playerIP, deviceName string) (err
 	return
 }
 
-// ClearStorage rpc request for clear audio storage pn player
-func (c *Client) ClearStorage(ctx context.Context, playerIP, storageUUID string) (err error) {
+// ClearStorage rpc request to player with ip for clear audio storage with UUID
+func (c *Client) ClearStorage(ctx context.Context, ip, UUID string) (err error) {
 	conn, err := grpc.Dial(
-		fmt.Sprintf(c.hostLayout, playerIP, c.controlPort),
+		fmt.Sprintf(c.hostLayout, ip, c.controlPort),
 		// todo
 		grpc.WithInsecure(),
 	)
@@ -128,7 +131,7 @@ func (c *Client) ClearStorage(ctx context.Context, playerIP, storageUUID string)
 		ClearStorage(
 			ctx,
 			&ClearStorageRequest{
-				StorageUUID: storageUUID,
+				StorageUUID: UUID,
 			},
 		)
 	return

@@ -47,10 +47,10 @@ message ClearStorageResponse{
 
 // grpc service to play audio
 service Player {
-  rpc StartReceive (StartReceiveRequest) returns (StartReceiveResponse) {}
-  rpc StopReceive (StopReceiveRequest) returns (StopReceiveResponse) {}
-  rpc StartPlay (StartPlayRequest) returns (StartPlayResponse) {}
-  rpc StopPlay (StopPlayRequest) returns (StopPlayResponse) {}
+  rpc ReceiveStart (StartReceiveRequest) returns (StartReceiveResponse) {}
+  rpc ReceiveStop (StopReceiveRequest) returns (StopReceiveResponse) {}
+  rpc Play (StartPlayRequest) returns (StartPlayResponse) {}
+  rpc Stop (StopPlayRequest) returns (StopPlayResponse) {}
   rpc ClearStorage(ClearStorageRequest) returns (ClearStorageResponse) {}
 }
 

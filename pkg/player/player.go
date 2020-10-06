@@ -36,8 +36,8 @@ type player struct {
 	storage storage
 }
 
-// StartReceive start receive data from server and save
-func (p *player) StartReceive(c context.Context, in *StartReceiveRequest) (out *StartReceiveResponse, err error) {
+// ReceiveStart start receive data from server and save
+func (p *player) ReceiveStart(c context.Context, in *StartReceiveRequest) (out *StartReceiveResponse, err error) {
 	p.receivingMutex.Lock()
 	defer p.receivingMutex.Unlock()
 
@@ -68,8 +68,8 @@ func (p *player) StartReceive(c context.Context, in *StartReceiveRequest) (out *
 	return
 }
 
-// StopReceive stop receive data from server
-func (p *player) StopReceive(c context.Context, in *StopReceiveRequest) (out *StopReceiveResponse, err error) {
+// ReceiveStop stop receive data from server
+func (p *player) ReceiveStop(c context.Context, in *StopReceiveRequest) (out *StopReceiveResponse, err error) {
 	p.receivingMutex.Lock()
 	defer p.receivingMutex.Unlock()
 
@@ -83,8 +83,8 @@ func (p *player) StopReceive(c context.Context, in *StopReceiveRequest) (out *St
 	return
 }
 
-// StartPlay play audio on device
-func (p *player) StartPlay(c context.Context, in *StartPlayRequest) (out *StartPlayResponse, err error) {
+// Play play audio on device
+func (p *player) Play(c context.Context, in *StartPlayRequest) (out *StartPlayResponse, err error) {
 	p.storagingMutex.Lock()
 	defer p.storagingMutex.Unlock()
 
@@ -108,8 +108,8 @@ func (p *player) StartPlay(c context.Context, in *StartPlayRequest) (out *StartP
 	return
 }
 
-// StopPlay stop play on device
-func (p *player) StopPlay(c context.Context, in *StopPlayRequest) (out *StopPlayResponse, err error) {
+// Stop stop play on device
+func (p *player) Stop(c context.Context, in *StopPlayRequest) (out *StopPlayResponse, err error) {
 	p.playingMutex.Lock()
 	defer p.playingMutex.Unlock()
 
