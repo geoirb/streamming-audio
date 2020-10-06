@@ -1,43 +1,38 @@
 # sound-ethernet-streaming
 
-Стриминг аудио по UDP
+Streaming audio
 
-Server - сервер для раздачи аудиосигнала
+* Server - control server
+* Player - client for playing audio signal on audio device
+* Recorder - client for receive audio signal from audio device 
 
-Player - клиент для приема и воспроизведения аудиосигнала
+## ToDoc        
 
-Recorder - клиент для получения аудиосигнала с микрофона
-
-## ToDo
 ### Server
 
-- [X] Стримминг аудиосигнала
-
-  - [X] из wav файла
-  - [X] с recorder
-
-- [X] Написание пакета для работы с микрофоном
-- [X] RPC система управление
-
-  - [X] player
-  - [X] recorder
-
-- [X] Запись сигнала в wav файл
-- [ ] Наложение 2х дорожек
-
+- [X] Streaming audio signal on Player from:
+  - [X] .wav file
+  - [X] Recorder
+- [X] RPC system control
+  - [X] Player
+  - [X] Recorder
+- [X] Record .wav file
+- [X] HTTP server
+- [ ] Overlay 2 tracks
+  
 ### Player
-
-- [X] Выбор звуковой карты
-- [X] Кэш
-- [X] Рефакторинг
-- [X] Управление с помощью RPC
-- [ ] Регулировка громкости
+- [X] Receive audio signal
+- [X] Playing audio signal
+- [X] Selecting an audio card
+- [X] Storage
+- [X] RPC system control
+- [ ] Volume control
 
 ### Recorder
 
-- [X] Получение аудиосигнала с микрофона
-- [X] Передача аудиосигнала на сервер
-- [X] Управление с помощью RPC
+- [X] Recording audio from microphone
+- [X] Streaming audio signal
+- [X] RPC system control
 
 ## Запуск server
 

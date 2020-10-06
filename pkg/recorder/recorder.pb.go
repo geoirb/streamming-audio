@@ -32,7 +32,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
-type StartRecordRequest struct {
+type StartSendRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -43,8 +43,8 @@ type StartRecordRequest struct {
 	DestAddr   string `protobuf:"bytes,4,opt,name=destAddr,proto3" json:"destAddr,omitempty"`
 }
 
-func (x *StartRecordRequest) Reset() {
-	*x = StartRecordRequest{}
+func (x *StartSendRequest) Reset() {
+	*x = StartSendRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_recorder_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -52,13 +52,13 @@ func (x *StartRecordRequest) Reset() {
 	}
 }
 
-func (x *StartRecordRequest) String() string {
+func (x *StartSendRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*StartRecordRequest) ProtoMessage() {}
+func (*StartSendRequest) ProtoMessage() {}
 
-func (x *StartRecordRequest) ProtoReflect() protoreflect.Message {
+func (x *StartSendRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_recorder_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -70,47 +70,47 @@ func (x *StartRecordRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StartRecordRequest.ProtoReflect.Descriptor instead.
-func (*StartRecordRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use StartSendRequest.ProtoReflect.Descriptor instead.
+func (*StartSendRequest) Descriptor() ([]byte, []int) {
 	return file_recorder_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *StartRecordRequest) GetDeviceName() string {
+func (x *StartSendRequest) GetDeviceName() string {
 	if x != nil {
 		return x.DeviceName
 	}
 	return ""
 }
 
-func (x *StartRecordRequest) GetChannels() uint32 {
+func (x *StartSendRequest) GetChannels() uint32 {
 	if x != nil {
 		return x.Channels
 	}
 	return 0
 }
 
-func (x *StartRecordRequest) GetRate() uint32 {
+func (x *StartSendRequest) GetRate() uint32 {
 	if x != nil {
 		return x.Rate
 	}
 	return 0
 }
 
-func (x *StartRecordRequest) GetDestAddr() string {
+func (x *StartSendRequest) GetDestAddr() string {
 	if x != nil {
 		return x.DestAddr
 	}
 	return ""
 }
 
-type StartRecordResponse struct {
+type StartSendResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *StartRecordResponse) Reset() {
-	*x = StartRecordResponse{}
+func (x *StartSendResponse) Reset() {
+	*x = StartSendResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_recorder_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -118,13 +118,13 @@ func (x *StartRecordResponse) Reset() {
 	}
 }
 
-func (x *StartRecordResponse) String() string {
+func (x *StartSendResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*StartRecordResponse) ProtoMessage() {}
+func (*StartSendResponse) ProtoMessage() {}
 
-func (x *StartRecordResponse) ProtoReflect() protoreflect.Message {
+func (x *StartSendResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_recorder_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -136,12 +136,12 @@ func (x *StartRecordResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StartRecordResponse.ProtoReflect.Descriptor instead.
-func (*StartRecordResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use StartSendResponse.ProtoReflect.Descriptor instead.
+func (*StartSendResponse) Descriptor() ([]byte, []int) {
 	return file_recorder_proto_rawDescGZIP(), []int{1}
 }
 
-type StopRecordRequest struct {
+type StopSendRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -149,8 +149,8 @@ type StopRecordRequest struct {
 	DeviceName string `protobuf:"bytes,1,opt,name=deviceName,proto3" json:"deviceName,omitempty"`
 }
 
-func (x *StopRecordRequest) Reset() {
-	*x = StopRecordRequest{}
+func (x *StopSendRequest) Reset() {
+	*x = StopSendRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_recorder_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -158,13 +158,13 @@ func (x *StopRecordRequest) Reset() {
 	}
 }
 
-func (x *StopRecordRequest) String() string {
+func (x *StopSendRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*StopRecordRequest) ProtoMessage() {}
+func (*StopSendRequest) ProtoMessage() {}
 
-func (x *StopRecordRequest) ProtoReflect() protoreflect.Message {
+func (x *StopSendRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_recorder_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -176,26 +176,26 @@ func (x *StopRecordRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StopRecordRequest.ProtoReflect.Descriptor instead.
-func (*StopRecordRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use StopSendRequest.ProtoReflect.Descriptor instead.
+func (*StopSendRequest) Descriptor() ([]byte, []int) {
 	return file_recorder_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *StopRecordRequest) GetDeviceName() string {
+func (x *StopSendRequest) GetDeviceName() string {
 	if x != nil {
 		return x.DeviceName
 	}
 	return ""
 }
 
-type StopRecordResponse struct {
+type StopSendResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *StopRecordResponse) Reset() {
-	*x = StopRecordResponse{}
+func (x *StopSendResponse) Reset() {
+	*x = StopSendResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_recorder_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -203,13 +203,13 @@ func (x *StopRecordResponse) Reset() {
 	}
 }
 
-func (x *StopRecordResponse) String() string {
+func (x *StopSendResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*StopRecordResponse) ProtoMessage() {}
+func (*StopSendResponse) ProtoMessage() {}
 
-func (x *StopRecordResponse) ProtoReflect() protoreflect.Message {
+func (x *StopSendResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_recorder_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -221,8 +221,8 @@ func (x *StopRecordResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StopRecordResponse.ProtoReflect.Descriptor instead.
-func (*StopRecordResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use StopSendResponse.ProtoReflect.Descriptor instead.
+func (*StopSendResponse) Descriptor() ([]byte, []int) {
 	return file_recorder_proto_rawDescGZIP(), []int{3}
 }
 
@@ -272,16 +272,16 @@ func file_recorder_proto_rawDescGZIP() []byte {
 
 var file_recorder_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_recorder_proto_goTypes = []interface{}{
-	(*StartRecordRequest)(nil),  // 0: recorder.StartRecordRequest
-	(*StartRecordResponse)(nil), // 1: recorder.StartRecordResponse
-	(*StopRecordRequest)(nil),   // 2: recorder.StopRecordRequest
-	(*StopRecordResponse)(nil),  // 3: recorder.StopRecordResponse
+	(*StartSendRequest)(nil),  // 0: recorder.StartSendRequest
+	(*StartSendResponse)(nil), // 1: recorder.StartSendResponse
+	(*StopSendRequest)(nil),   // 2: recorder.StopSendRequest
+	(*StopSendResponse)(nil),  // 3: recorder.StopSendResponse
 }
 var file_recorder_proto_depIdxs = []int32{
-	0, // 0: recorder.Recorder.StartRecord:input_type -> recorder.StartRecordRequest
-	2, // 1: recorder.Recorder.StopRecord:input_type -> recorder.StopRecordRequest
-	1, // 2: recorder.Recorder.StartRecord:output_type -> recorder.StartRecordResponse
-	3, // 3: recorder.Recorder.StopRecord:output_type -> recorder.StopRecordResponse
+	0, // 0: recorder.Recorder.StartSend:input_type -> recorder.StartSendRequest
+	2, // 1: recorder.Recorder.StopSend:input_type -> recorder.StopSendRequest
+	1, // 2: recorder.Recorder.StartSend:output_type -> recorder.StartSendResponse
+	3, // 3: recorder.Recorder.StopSend:output_type -> recorder.StopSendResponse
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -296,7 +296,7 @@ func file_recorder_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_recorder_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StartRecordRequest); i {
+			switch v := v.(*StartSendRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -308,7 +308,7 @@ func file_recorder_proto_init() {
 			}
 		}
 		file_recorder_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StartRecordResponse); i {
+			switch v := v.(*StartSendResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -320,7 +320,7 @@ func file_recorder_proto_init() {
 			}
 		}
 		file_recorder_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StopRecordRequest); i {
+			switch v := v.(*StopSendRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -332,7 +332,7 @@ func file_recorder_proto_init() {
 			}
 		}
 		file_recorder_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StopRecordResponse); i {
+			switch v := v.(*StopSendResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -376,8 +376,8 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type RecorderClient interface {
-	StartRecord(ctx context.Context, in *StartRecordRequest, opts ...grpc.CallOption) (*StartRecordResponse, error)
-	StopRecord(ctx context.Context, in *StopRecordRequest, opts ...grpc.CallOption) (*StopRecordResponse, error)
+	StartSend(ctx context.Context, in *StartSendRequest, opts ...grpc.CallOption) (*StartSendResponse, error)
+	StopSend(ctx context.Context, in *StopSendRequest, opts ...grpc.CallOption) (*StopSendResponse, error)
 }
 
 type recorderClient struct {
@@ -388,18 +388,18 @@ func NewRecorderClient(cc grpc.ClientConnInterface) RecorderClient {
 	return &recorderClient{cc}
 }
 
-func (c *recorderClient) StartRecord(ctx context.Context, in *StartRecordRequest, opts ...grpc.CallOption) (*StartRecordResponse, error) {
-	out := new(StartRecordResponse)
-	err := c.cc.Invoke(ctx, "/recorder.Recorder/StartRecord", in, out, opts...)
+func (c *recorderClient) StartSend(ctx context.Context, in *StartSendRequest, opts ...grpc.CallOption) (*StartSendResponse, error) {
+	out := new(StartSendResponse)
+	err := c.cc.Invoke(ctx, "/recorder.Recorder/StartSend", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *recorderClient) StopRecord(ctx context.Context, in *StopRecordRequest, opts ...grpc.CallOption) (*StopRecordResponse, error) {
-	out := new(StopRecordResponse)
-	err := c.cc.Invoke(ctx, "/recorder.Recorder/StopRecord", in, out, opts...)
+func (c *recorderClient) StopSend(ctx context.Context, in *StopSendRequest, opts ...grpc.CallOption) (*StopSendResponse, error) {
+	out := new(StopSendResponse)
+	err := c.cc.Invoke(ctx, "/recorder.Recorder/StopSend", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -408,57 +408,57 @@ func (c *recorderClient) StopRecord(ctx context.Context, in *StopRecordRequest, 
 
 // RecorderServer is the server API for Recorder service.
 type RecorderServer interface {
-	StartRecord(context.Context, *StartRecordRequest) (*StartRecordResponse, error)
-	StopRecord(context.Context, *StopRecordRequest) (*StopRecordResponse, error)
+	StartSend(context.Context, *StartSendRequest) (*StartSendResponse, error)
+	StopSend(context.Context, *StopSendRequest) (*StopSendResponse, error)
 }
 
 // UnimplementedRecorderServer can be embedded to have forward compatible implementations.
 type UnimplementedRecorderServer struct {
 }
 
-func (*UnimplementedRecorderServer) StartRecord(context.Context, *StartRecordRequest) (*StartRecordResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StartRecord not implemented")
+func (*UnimplementedRecorderServer) StartSend(context.Context, *StartSendRequest) (*StartSendResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartSend not implemented")
 }
-func (*UnimplementedRecorderServer) StopRecord(context.Context, *StopRecordRequest) (*StopRecordResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StopRecord not implemented")
+func (*UnimplementedRecorderServer) StopSend(context.Context, *StopSendRequest) (*StopSendResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StopSend not implemented")
 }
 
 func RegisterRecorderServer(s *grpc.Server, srv RecorderServer) {
 	s.RegisterService(&_Recorder_serviceDesc, srv)
 }
 
-func _Recorder_StartRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StartRecordRequest)
+func _Recorder_StartSend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartSendRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RecorderServer).StartRecord(ctx, in)
+		return srv.(RecorderServer).StartSend(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/recorder.Recorder/StartRecord",
+		FullMethod: "/recorder.Recorder/StartSend",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RecorderServer).StartRecord(ctx, req.(*StartRecordRequest))
+		return srv.(RecorderServer).StartSend(ctx, req.(*StartSendRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Recorder_StopRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StopRecordRequest)
+func _Recorder_StopSend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StopSendRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RecorderServer).StopRecord(ctx, in)
+		return srv.(RecorderServer).StopSend(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/recorder.Recorder/StopRecord",
+		FullMethod: "/recorder.Recorder/StopSend",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RecorderServer).StopRecord(ctx, req.(*StopRecordRequest))
+		return srv.(RecorderServer).StopSend(ctx, req.(*StopSendRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -468,12 +468,12 @@ var _Recorder_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*RecorderServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "StartRecord",
-			Handler:    _Recorder_StartRecord_Handler,
+			MethodName: "StartSend",
+			Handler:    _Recorder_StartSend_Handler,
 		},
 		{
-			MethodName: "StopRecord",
-			Handler:    _Recorder_StopRecord_Handler,
+			MethodName: "StopSend",
+			Handler:    _Recorder_StopSend_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

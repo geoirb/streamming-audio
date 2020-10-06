@@ -24,8 +24,8 @@ type Recorder struct {
 	device device
 }
 
-// StartRecord ...
-func (r *Recorder) StartRecord(c context.Context, in *StartRecordRequest) (out *StartRecordResponse, err error) {
+// StartSend ...
+func (r *Recorder) StartSend(c context.Context, in *StartSendRequest) (out *StartSendResponse, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
@@ -35,7 +35,7 @@ func (r *Recorder) StartRecord(c context.Context, in *StartRecordRequest) (out *
 			ctx, stop := context.WithCancel(context.Background())
 			if err = r.device.Record(ctx, in.DeviceName, int(in.Channels), int(in.Rate), destination); err == nil {
 				r.recoding[in.DeviceName] = stop
-				out = &StartRecordResponse{}
+				out = &StartSendResponse{}
 				return
 			}
 			stop()
@@ -46,15 +46,15 @@ func (r *Recorder) StartRecord(c context.Context, in *StartRecordRequest) (out *
 	return
 }
 
-// StopRecord ...
-func (r *Recorder) StopRecord(ctx context.Context, in *StopRecordRequest) (out *StopRecordResponse, err error) {
+// StopSend ...
+func (r *Recorder) StopSend(ctx context.Context, in *StopSendRequest) (out *StopSendResponse, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
 	if stop, isExist := r.recoding[in.DeviceName]; isExist {
 		stop()
 		delete(r.recoding, in.DeviceName)
-		out = &StopRecordResponse{}
+		out = &StopSendResponse{}
 		return
 	}
 	err = fmt.Errorf("%v is not exist", in.DeviceName)

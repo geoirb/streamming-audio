@@ -11,20 +11,20 @@ type loggerMiddleware struct {
 	recorder RecorderServer
 }
 
-// StartRecord log
-func (l *loggerMiddleware) StartRecord(ctx context.Context, in *StartRecordRequest) (out *StartRecordResponse, err error) {
-	l.logger.Log("StartRecord", "start", "in", in.String())
-	if out, err = l.recorder.StartRecord(ctx, in); err != nil {
-		l.logger.Log("StartRecord", "err", "in", in.String(), "err", err.Error())
+// StartSend log
+func (l *loggerMiddleware) StartSend(ctx context.Context, in *StartSendRequest) (out *StartSendResponse, err error) {
+	l.logger.Log("StartSend", "start", "in", in.String())
+	if out, err = l.recorder.StartSend(ctx, in); err != nil {
+		l.logger.Log("StartSend", "err", "in", in.String(), "err", err.Error())
 	}
 	return
 }
 
-// StopRecord ...
-func (l *loggerMiddleware) StopRecord(ctx context.Context, in *StopRecordRequest) (out *StopRecordResponse, err error) {
-	l.logger.Log("StopRecord", "start", "in", in.String())
-	if out, err = l.recorder.StopRecord(ctx, in); err != nil {
-		l.logger.Log("StopRecord", "err", "in", in.String(), "err", err.Error())
+// StopSend ...
+func (l *loggerMiddleware) StopSend(ctx context.Context, in *StopSendRequest) (out *StopSendResponse, err error) {
+	l.logger.Log("StopSend", "start", "in", in.String())
+	if out, err = l.recorder.StopSend(ctx, in); err != nil {
+		l.logger.Log("StopSend", "err", "in", in.String(), "err", err.Error())
 	}
 	return
 }

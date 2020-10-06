@@ -13,8 +13,8 @@ type Client struct {
 	controlPort string
 }
 
-// StartRecord rpc request for start record and send audio signal on server
-func (c *Client) StartRecord(ctx context.Context, destAddr, recorderIP, deviceName string, channels, rate uint32) (err error) {
+// StartSend rpc request for start record and send audio signal on server
+func (c *Client) StartSend(ctx context.Context, destAddr, recorderIP, deviceName string, channels, rate uint32) (err error) {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(c.hostLayout, recorderIP, c.controlPort),
 		// todo
@@ -26,9 +26,9 @@ func (c *Client) StartRecord(ctx context.Context, destAddr, recorderIP, deviceNa
 	}
 
 	_, err = NewRecorderClient(conn).
-		StartRecord(
+		StartSend(
 			ctx,
-			&StartRecordRequest{
+			&StartSendRequest{
 				DeviceName: deviceName,
 				Channels:   channels,
 				Rate:       rate,
@@ -40,8 +40,8 @@ func (c *Client) StartRecord(ctx context.Context, destAddr, recorderIP, deviceNa
 	return
 }
 
-// StopRecord rpc request for stop record and send audio signal
-func (c *Client) StopRecord(ctx context.Context, recorderIP, deviceName string) (err error) {
+// StopSend rpc request for stop record and send audio signal
+func (c *Client) StopSend(ctx context.Context, recorderIP, deviceName string) (err error) {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(c.hostLayout, recorderIP, c.controlPort),
 		// todo
@@ -53,9 +53,9 @@ func (c *Client) StopRecord(ctx context.Context, recorderIP, deviceName string) 
 	}
 
 	_, err = NewRecorderClient(conn).
-		StopRecord(
+		StopSend(
 			ctx,
-			&StopRecordRequest{
+			&StopSendRequest{
 				DeviceName: deviceName,
 			},
 		)
