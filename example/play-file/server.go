@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -58,8 +57,9 @@ func main() {
 	svc = server.NewLoggerMiddleware(svc, logger)
 	level.Error(logger).Log("msg", "server start")
 
-	pwd, _ := os.Getwd()
-	file := fmt.Sprintf("%s/%s", pwd, "example/play-file/server/test.wav")
+	// pwd, _ := os.Getwd()
+	// file := fmt.Sprintf("%s/%s", pwd, "example/play-file/test.wav")
+	file := "/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/example/play-file/test.wav"
 	playerIP := "127.0.0.1"
 	playerPort := "8083"
 	playerDeviceName := "hw:0,0"

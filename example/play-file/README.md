@@ -12,4 +12,4 @@ Start from project root
 
 3. Start example server
 
-    `go run example/play-file/main.go`
+    `go run example/play-file/server.go`
