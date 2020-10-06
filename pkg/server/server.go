@@ -2,250 +2,263 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"sync"
 )
 
+// errors
+var (
+	ErrDeviceIsBusy   = errors.New("device is busy")
+	ErrDeviceNotFound = errors.New("device not found")
+	ErrPortIsBusy     = errors.New("port is busy")
+	ErrPortNotFound   = errors.New("port not found")
+)
+
 type audio interface {
-	Read(data []byte) (reader io.Reader, channels uint16, rate uint32, err error)
-	Write(name string, channels uint16, rate uint32) (io.WriteCloser, error)
+	Reader(data []byte) (io.Reader, uint16, uint32, error)
+	Writer(fileName string, channels uint16, rate uint32) (io.WriteCloser, error)
 }
 
 type udp interface {
-	Send(context.Context, string, io.Reader) error
+	Send(ctx context.Context, host string, r io.Reader) error
 	Receive(ctx context.Context, receivePort string, w io.Writer) (err error)
 }
 
 type player interface {
-	StartReceive(ctx context.Context, playerIP, receivePort string, UUID *string) (storageUUID string, err error)
-	StopReceive(ctx context.Context, destIP, destPort string) (err error)
-	StartPlay(ctx context.Context, playerIP, deviceName, storageUUID string, channels, rate uint32) (err error)
-	StopPlay(ctx context.Context, playerIP, deviceName string) (err error)
-	ClearStorage(ctx context.Context, playerIP, storageUUID string) (err error)
+	ReceiveStart(ctx context.Context, ip, port string, uuid *string) (sUUID string, err error)
+	ReceiveStop(ctx context.Context, ip, port string) (err error)
+	Play(ctx context.Context, ip, uuid, deviceName string, channels, rate uint32) (err error)
+	Stop(ctx context.Context, ip, deviceName string) (err error)
+	ClearStorage(ctx context.Context, ip, uuid string) (err error)
 }
 
 type recorder interface {
-	StartSend(ctx context.Context, destAddr, recorderIP, deviceName string, channels, rate uint32) (err error)
-	StopSend(ctx context.Context, recorderIP, deviceName string) (err error)
+	Start(ctx context.Context, destAddr, recorderIP, deviceName string, channels, rate uint32) (err error)
+	Stop(ctx context.Context, recorderIP, deviceName string) (err error)
 }
 
 // Server ...
 type Server interface {
-	PlayAudioFile(ctx context.Context, playerIP, playerPort, fileName, deviceName string) (storageUUID string, channels uint16, rate uint32, err error)
-	Play(ctx context.Context, playerIP, storageUUID, deviceName string, channels uint16, rate uint32) (err error)
-	Pause(ctx context.Context, playerIP, deviceName string) (err error)
-	Stop(c context.Context, playerIP, playerPort, deviceName, storageUUID string) (err error)
+	FilePlaying(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, err error)
+	
+	PlayerReceiveStart(ctx context.Context, playerIP, playerPort string, uuid *string) (string, error)
+	PlayerReceiveStop(ctx context.Context, playerIP, playerPort string) error
+	PlayerPlay(ctx context.Context, playerIP, uuid, playerDeviceName string, channels, rate uint32) (err error)
+	PlayerPause(ctx context.Context, playerIP, playerDeviceName string) (err error)
+	PlayerStop(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid string) (err error)
 
-	RecordingOnPlayer(ctx context.Context, playerIP, playerPort, playerDeviceNameName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error)
-	RecordingInFile(c context.Context, fileName, receivePort, recoderIP, recoderDeviceName string, channels, rate int) (err error)
-	StopRecoding(c context.Context, recoderIP, deviceName string) (err error)
+	StartFileRecoding(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error)
+	StopFileRecoding(ctx context.Context, recorderIP, recorderDeviceName, receivePort string) error
+	
+	RecorderStart(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, dstAddr string) error
+	RecoderStop(ctx context.Context, recorderIP, recorderDeviceName string) error 
+	
+	PlayFromRecorder(ctx context.Context, playerIP, playerPort, playerDeviceName string, channels, rate uint32, recorderIP, recorderDeviceName string) (uuid string, err error) 
+	StopFromRecorder(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid, recorderIP, recorderDeviceName string) error 
 }
 
 type server struct {
 	mutexSending sync.Mutex
-	sending      map[string]context.CancelFunc
+	sending      map[string]func()
 
-	mutexPlaying sync.Mutex
-	playing      map[string]struct{}
-
-	mutexRecording sync.Mutex
-	recoding       map[string]context.CancelFunc
+	mutexReceiving sync.Mutex
+	receiving      map[string]func()
 
 	audio    audio
 	player   player
 	recorder recorder
 	udp      udp
 
-	hostLayout   string
+	serverIP     string
+	addrLayout   string
 	deviceLayout string
 }
 
-// PlayAudioFile send file on player client and play then
-func (s *server) PlayAudioFile(c context.Context, playerIP, playerPort, fileName, deviceName string) (storageUUID string, channels uint16, rate uint32, err error) {
-	data, err := ioutil.ReadFile(fileName)
-	if err != nil {
+// FilePlaying send file to player with playerIP on port and play on playerDeviceName
+// channel and rate audio info from file
+// player save audio from server in storage with uuid
+func (s *server) FilePlaying(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, err error) {
+	var data []byte
+	if data, err = ioutil.ReadFile(file); err != nil {
+		return
+	}
+	var r io.Reader
+	if r, channels, rate, err = s.audio.Reader(data); err != nil {
 		return
 	}
 
-	audio, channels, rate, err := s.audio.Read(data)
-	if err != nil {
+	if uuid, err = s.PlayerReceiveStart(ctx, playerIP, playerPort, nil); err != nil {
 		return
 	}
 
-	if storageUUID, err = s.startSending(c, playerIP, playerPort, audio); err == nil {
-		err = s.Play(c, playerIP, storageUUID, deviceName, channels, rate)
+	if err = s.startSending(ctx, playerIP, playerPort, r); err != nil {
+		return
+	}
+
+	if err = s.PlayerPlay(ctx, playerIP, uuid, playerDeviceName, uint32(channels), rate); err != nil {
+		s.PlayerReceiveStop(ctx, playerIP, playerPort)
+		s.stopSending(ctx, playerIP, playerPort)
 	}
 	return
 }
 
-// Play audio from storage on player client
-func (s *server) Play(c context.Context, playerIP, storageUUID, deviceName string, channels uint16, rate uint32) (err error) {
-	s.mutexPlaying.Lock()
-	defer s.mutexPlaying.Unlock()
+//todo
+func (s *server) PlayerReceiveStart(ctx context.Context, playerIP, playerPort string, uuid *string) (string, error) {
+	return s.player.ReceiveStart(ctx, playerIP, playerPort, uuid)
+}
 
-	player := fmt.Sprintf(s.deviceLayout, playerIP, deviceName)
-	if _, isExist := s.playing[player]; !isExist {
-		if err = s.player.StartPlay(c, playerIP, deviceName, storageUUID, uint32(channels), rate); err == nil {
-			s.playing[player] = struct{}{}
-		}
-		return
-	}
-	err = fmt.Errorf("%s is busy", player)
+//todo
+func (s *server) PlayerReceiveStop(ctx context.Context, playerIP, playerPort string) error {
+	return s.player.ReceiveStop(ctx, playerIP, playerPort)
+}
+
+// PlayerPlay play audio from storage with uuid on player with playerIP on playerDeviceName
+// channels, rate - params audio
+func (s *server) PlayerPlay(ctx context.Context, playerIP, uuid, playerDeviceName string, channels, rate uint32) (err error) {
+	return s.player.Play(ctx, playerIP, uuid, playerDeviceName, channels, rate)
+}
+
+// PlayerPause pause audio on player with playerIP on playerDeviceName
+func (s *server) PlayerPause(ctx context.Context, playerIP, playerDeviceName string) (err error) {
+	return s.player.Stop(ctx, playerIP, playerDeviceName)
+}
+
+// PlayerStop stop audio from storage uuid on player with playerIP on playerDeviceName
+func (s *server) PlayerStop(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid string) (err error) {
+	s.stopSending(ctx, playerIP, playerPort)
+	s.player.ReceiveStop(ctx, playerIP, playerPort)
+	s.PlayerPause(ctx, playerIP, playerDeviceName)
+	s.player.ClearStorage(ctx, playerIP, uuid)
 	return
 }
 
-//  Pause audio from storage on player client
-func (s *server) Pause(c context.Context, playerIP, deviceName string) (err error) {
-	s.mutexPlaying.Lock()
-	defer s.mutexPlaying.Unlock()
-
-	player := fmt.Sprintf(s.deviceLayout, playerIP, deviceName)
-	if _, isExist := s.playing[player]; isExist {
-		if err = s.player.StopPlay(c, playerIP, deviceName); err == nil {
-			delete(s.playing, player)
-		}
+// StartFileRecoding start receive on receivePort audio signal from recorder with recorderIP from recordeDeviceName and write in file
+// channels, rate - params audio
+func (s *server) StartFileRecoding(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error) {
+	var wc io.WriteCloser
+	if wc, err = s.audio.Writer(file, uint16(channels), rate); err != nil {
 		return
 	}
-	err = fmt.Errorf("%s is not exist", player)
+	if err = s.startReceive(ctx, recorderIP, receivePort, wc); err != nil {
+		return
+	}
+
+	receiveAddr := fmt.Sprintf(s.addrLayout, s.serverIP, receivePort)
+	if err = s.RecorderStart(ctx, recorderIP, recorderDeviceName, channels, rate, receiveAddr); err != nil {
+		s.stopReceive(ctx, receivePort)
+	}
 	return
 }
 
-// Stop audio from storage on player client
-func (s *server) Stop(c context.Context, playerIP, playerPort, deviceName, storageUUID string) (err error) {
-	if err = s.stopSending(c, playerIP, playerPort); err != nil {
+// StopFileRecoding stop receive on receivePort audio signal from recorder with recorderIP from recordeDeviceName
+func (s *server) StopFileRecoding(ctx context.Context, recorderIP, recorderDeviceName, receivePort string) error {
+	s.stopReceive(ctx, receivePort)
+	s.recorder.Stop(ctx, recorderIP, recorderDeviceName)
+	return nil
+}
+
+// RecorderStart start recording audio on recorder with recorderIP from recorderDeviceName and receive on dstAddr
+// channels, rate - recoding param
+func (s *server) RecorderStart(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, dstAddr string) error {
+	return s.recorder.Start(ctx, dstAddr, recorderIP, recorderDeviceName, channels, rate)
+}
+
+// RecoderStop stop recording audio on recorder with recorderIP from recorderDeviceName
+func (s *server) RecoderStop(ctx context.Context, recorderIP, recorderDeviceName string) error {
+	return s.recorder.Stop(ctx, recorderIP, recorderDeviceName)
+}
+
+//todo
+func (s *server) PlayFromRecorder(ctx context.Context, playerIP, playerPort, playerDeviceName string, channels, rate uint32, recorderIP, recorderDeviceName string) (uuid string, err error) {
+	if uuid, err = s.PlayerReceiveStart(ctx, playerIP, playerPort, nil); err != nil {
 		return
 	}
 
-	s.mutexPlaying.Lock()
-	defer s.mutexPlaying.Unlock()
-
-	player := fmt.Sprintf(s.deviceLayout, playerIP, deviceName)
-	if _, isExist := s.playing[player]; isExist {
-		if err = s.player.StopPlay(c, playerIP, deviceName); err != nil {
-			return
-		}
-		if err = s.player.ClearStorage(c, playerIP, storageUUID); err != nil {
-			return
-		}
-		delete(s.playing, player)
+	if err = s.PlayerPlay(ctx, playerIP, uuid, playerDeviceName, channels, rate); err != nil {
+		s.PlayerReceiveStop(ctx, playerIP, playerPort)
 		return
 	}
-	err = fmt.Errorf("%s is not exist", player)
+
+	dstAddr := fmt.Sprintf(s.addrLayout, playerIP, playerPort)
+	if err = s.RecorderStart(ctx, recorderIP, recorderDeviceName, channels, rate, dstAddr); err != nil {
+		s.PlayerReceiveStop(ctx, playerIP, playerPort)
+		s.PlayerStop(ctx, playerIP, playerPort, playerDeviceName, uuid)
+	}
 	return
 }
 
-// StartSendingInFile start recoding player and save on file
-func (s *server) RecordingOnPlayer(c context.Context, playerIP, playerPort, playerDeviceNameName, recoderIP, recorderDeviceName string, channels, rate int) (storageUUID string, err error) {
-	s.mutexRecording.Lock()
-	defer s.mutexRecording.Unlock()
+func (s *server) StopFromRecorder(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid, recorderIP, recorderDeviceName string) error {
+	s.PlayerReceiveStop(ctx, playerIP, playerPort)
+	s.PlayerStop(ctx, playerIP, playerPort, playerDeviceName, uuid)
+	s.RecoderStop(ctx, recorderIP, recorderDeviceName)
+	return nil
+}
 
-	recoder := fmt.Sprintf(s.deviceLayout, recoderIP, recorderDeviceName)
-	if _, isExist := s.recoding[recoder]; !isExist {
-		if storageUUID, err = s.player.StartReceive(c, playerIP, playerPort, nil); err != nil {
+func (s *server) startSending(ctx context.Context, playerIP, playerPort string, r io.Reader) (err error) {
+	s.mutexSending.Lock()
+	defer s.mutexSending.Unlock()
+
+	dstAddr := fmt.Sprintf(s.addrLayout, playerIP, playerPort)
+	if _, isExist := s.sending[dstAddr]; !isExist {
+		c, stop := context.WithCancel(context.Background())
+		if err = s.udp.Send(c, dstAddr, r); err == nil {
+			s.sending[dstAddr] = stop
 			return
 		}
-		if err = s.recorder.StartSend(c, playerIP+":"+playerPort, recoderIP, recorderDeviceName, uint32(channels), uint32(rate)); err != nil {
-			s.player.StopReceive(c, playerIP, playerPort)
-			s.player.ClearStorage(c, playerIP, storageUUID)
-			return
-		}
-		if err = s.Play(c, playerIP, storageUUID, playerDeviceNameName, uint16(channels), uint32(rate)); err != nil {
-			s.player.StopReceive(c, playerIP, playerPort)
-			s.player.ClearStorage(c, playerIP, storageUUID)
-			s.recorder.StopSend(c, recoderIP, recorderDeviceName)
-			return
-		}
-		var stop context.CancelFunc
-		s.recoding[recoder] = stop
+		stop()
 		return
 	}
-	err = fmt.Errorf("%s is busy", recoder)
+	err = ErrDeviceIsBusy
 	return
 }
 
-// StartSendingInFile start recoding player and save on file
-func (s *server) RecordingInFile(c context.Context, fileName, receivePort, recoderIP, recoderDeviceName string, channels, rate int) (err error) {
-	s.mutexRecording.Lock()
-	defer s.mutexRecording.Unlock()
+func (s *server) stopSending(ctx context.Context, playerIP, playerPort string) (err error) {
+	s.mutexSending.Lock()
+	defer s.mutexSending.Unlock()
 
-	recoder := fmt.Sprintf(s.deviceLayout, recoderIP, recoderDeviceName)
-	if _, isExist := s.recoding[recoder]; !isExist {
-		var writer io.WriteCloser
-		ctx, stop := context.WithCancel(context.Background())
-		if writer, err = s.audio.Write(fileName, uint16(channels), uint32(rate)); err == nil {
-			if err = s.udp.Receive(ctx, receivePort, writer); err == nil {
-				if err = s.recorder.StartSend(c, fmt.Sprintf(s.hostLayout, "127.0.0.1", receivePort), recoderIP, recoderDeviceName, uint32(channels), uint32(rate)); err == nil {
-					s.recoding[recoder] = func() {
-						stop()
-						writer.Close()
-					}
-					return
-				}
+	dstAddr := fmt.Sprintf(s.addrLayout, playerIP, playerPort)
+	if stop, isExist := s.sending[dstAddr]; !isExist {
+		stop()
+		delete(s.sending, dstAddr)
+		return
+	}
+	err = ErrDeviceNotFound
+	return
+}
+
+func (s *server) startReceive(ctx context.Context, recorderIP, receivePort string, wc io.WriteCloser) (err error) {
+	s.mutexReceiving.Lock()
+	defer s.mutexReceiving.Unlock()
+
+	if _, isExist := s.receiving[receivePort]; !isExist {
+		c, stop := context.WithCancel(context.Background())
+		if err = s.udp.Receive(c, receivePort, wc); err == nil {
+			s.receiving[receivePort] = func() {
+				stop()
+				wc.Close()
 			}
+			return
 		}
 		stop()
 		return
 	}
-	err = fmt.Errorf("%s is busy", recoder)
+	err = ErrPortIsBusy
 	return
 }
 
-// StopSending ...
-func (s *server) StopRecoding(c context.Context, recoderIP, deviceName string) (err error) {
-	s.mutexRecording.Lock()
-	defer s.mutexRecording.Unlock()
+func (s *server) stopReceive(ctx context.Context, receivePort string) (err error) {
+	s.mutexReceiving.Lock()
+	defer s.mutexReceiving.Unlock()
 
-	recoder := fmt.Sprintf(s.deviceLayout, recoderIP, deviceName)
-	if _, isExist := s.recoding[recoder]; isExist {
-		s.recorder.StopSend(c, recoderIP, deviceName)
-		delete(s.recoding, recoder)
-		return
-	}
-	err = fmt.Errorf("%s is not exist", recoder)
-	return
-}
-
-func (s *server) startSending(c context.Context, destIP, destPort string, r io.Reader) (storageUUID string, err error) {
-	s.mutexSending.Lock()
-	defer s.mutexSending.Unlock()
-
-	host := fmt.Sprintf(s.hostLayout, destIP, destPort)
-	if _, isExist := s.sending[host]; isExist {
-		err = fmt.Errorf("%s is busy", host)
-		return
-	}
-
-	ctx, stop := context.WithCancel(context.Background())
-	if storageUUID, err = s.player.StartReceive(c, destIP, destPort, nil); err != nil {
+	if stop, isExist := s.receiving[receivePort]; !isExist {
 		stop()
+		delete(s.receiving, receivePort)
 		return
 	}
-	if err = s.udp.Send(ctx, host, r); err == nil {
-		s.sending[host] = stop
-		return
-	}
-
-	stop()
-	s.player.StopPlay(c, destIP, destPort)
-	return
-}
-
-// StopSending on player
-func (s *server) stopSending(c context.Context, destIP, destPort string) (err error) {
-	s.mutexSending.Lock()
-	defer s.mutexSending.Unlock()
-
-	host := fmt.Sprintf(s.hostLayout, destIP, destPort)
-	if stop, isExist := s.sending[host]; isExist {
-		stop()
-		if err = s.player.StopReceive(c, destIP, destPort); err == nil {
-			delete(s.sending, host)
-		}
-		return
-	}
-	err = fmt.Errorf("%s is not exist", host)
+	err = ErrPortNotFound
 	return
 }
 
@@ -256,20 +269,21 @@ func NewServer(
 	player player,
 	udp udp,
 
-	hostLayout string,
+	serverIP string,
+	addrLayout string,
 	deviceLayout string,
 ) Server {
 	return &server{
-		sending:  make(map[string]context.CancelFunc),
-		playing:  make(map[string]struct{}),
-		recoding: make(map[string]context.CancelFunc),
+		receiving: make(map[string]func()),
+		sending:   make(map[string]func()),
 
 		audio:    audio,
 		recorder: recorder,
 		player:   player,
 		udp:      udp,
 
-		hostLayout:   hostLayout,
+		serverIP:     serverIP,
+		addrLayout:   addrLayout,
 		deviceLayout: deviceLayout,
 	}
 }

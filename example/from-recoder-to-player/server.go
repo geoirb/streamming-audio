@@ -18,12 +18,14 @@ import (
 )
 
 type configuration struct {
+	ServerIP string `envconfig:"SERVER_IP" default:"127.0.0.1"`
+
 	PlayerPort   string `envconfig:"PLAYER_PORT" default:"8081"`
 	RecorderPort string `envconfig:"RECODER_PORT" default:"8082"`
 
 	UDPBuffSize int `envconfig:"UDP_BUF_SIZE" default:"1024"`
 
-	HostLayout   string `envconfig:"HOST_LAYOUT" default:"%s:%s"`
+	AddrLayout   string `envconfig:"ADDRESS_LAYOUT" default:"%s:%s"`
 	DeviceLayout string `envconfig:"DEVICE_LAYOUT" default:"%s:%s"`
 }
 
@@ -42,11 +44,11 @@ func main() {
 
 	wav := wav.NewWAV()
 	player := player.NewClient(
-		cfg.HostLayout,
+		cfg.AddrLayout,
 		cfg.PlayerPort,
 	)
 	recorder := recorder.NewClient(
-		cfg.HostLayout,
+		cfg.AddrLayout,
 		cfg.RecorderPort,
 	)
 	udp := udp.NewUDP(cfg.UDPBuffSize)
@@ -56,15 +58,16 @@ func main() {
 		player,
 		udp,
 
-		cfg.HostLayout,
+		cfg.ServerIP,
+		cfg.AddrLayout,
 		cfg.DeviceLayout,
 	)
-	svc = server.NewLoggerMiddleware(svc, logger)
-	svc.RecordingOnPlayer(context.Background(), "127.0.0.1", "8083", "hw:0,0", "127.0.0.1", "hw:0,0", 2, 44100)
+	// svc = server.NewLoggerMiddleware(svc, logger)
+	uuid, _ := svc.PlayFromRecorder(context.Background(), "127.0.0.1", "8083", "hw:0,0", 2, 44100, "127.0.0.1", "hw:0,0")
 	level.Error(logger).Log("msg", "server start")
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
-	svc.StopRecoding(context.Background(), "127.0.0.1", "hw:0,0")
+	svc.StopFromRecorder(context.Background(), "127.0.0.1", "8083", "hw:0,0", uuid, "127.0.0.1", "hw:0,0")
 }

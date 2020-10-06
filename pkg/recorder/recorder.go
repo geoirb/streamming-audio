@@ -24,8 +24,8 @@ type Recorder struct {
 	device device
 }
 
-// StartSend ...
-func (r *Recorder) StartSend(c context.Context, in *StartSendRequest) (out *StartSendResponse, err error) {
+// Start ...
+func (r *Recorder) Start(c context.Context, in *StartSendRequest) (out *StartSendResponse, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
@@ -46,8 +46,8 @@ func (r *Recorder) StartSend(c context.Context, in *StartSendRequest) (out *Star
 	return
 }
 
-// StopSend ...
-func (r *Recorder) StopSend(ctx context.Context, in *StopSendRequest) (out *StopSendResponse, err error) {
+// Stop ...
+func (r *Recorder) Stop(ctx context.Context, in *StopSendRequest) (out *StopSendResponse, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 

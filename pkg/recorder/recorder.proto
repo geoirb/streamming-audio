@@ -23,7 +23,7 @@ message StopSendResponse{
 
 // grpc service to record audio
 service Recorder {
-  rpc StartSend (StartSendRequest) returns (StartSendResponse) {}
-  rpc StopSend (StopSendRequest) returns (StopSendResponse) {}
+  rpc Start (StartSendRequest) returns (StartSendResponse) {}
+  rpc Stop (StopSendRequest) returns (StopSendResponse) {}
 }
 

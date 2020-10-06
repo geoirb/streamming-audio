@@ -278,10 +278,10 @@ var file_recorder_proto_goTypes = []interface{}{
 	(*StopSendResponse)(nil),  // 3: recorder.StopSendResponse
 }
 var file_recorder_proto_depIdxs = []int32{
-	0, // 0: recorder.Recorder.StartSend:input_type -> recorder.StartSendRequest
-	2, // 1: recorder.Recorder.StopSend:input_type -> recorder.StopSendRequest
-	1, // 2: recorder.Recorder.StartSend:output_type -> recorder.StartSendResponse
-	3, // 3: recorder.Recorder.StopSend:output_type -> recorder.StopSendResponse
+	0, // 0: recorder.Recorder.Start:input_type -> recorder.StartSendRequest
+	2, // 1: recorder.Recorder.Stop:input_type -> recorder.StopSendRequest
+	1, // 2: recorder.Recorder.Start:output_type -> recorder.StartSendResponse
+	3, // 3: recorder.Recorder.Stop:output_type -> recorder.StopSendResponse
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -376,8 +376,8 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type RecorderClient interface {
-	StartSend(ctx context.Context, in *StartSendRequest, opts ...grpc.CallOption) (*StartSendResponse, error)
-	StopSend(ctx context.Context, in *StopSendRequest, opts ...grpc.CallOption) (*StopSendResponse, error)
+	Start(ctx context.Context, in *StartSendRequest, opts ...grpc.CallOption) (*StartSendResponse, error)
+	Stop(ctx context.Context, in *StopSendRequest, opts ...grpc.CallOption) (*StopSendResponse, error)
 }
 
 type recorderClient struct {
@@ -388,18 +388,18 @@ func NewRecorderClient(cc grpc.ClientConnInterface) RecorderClient {
 	return &recorderClient{cc}
 }
 
-func (c *recorderClient) StartSend(ctx context.Context, in *StartSendRequest, opts ...grpc.CallOption) (*StartSendResponse, error) {
+func (c *recorderClient) Start(ctx context.Context, in *StartSendRequest, opts ...grpc.CallOption) (*StartSendResponse, error) {
 	out := new(StartSendResponse)
-	err := c.cc.Invoke(ctx, "/recorder.Recorder/StartSend", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/recorder.Recorder/Start", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *recorderClient) StopSend(ctx context.Context, in *StopSendRequest, opts ...grpc.CallOption) (*StopSendResponse, error) {
+func (c *recorderClient) Stop(ctx context.Context, in *StopSendRequest, opts ...grpc.CallOption) (*StopSendResponse, error) {
 	out := new(StopSendResponse)
-	err := c.cc.Invoke(ctx, "/recorder.Recorder/StopSend", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/recorder.Recorder/Stop", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -408,19 +408,19 @@ func (c *recorderClient) StopSend(ctx context.Context, in *StopSendRequest, opts
 
 // RecorderServer is the server API for Recorder service.
 type RecorderServer interface {
-	StartSend(context.Context, *StartSendRequest) (*StartSendResponse, error)
-	StopSend(context.Context, *StopSendRequest) (*StopSendResponse, error)
+	Start(context.Context, *StartSendRequest) (*StartSendResponse, error)
+	Stop(context.Context, *StopSendRequest) (*StopSendResponse, error)
 }
 
 // UnimplementedRecorderServer can be embedded to have forward compatible implementations.
 type UnimplementedRecorderServer struct {
 }
 
-func (*UnimplementedRecorderServer) StartSend(context.Context, *StartSendRequest) (*StartSendResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StartSend not implemented")
+func (*UnimplementedRecorderServer) Start(context.Context, *StartSendRequest) (*StartSendResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
 }
-func (*UnimplementedRecorderServer) StopSend(context.Context, *StopSendRequest) (*StopSendResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StopSend not implemented")
+func (*UnimplementedRecorderServer) Stop(context.Context, *StopSendRequest) (*StopSendResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Stop not implemented")
 }
 
 func RegisterRecorderServer(s *grpc.Server, srv RecorderServer) {
@@ -433,14 +433,14 @@ func _Recorder_StartSend_Handler(srv interface{}, ctx context.Context, dec func(
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RecorderServer).StartSend(ctx, in)
+		return srv.(RecorderServer).Start(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/recorder.Recorder/StartSend",
+		FullMethod: "/recorder.Recorder/Start",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RecorderServer).StartSend(ctx, req.(*StartSendRequest))
+		return srv.(RecorderServer).Start(ctx, req.(*StartSendRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -451,14 +451,14 @@ func _Recorder_StopSend_Handler(srv interface{}, ctx context.Context, dec func(i
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RecorderServer).StopSend(ctx, in)
+		return srv.(RecorderServer).Stop(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/recorder.Recorder/StopSend",
+		FullMethod: "/recorder.Recorder/Stop",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RecorderServer).StopSend(ctx, req.(*StopSendRequest))
+		return srv.(RecorderServer).Stop(ctx, req.(*StopSendRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -468,11 +468,11 @@ var _Recorder_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*RecorderServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "StartSend",
+			MethodName: "Start",
 			Handler:    _Recorder_StartSend_Handler,
 		},
 		{
-			MethodName: "StopSend",
+			MethodName: "Stop",
 			Handler:    _Recorder_StopSend_Handler,
 		},
 	},

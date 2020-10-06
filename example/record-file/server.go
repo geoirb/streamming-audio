@@ -18,12 +18,14 @@ import (
 )
 
 type configuration struct {
+	ServerIP string `envconfig:"SERVER_IP" default:"127.0.0.1"`
+
 	PlayerPort   string `envconfig:"PLAYER_PORT" default:"8081"`
 	RecorderPort string `envconfig:"RECODER_PORT" default:"8082"`
 
 	UDPBuffSize int `envconfig:"UDP_BUF_SIZE" default:"1024"`
 
-	HostLayout   string `envconfig:"HOST_LAYOUT" default:"%s:%s"`
+	AddrLayout   string `envconfig:"ADDRESS_LAYOUT" default:"%s:%s"`
 	DeviceLayout string `envconfig:"DEVICE_LAYOUT" default:"%s:%s"`
 
 	RecodeFile string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/testRecode.wav"`
@@ -44,7 +46,7 @@ func main() {
 
 	wav := wav.NewWAV()
 	recorder := recorder.NewClient(
-		cfg.HostLayout,
+		cfg.AddrLayout,
 		cfg.RecorderPort,
 	)
 	udp := udp.NewUDP(cfg.UDPBuffSize)
@@ -54,7 +56,8 @@ func main() {
 		nil,
 		udp,
 
-		cfg.HostLayout,
+		cfg.ServerIP,
+		cfg.AddrLayout,
 		cfg.DeviceLayout,
 	)
 
@@ -63,12 +66,13 @@ func main() {
 	recorderDevice := "hw:0,0"
 	pwd, _ := os.Getwd()
 	file := fmt.Sprintf("%s/%s", pwd, "example/play-file/server/test.wav")
-	svc = server.NewLoggerMiddleware(svc, logger)
-	svc.RecordingInFile(context.Background(), file, receivePort, recorderIP, recorderDevice, 2, 44100)
+	// svc = server.NewLoggerMiddleware(svc, logger)
+	svc.StartFileRecoding(context.Background(), recorderIP, recorderDevice, 2, 44100, receivePort, file)
 	level.Error(logger).Log("msg", "server start")
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 
+	svc.StopFileRecoding(context.Background(), recorderIP, recorderDevice, receivePort)
 }

@@ -18,12 +18,14 @@ import (
 )
 
 type configuration struct {
+	ServerIP string `envconfig:"SERVER_IP" default:"127.0.0.1"`
+
 	PlayerPort   string `envconfig:"PLAYER_PORT" default:"8081"`
 	RecorderPort string `envconfig:"RECODER_PORT" default:"8082"`
 
 	UDPBuffSize int `envconfig:"UDP_BUF_SIZE" default:"1024"`
 
-	HostLayout   string `envconfig:"HOST_LAYOUT" default:"%s:%s"`
+	AddrLayout   string `envconfig:"ADDRESS_LAYOUT" default:"%s:%s"`
 	DeviceLayout string `envconfig:"DEVICE_LAYOUT" default:"%s:%s"`
 }
 
@@ -42,7 +44,7 @@ func main() {
 
 	wav := wav.NewWAV()
 	player := player.NewClient(
-		cfg.HostLayout,
+		cfg.AddrLayout,
 		cfg.PlayerPort,
 	)
 	udp := udp.NewUDP(cfg.UDPBuffSize)
@@ -52,10 +54,11 @@ func main() {
 		player,
 		udp,
 
-		cfg.HostLayout,
+		cfg.ServerIP,
+		cfg.AddrLayout,
 		cfg.DeviceLayout,
 	)
-	svc = server.NewLoggerMiddleware(svc, logger)
+	// svc = server.NewLoggerMiddleware(svc, logger)
 	level.Error(logger).Log("msg", "server start")
 
 	pwd, _ := os.Getwd()
@@ -63,11 +66,11 @@ func main() {
 	playerIP := "127.0.0.1"
 	playerPort := "8083"
 	playerDeviceName := "hw:0,0"
-	uuid, _, _, _ := svc.PlayAudioFile(context.Background(), playerIP, playerPort, file, playerDeviceName)
+	uuid, _, _, _ := svc.FilePlaying(context.Background(), file, playerIP, playerPort, playerDeviceName)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 
-	svc.Stop(context.Background(), playerIP, playerPort, playerDeviceName, uuid)
+	svc.PlayerStop(context.Background(), playerIP, playerPort, playerDeviceName, uuid)
 }
