@@ -58,14 +58,14 @@ func main() {
 		cfg.AddrLayout,
 		cfg.DeviceLayout,
 	)
-	// svc = server.NewLoggerMiddleware(svc, logger)
+	svc = server.NewLoggerMiddleware(svc, logger)
 	level.Error(logger).Log("msg", "server start")
 
 	pwd, _ := os.Getwd()
-	file := fmt.Sprintf("%s/%s", pwd, "example/play-file/server/test.wav")
+	file := fmt.Sprintf("%s/%s", pwd, "example/play-file/test.wav")
 	playerIP := "127.0.0.1"
 	playerPort := "8083"
-	playerDeviceName := "hw:0,0"
+	playerDeviceName := "hw:1,0"
 	uuid, _, _, _ := svc.FilePlaying(context.Background(), file, playerIP, playerPort, playerDeviceName)
 
 	c := make(chan os.Signal, 1)

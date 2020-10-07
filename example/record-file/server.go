@@ -66,7 +66,7 @@ func main() {
 	recorderDevice := "hw:0,0"
 	pwd, _ := os.Getwd()
 	file := fmt.Sprintf("%s/%s", pwd, "example/play-file/server/test.wav")
-	// svc = server.NewLoggerMiddleware(svc, logger)
+	svc = server.NewLoggerMiddleware(svc, logger)
 	svc.StartFileRecoding(context.Background(), recorderIP, recorderDevice, 2, 44100, receivePort, file)
 	level.Error(logger).Log("msg", "server start")
 

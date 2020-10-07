@@ -18,6 +18,7 @@ Streaming audio
   - [X] Recorder
 - [X] Record .wav file
 - [X] HTTP server
+- [ ] Find online Players and Recorders
 - [ ] Overlay 2 tracks
   
 ### Player

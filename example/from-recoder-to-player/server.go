@@ -62,7 +62,7 @@ func main() {
 		cfg.AddrLayout,
 		cfg.DeviceLayout,
 	)
-	// svc = server.NewLoggerMiddleware(svc, logger)
+	svc = server.NewLoggerMiddleware(svc, logger)
 	uuid, _ := svc.PlayFromRecorder(context.Background(), "127.0.0.1", "8083", "hw:0,0", 2, 44100, "127.0.0.1", "hw:0,0")
 	level.Error(logger).Log("msg", "server start")
 

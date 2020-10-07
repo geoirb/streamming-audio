@@ -12,11 +12,13 @@ import (
 	"github.com/geoirb/sound-ethernet-streaming/pkg/player"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/recorder"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/server"
+	"github.com/geoirb/sound-ethernet-streaming/pkg/server/httpserver"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/udp"
 	"github.com/geoirb/sound-ethernet-streaming/pkg/wav"
 )
 
 type configuration struct {
+	Port     string `envconfig:"PORT" default:"8080"`
 	ServerIP string `envconfig:"SERVER_IP" default:"127.0.0.1"`
 
 	PlayerPort   string `envconfig:"PLAYER_PORT" default:"8081"`
@@ -54,7 +56,7 @@ func main() {
 		cfg.RecorderPort,
 	)
 	udp := udp.NewUDP(cfg.UDPBuffSize)
-	_ = server.NewServer(
+	svc := server.NewServer(
 		wav,
 		recorder,
 		player,
@@ -64,11 +66,23 @@ func main() {
 		cfg.AddrLayout,
 		cfg.DeviceLayout,
 	)
-	// svc = server.NewLoggerMiddleware(svc, logger)
+	svc = server.NewLoggerMiddleware(svc, logger)
 
-	level.Error(logger).Log("msg", "server start")
+	server := httpserver.NewServer(svc)
+
+	go func() {
+		level.Info(logger).Log("msg", "start server", "port", cfg.Port)
+		if err := server.ListenAndServe(":" + cfg.Port); err != nil {
+			level.Error(logger).Log("server run failure error %s", err)
+			os.Exit(1)
+		}
+	}()
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
+
+	if err := server.Shutdown(); err != nil {
+		level.Error(logger).Log("server shutdown failure %v", err)
+	}
 }

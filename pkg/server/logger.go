@@ -145,37 +145,6 @@ func (l *loggerMiddleware) StopFileRecoding(ctx context.Context, recorderIP, rec
 	return
 }
 
-func (l *loggerMiddleware) RecorderStart(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, dstAddr string) (err error) {
-	l.logger.Log("RecorderStart", "start")
-	if err = l.server.RecorderStart(ctx, recorderIP, recorderDeviceName, channels, rate, dstAddr); err != nil {
-		l.logger.Log(
-			"RecorderStart", "err",
-			"recorderIP", recorderIP,
-			"recorderDeviceName", recorderDeviceName,
-			"channels", channels,
-			"rate", rate,
-			"dstAddr", dstAddr,
-			"err", err,
-		)
-	}
-	l.logger.Log("RecorderStart", "end")
-	return
-}
-
-func (l *loggerMiddleware) RecoderStop(ctx context.Context, recorderIP, recorderDeviceName string) (err error) {
-	l.logger.Log("RecoderStop", "start")
-	if err = l.server.RecoderStop(ctx, recorderIP, recorderDeviceName); err != nil {
-		l.logger.Log(
-			"RecoderStop", "err",
-			"recorderIP", recorderIP,
-			"recorderDeviceName", recorderDeviceName,
-			"err", err,
-		)
-	}
-	l.logger.Log("RecoderStop", "end")
-	return
-}
-
 func (l *loggerMiddleware) PlayFromRecorder(ctx context.Context, playerIP, playerPort, playerDeviceName string, channels, rate uint32, recorderIP, recorderDeviceName string) (uuid string, err error) {
 	l.logger.Log("PlayFromRecorder", "start")
 	if uuid, err = l.server.PlayFromRecorder(ctx, playerIP, playerPort, playerDeviceName, channels, rate, recorderIP, recorderDeviceName); err != nil {
@@ -216,8 +185,39 @@ func (l *loggerMiddleware) StopFromRecorder(ctx context.Context, playerIP, playe
 	return
 }
 
+func (l *loggerMiddleware) RecorderStart(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, dstAddr string) (err error) {
+	l.logger.Log("RecorderStart", "start")
+	if err = l.server.RecorderStart(ctx, recorderIP, recorderDeviceName, channels, rate, dstAddr); err != nil {
+		l.logger.Log(
+			"RecorderStart", "err",
+			"recorderIP", recorderIP,
+			"recorderDeviceName", recorderDeviceName,
+			"channels", channels,
+			"rate", rate,
+			"dstAddr", dstAddr,
+			"err", err,
+		)
+	}
+	l.logger.Log("RecorderStart", "end")
+	return
+}
+
+func (l *loggerMiddleware) RecoderStop(ctx context.Context, recorderIP, recorderDeviceName string) (err error) {
+	l.logger.Log("RecoderStop", "start")
+	if err = l.server.RecoderStop(ctx, recorderIP, recorderDeviceName); err != nil {
+		l.logger.Log(
+			"RecoderStop", "err",
+			"recorderIP", recorderIP,
+			"recorderDeviceName", recorderDeviceName,
+			"err", err,
+		)
+	}
+	l.logger.Log("RecoderStop", "end")
+	return
+}
+
 // NewLoggerMiddleware logger middleware for server
-func NewLoggerMiddleware(logger log.Logger, server Server) Server {
+func NewLoggerMiddleware(server Server, logger log.Logger) Server {
 	return &loggerMiddleware{
 		server: server,
 		logger: logger,
