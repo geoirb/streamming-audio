@@ -46,18 +46,18 @@ func NewServer(svc svc) *fasthttp.Server {
 	router.Handle(methodFilePlaying, uriFilePlaying, filePlayingHandler(svc, newFilePlayingTransport(), ErrorProcessing))
 
 	router.Handle(methodPlayerReceiveStart, uriPlayerReceiveStart, playerReceiveStartHandler(svc, newPlayerReceiveStartTransport(), ErrorProcessing))
-	// router.Handle(methodPlayerReceiveStop, uriPlayerReceiveStop, Handler(svc, newTransport(), ErrorProcessing))
-	// router.Handle(methodPlayerPlay, uriPlayerPlay, Handler(svc, newTransport(), ErrorProcessing))
-	// router.Handle(methodPlayerPause, uriPlayerPause, Handler(svc, newTransport(), ErrorProcessing))
-	// router.Handle(methodPlayerStop, uriPlayerStop, Handler(svc, newTransport(), ErrorProcessing))
+	router.Handle(methodPlayerReceiveStop, uriPlayerReceiveStop, playerReceiveStopHandler(svc, newPlayerReceiveStopTransport(), ErrorProcessing))
+	router.Handle(methodPlayerPlay, uriPlayerPlay, playerPlayHandler(svc, newPlayerPlayTransport(), ErrorProcessing))
+	router.Handle(methodPlayerPause, uriPlayerPause, playerPauseHandler(svc, newPlayerPauseTransport(), ErrorProcessing))
+	router.Handle(methodPlayerStop, uriPlayerStop, playerStopHandler(svc, newPlayerStopTransport(), ErrorProcessing))
 
-	// router.Handle(methodStartFileRecoding, uriStartFileRecoding, Handler(svc, newTransport(), ErrorProcessing))
-	// router.Handle(methodStopFileRecoding, uriStopFileRecoding, Handler(svc, newTransport(), ErrorProcessing))
-	// router.Handle(methodPlayFromRecorder, uriPlayFromRecorder, Handler(svc, newTransport(), ErrorProcessing))
-	// router.Handle(methodStopFromRecorder, uriStopFromRecorder, Handler(svc, newTransport(), ErrorProcessing))
+	router.Handle(methodStartFileRecoding, uriStartFileRecoding, startFileRecodingHandler(svc, newStartFileRecodingTransport(), ErrorProcessing))
+	router.Handle(methodStopFileRecoding, uriStopFileRecoding, stopFileRecodingHandler(svc, newStopFileRecodingTransport(), ErrorProcessing))
+	router.Handle(methodStopFileRecoding, uriStopFileRecoding, playFromRecorderHandler(svc, newPlayFromRecorderTransport(), ErrorProcessing))
+	router.Handle(methodStopFileRecoding, uriStopFileRecoding, stopFromRecorderHandler(svc, newStopFromRecorderTransport(), ErrorProcessing))
 
-	// router.Handle(methodRecorderStart, uriRecorderStart, Handler(svc, newTransport(), ErrorProcessing))
-	// router.Handle(methodRecorderStart, uriRecorderStart, Handler(svc, newTransport(), ErrorProcessing))
+	router.Handle(methodRecorderStart, uriRecorderStart, recorderStartHandler(svc, newRecorderStartTransport(), ErrorProcessing))
+	router.Handle(methodRecorderStart, uriRecorderStart, recorderStopHandler(svc, newRecorderStopTransport(), ErrorProcessing))
 
 	router.Handle("GET", "/debug/pprof/", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Index))
 	router.Handle("GET", "/debug/pprof/profile", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Profile))
