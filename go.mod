@@ -6,7 +6,7 @@ require (
 	github.com/buaazp/fasthttprouter v0.1.1
 	github.com/cocoonlife/goalsa v0.0.0-20160812085113-b711ae6f3eff
 	github.com/cocoonlife/testify v0.0.0-20160218172820-792cc1faeb64 // indirect
-	github.com/geoirb/wav v0.0.0-20201008163213-ae2133648cc6
+	github.com/geoirb/wav main
 	github.com/go-kit/kit v0.10.0
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.2 // indirect

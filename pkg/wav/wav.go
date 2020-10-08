@@ -17,6 +17,7 @@ func (w *WAV) Reader(data []byte) (r io.Reader, channels uint16, rate uint32, er
 	if err != nil {
 		return
 	}
+
 	channels = wav.GetNumChannels()
 	rate = wav.GetSampleRate()
 	r = wav
