@@ -6,14 +6,10 @@ Start from project root
    
    `sudo apt-get install libasound2-dev`
 
-2. Start player
+2. Start recoder
    
-   `go run cmd/player/main.go`
+   `go run cmd/recorder/main.go`
 
-4. Start recoder
-   
-   `go run cmd/recorder/main.go
+3. Start example server
 
-5. Start example server
-
-   `go run example/from-recoder-to-player/main.go`
+   `go run example/record-file/server.go`

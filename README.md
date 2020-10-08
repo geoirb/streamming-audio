@@ -2,8 +2,8 @@
 
 Streaming audio
 
-* Server - control server
-* Player - client for playing audio signal on audio device
+* Server - control server ([API](cmd/server/API.md))
+* Player - client for playing audio signal on audio device 
 * Recorder - client for receive audio signal from audio device 
 
 ## ToDoc        
@@ -17,9 +17,8 @@ Streaming audio
   - [X] Player
   - [X] Recorder
 - [X] Record .wav file
-- [ ] HTTP server
+- [X] HTTP server 
 - [ ] HTTP client
-- [ ] Find online Players and Recorders
 - [ ] Overlay 2 tracks
   
 ### Player

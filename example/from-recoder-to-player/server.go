@@ -63,11 +63,11 @@ func main() {
 		cfg.DeviceLayout,
 	)
 	svc = server.NewLoggerMiddleware(svc, logger)
-	uuid, _ := svc.PlayFromRecorder(context.Background(), "127.0.0.1", "8083", "hw:0,0", 2, 44100, "127.0.0.1", "hw:0,0")
-	level.Error(logger).Log("msg", "server start")
+	uuid, _ := svc.PlayFromRecorder(context.Background(), "127.0.0.1", "8083", "hw:1,0", 2, 44100, "127.0.0.1", "hw:0,0")
+	level.Info(logger).Log("msg", "server start")
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
-	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
+	level.Info(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 	svc.StopFromRecorder(context.Background(), "127.0.0.1", "8083", "hw:0,0", uuid, "127.0.0.1", "hw:0,0")
 }

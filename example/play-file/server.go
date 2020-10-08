@@ -59,7 +59,7 @@ func main() {
 		cfg.DeviceLayout,
 	)
 	svc = server.NewLoggerMiddleware(svc, logger)
-	level.Error(logger).Log("msg", "server start")
+	level.Info(logger).Log("msg", "server start")
 
 	pwd, _ := os.Getwd()
 	file := fmt.Sprintf("%s/%s", pwd, "example/play-file/test.wav")
@@ -70,7 +70,7 @@ func main() {
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
-	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
+	level.Info(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 
 	svc.PlayerStop(context.Background(), playerIP, playerPort, playerDeviceName, uuid)
 }

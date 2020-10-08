@@ -47,6 +47,8 @@ func main() {
 	r5r = recorder.NewLoggerMiddleware(logger, r5r)
 
 	lis, err := net.Listen("tcp", ":"+cfg.Port)
+	defer lis.Close()
+	
 	if err != nil {
 		level.Error(logger).Log("msg", "failed to turn up tcp connection", "err", err)
 		os.Exit(1)
@@ -56,9 +58,9 @@ func main() {
 	recorder.RegisterRecorderServer(server, r5r)
 
 	go server.Serve(lis)
-	level.Error(logger).Log("msg", "recorder start", "port", cfg.Port)
+	level.Info(logger).Log("msg", "recorder start", "port", cfg.Port)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
-	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
+	level.Info(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 }

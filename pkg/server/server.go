@@ -104,12 +104,15 @@ func (s *server) FilePlaying(ctx context.Context, file, playerIP, playerPort, pl
 	return
 }
 
-//todo
-func (s *server) PlayerReceiveStart(ctx context.Context, playerIP, playerPort string, uuid *string) (string, error) {
+// PlayerReceiveStart player with playerIP start receive signal from server on playerPort.
+// uuid of the storage existing on the player
+// if the storage with uuid does not exist or the uuid is nil, a new storage will be created on the player
+// The signal will be stored in the storage sUUID
+func (s *server) PlayerReceiveStart(ctx context.Context, playerIP, playerPort string, uuid *string) (sUUID string, err error) {
 	return s.player.ReceiveStart(ctx, playerIP, playerPort, uuid)
 }
 
-//todo
+// PlayerReceiveStop player with playerIP stop receive signal from server on playerPort.
 func (s *server) PlayerReceiveStop(ctx context.Context, playerIP, playerPort string) error {
 	return s.player.ReceiveStop(ctx, playerIP, playerPort)
 }
@@ -159,7 +162,7 @@ func (s *server) StopFileRecoding(ctx context.Context, recorderIP, recorderDevic
 	return nil
 }
 
-//todo
+// PlayFromRecorder play audio on player with playerIP from recorder with recorderIP
 func (s *server) PlayFromRecorder(ctx context.Context, playerIP, playerPort, playerDeviceName string, channels, rate uint32, recorderIP, recorderDeviceName string) (uuid string, err error) {
 	if uuid, err = s.PlayerReceiveStart(ctx, playerIP, playerPort, nil); err != nil {
 		return
@@ -178,6 +181,7 @@ func (s *server) PlayFromRecorder(ctx context.Context, playerIP, playerPort, pla
 	return
 }
 
+// StopFromRecorder stop audio on player with playerIP from recorder with recorderIP
 func (s *server) StopFromRecorder(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid, recorderIP, recorderDeviceName string) error {
 	s.PlayerReceiveStop(ctx, playerIP, playerPort)
 	s.PlayerStop(ctx, playerIP, playerPort, playerDeviceName, uuid)
@@ -219,7 +223,7 @@ func (s *server) stopSending(ctx context.Context, playerIP, playerPort string) (
 	defer s.mutexSending.Unlock()
 
 	dstAddr := fmt.Sprintf(s.addrLayout, playerIP, playerPort)
-	if stop, isExist := s.sending[dstAddr]; !isExist {
+	if stop, isExist := s.sending[dstAddr]; isExist {
 		stop()
 		delete(s.sending, dstAddr)
 		return
@@ -252,7 +256,7 @@ func (s *server) stopReceive(ctx context.Context, receivePort string) (err error
 	s.mutexReceiving.Lock()
 	defer s.mutexReceiving.Unlock()
 
-	if stop, isExist := s.receiving[receivePort]; !isExist {
+	if stop, isExist := s.receiving[receivePort]; isExist {
 		stop()
 		delete(s.receiving, receivePort)
 		return

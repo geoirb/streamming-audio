@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -64,15 +64,17 @@ func main() {
 	recorderIP := "127.0.0.1"
 	receivePort := "8083"
 	recorderDevice := "hw:0,0"
-	pwd, _ := os.Getwd()
-	file := fmt.Sprintf("%s/%s", pwd, "example/play-file/server/test.wav")
+	file := "/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/example/record-file/test.wav"
 	svc = server.NewLoggerMiddleware(svc, logger)
 	svc.StartFileRecoding(context.Background(), recorderIP, recorderDevice, 2, 44100, receivePort, file)
-	level.Error(logger).Log("msg", "server start")
+	level.Info(logger).Log("msg", "server start")
+
+	time.Sleep(30 * time.Second)
+
+	svc.StopFileRecoding(context.Background(), recorderIP, recorderDevice, receivePort)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
-	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
+	level.Info(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 
-	svc.StopFileRecoding(context.Background(), recorderIP, recorderDevice, receivePort)
 }

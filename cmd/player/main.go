@@ -55,6 +55,8 @@ func main() {
 	p4r = player.NewLoggerMiddleware(logger, p4r)
 
 	lis, err := net.Listen("tcp", ":"+cfg.Port)
+	defer lis.Close()
+
 	if err != nil {
 		level.Error(logger).Log("msg", "failed to turn up tcp connection", "err", err)
 		os.Exit(1)
@@ -64,9 +66,9 @@ func main() {
 	player.RegisterPlayerServer(server, p4r)
 
 	go server.Serve(lis)
-	level.Error(logger).Log("msg", "player start", "port", cfg.Port)
+	level.Info(logger).Log("msg", "player start", "port", cfg.Port)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
-	level.Error(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
+	level.Info(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 }

@@ -12,8 +12,8 @@ Start from project root
 
 4. Start recoder
    
-   `go run cmd/recorder/main.go
+   `go run cmd/recorder/main.go`
 
 5. Start example server
 
-   `go run example/from-recoder-to-player/main.go`
+   `go run example/from-recoder-to-player/server.go`
