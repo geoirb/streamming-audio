@@ -18,7 +18,7 @@ type device interface {
 // Recorder audio signal
 type Recorder struct {
 	mutex    sync.Mutex
-	recoding map[string]context.CancelFunc
+	recoding map[string]func()
 
 	udp    udp
 	device device
@@ -67,7 +67,7 @@ func NewRecorder(
 	device device,
 ) RecorderServer {
 	return &Recorder{
-		recoding: make(map[string]context.CancelFunc),
+		recoding: make(map[string]func()),
 
 		udp:    udp,
 		device: device,

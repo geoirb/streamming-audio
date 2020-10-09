@@ -23,13 +23,13 @@ type device interface {
 
 type player struct {
 	receivingMutex sync.Mutex
-	receiving      map[string]context.CancelFunc
+	receiving      map[string]func()
 
 	storagingMutex sync.Mutex
 	storaging      map[string]io.ReadWriteCloser
 
 	playingMutex sync.Mutex
-	playing      map[string]context.CancelFunc
+	playing      map[string]func()
 
 	udp     udp
 	device  device
@@ -145,9 +145,9 @@ func NewPlayer(
 	storage storage,
 ) PlayerServer {
 	return &player{
-		receiving: make(map[string]context.CancelFunc),
+		receiving: make(map[string]func()),
 		storaging: make(map[string]io.ReadWriteCloser),
-		playing:   make(map[string]context.CancelFunc),
+		playing:   make(map[string]func()),
 
 		udp:     udp,
 		device:  device,

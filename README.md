@@ -2,7 +2,7 @@
 
 Streaming audio
 
-* Server - control server ([API](cmd/server/API.md))
+* Server - control server [API](pkg/server/httpserver/API.md)
 * Player - client for playing audio signal on audio device 
 * Recorder - client for receive audio signal from audio device 
 
