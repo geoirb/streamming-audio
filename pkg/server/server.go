@@ -42,13 +42,14 @@ type recorder interface {
 
 // Server ...
 type Server interface {
-	FilePlaying(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, err error)
+	FilePlay(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, err error)
+	FileStop(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid string) (err error)
 
 	PlayerReceiveStart(ctx context.Context, playerIP, playerPort string, uuid *string) (string, error)
 	PlayerReceiveStop(ctx context.Context, playerIP, playerPort string) error
 	PlayerPlay(ctx context.Context, playerIP, uuid, playerDeviceName string, channels, rate uint32) (err error)
-	PlayerPause(ctx context.Context, playerIP, playerDeviceName string) (err error)
-	PlayerStop(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid string) (err error)
+	PlayerStop(ctx context.Context, playerIP, playerDeviceName string) (err error)
+	PlayerClearStorage(ctx context.Context, playerIP, uuid string) (err error)
 
 	StartFileRecoding(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error)
 	StopFileRecoding(ctx context.Context, recorderIP, recorderDeviceName, receivePort string) error
@@ -76,10 +77,10 @@ type server struct {
 	deviceLayout string
 }
 
-// FilePlaying send file to player with playerIP on port and play on playerDeviceName
-// channel and rate audio info from file
-// player save audio from server in storage with uuid
-func (s *server) FilePlaying(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, err error) {
+// FilePlay send file to player with playerIP on port and play on playerDeviceName
+// channel and rate audio info from file.
+// Player save audio from server in storage with uuid.
+func (s *server) FilePlay(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, err error) {
 	var data []byte
 	if data, err = ioutil.ReadFile(file); err != nil {
 		return
@@ -104,6 +105,22 @@ func (s *server) FilePlaying(ctx context.Context, file, playerIP, playerPort, pl
 	return
 }
 
+// FileStop stop send file to player with playerIP on port.
+// Stop play audio on playerDeviceName on player with playerIP
+// Clear storage with uuid on player with playerIP
+func (s *server) FileStop(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid string) (err error) {
+	if err = s.stopSending(ctx, playerIP, playerPort); err != nil {
+		return
+	}
+	if err = s.PlayerReceiveStop(ctx, playerIP, playerPort); err != nil {
+		return
+	}
+	if err = s.PlayerStop(ctx, playerIP, playerDeviceName); err != nil {
+		return
+	}
+	return s.stopSending(ctx, playerIP, playerPort)
+}
+
 // PlayerReceiveStart player with playerIP start receive signal from server on playerPort.
 // uuid of the storage existing on the player
 // if the storage with uuid does not exist or the uuid is nil, a new storage will be created on the player
@@ -123,19 +140,18 @@ func (s *server) PlayerPlay(ctx context.Context, playerIP, uuid, playerDeviceNam
 	return s.player.Play(ctx, playerIP, uuid, playerDeviceName, channels, rate)
 }
 
-// PlayerPause pause audio on player with playerIP on playerDeviceName
-func (s *server) PlayerPause(ctx context.Context, playerIP, playerDeviceName string) (err error) {
+// PlayerStop pause audio on player with playerIP on playerDeviceName
+func (s *server) PlayerStop(ctx context.Context, playerIP, playerDeviceName string) (err error) {
 	return s.player.Stop(ctx, playerIP, playerDeviceName)
 }
 
-// PlayerStop stop audio from storage uuid on player with playerIP on playerDeviceName
-func (s *server) PlayerStop(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid string) (err error) {
-	s.stopSending(ctx, playerIP, playerPort)
-	s.player.ReceiveStop(ctx, playerIP, playerPort)
-	s.PlayerPause(ctx, playerIP, playerDeviceName)
-	s.player.ClearStorage(ctx, playerIP, uuid)
-	return
+// PlayerClearStorage clear storage with uuid on player with playerIP
+func (s *server) PlayerClearStorage(ctx context.Context, playerIP, uuid string) (err error) {
+	return s.player.ClearStorage(ctx, playerIP, uuid)
 }
+
+//todo
+// s.stopSending(ctx, playerIP, playerPort)
 
 // StartFileRecoding start receive on receivePort audio signal from recorder with recorderIP from recordeDeviceName and write in file
 // channels, rate - params audio
@@ -170,13 +186,15 @@ func (s *server) PlayFromRecorder(ctx context.Context, playerIP, playerPort, pla
 
 	if err = s.PlayerPlay(ctx, playerIP, uuid, playerDeviceName, channels, rate); err != nil {
 		s.PlayerReceiveStop(ctx, playerIP, playerPort)
+		s.PlayerClearStorage(ctx, playerIP, uuid)
 		return
 	}
 
 	dstAddr := fmt.Sprintf(s.addrLayout, playerIP, playerPort)
 	if err = s.RecorderStart(ctx, recorderIP, recorderDeviceName, channels, rate, dstAddr); err != nil {
 		s.PlayerReceiveStop(ctx, playerIP, playerPort)
-		s.PlayerStop(ctx, playerIP, playerPort, playerDeviceName, uuid)
+		s.PlayerStop(ctx, playerIP, playerDeviceName)
+		s.PlayerClearStorage(ctx, playerIP, uuid)
 	}
 	return
 }
@@ -184,7 +202,8 @@ func (s *server) PlayFromRecorder(ctx context.Context, playerIP, playerPort, pla
 // StopFromRecorder stop audio on player with playerIP from recorder with recorderIP
 func (s *server) StopFromRecorder(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid, recorderIP, recorderDeviceName string) error {
 	s.PlayerReceiveStop(ctx, playerIP, playerPort)
-	s.PlayerStop(ctx, playerIP, playerPort, playerDeviceName, uuid)
+	s.PlayerStop(ctx, playerIP, playerDeviceName)
+	s.PlayerClearStorage(ctx, playerIP, uuid)
 	s.RecoderStop(ctx, recorderIP, recorderDeviceName)
 	return nil
 }

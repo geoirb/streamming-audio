@@ -66,11 +66,11 @@ func main() {
 	playerIP := "127.0.0.1"
 	playerPort := "8083"
 	playerDeviceName := "hw:1,0"
-	uuid, _, _, _ := svc.FilePlaying(context.Background(), file, playerIP, playerPort, playerDeviceName)
+	uuid, _, _, _ := svc.FilePlay(context.Background(), file, playerIP, playerPort, playerDeviceName)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Info(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 
-	svc.PlayerStop(context.Background(), playerIP, playerPort, playerDeviceName, uuid)
+	svc.FileStop(context.Background(), playerIP, playerPort, playerDeviceName, uuid)
 }

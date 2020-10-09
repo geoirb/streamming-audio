@@ -55,12 +55,11 @@ func main() {
 	p4r = player.NewLoggerMiddleware(logger, p4r)
 
 	lis, err := net.Listen("tcp", ":"+cfg.Port)
-	defer lis.Close()
-
 	if err != nil {
 		level.Error(logger).Log("msg", "failed to turn up tcp connection", "err", err)
 		os.Exit(1)
 	}
+	defer lis.Close()
 
 	server := grpc.NewServer()
 	player.RegisterPlayerServer(server, p4r)

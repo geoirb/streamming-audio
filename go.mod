@@ -15,10 +15,10 @@ require (
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/twinj/uuid v1.0.0
 	github.com/valyala/fasthttp v1.16.0
-	golang.org/x/net v0.0.0-20201006153459-a7d1128ccaa0 // indirect
-	golang.org/x/sys v0.0.0-20201008064518-c1f3e3309c71 // indirect
+	golang.org/x/net v0.0.0-20201009032441-dbdefad45b89 // indirect
+	golang.org/x/sys v0.0.0-20201009025420-dfb3f7c4e634 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	google.golang.org/grpc v1.32.0
+	google.golang.org/grpc v1.33.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect
 )

@@ -1,37 +1,20 @@
 package httpserver
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/valyala/fasthttp"
+
+	"github.com/geoirb/sound-ethernet-streaming/pkg/server"
 )
 
-type svc interface {
-	FilePlaying(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, err error)
-
-	PlayerReceiveStart(ctx context.Context, playerIP, playerPort string, uuid *string) (string, error)
-	PlayerReceiveStop(ctx context.Context, playerIP, playerPort string) error
-	PlayerPlay(ctx context.Context, playerIP, uuid, playerDeviceName string, channels, rate uint32) (err error)
-	PlayerPause(ctx context.Context, playerIP, playerDeviceName string) (err error)
-	PlayerStop(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid string) (err error)
-
-	StartFileRecoding(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error)
-	StopFileRecoding(ctx context.Context, recorderIP, recorderDeviceName, receivePort string) error
-	PlayFromRecorder(ctx context.Context, playerIP, playerPort, playerDeviceName string, channels, rate uint32, recorderIP, recorderDeviceName string) (uuid string, err error)
-	StopFromRecorder(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid, recorderIP, recorderDeviceName string) error
-
-	RecorderStart(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, dstAddr string) error
-	RecoderStop(ctx context.Context, recorderIP, recorderDeviceName string) error
-}
-
-type filePlaying struct {
-	svc             svc
-	transport       FilePlayingTransport
+type filePlay struct {
+	svc             server.Server
+	transport       FilePlayTransport
 	errorProcessing errorProcessing
 }
 
-func (s *filePlaying) handler(ctx *fasthttp.RequestCtx) {
+func (s *filePlay) handler(ctx *fasthttp.RequestCtx) {
 	var (
 		err                                                error
 		file, playerIP, playerPort, playerDeviceName, uuid string
@@ -43,7 +26,7 @@ func (s *filePlaying) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if uuid, channels, rate, err = s.svc.FilePlaying(ctx, file, playerIP, playerPort, playerDeviceName); err != nil {
+	if uuid, channels, rate, err = s.svc.FilePlay(ctx, file, playerIP, playerPort, playerDeviceName); err != nil {
 		s.errorProcessing(&ctx.Response, err, -1)
 		return
 	}
@@ -54,8 +37,44 @@ func (s *filePlaying) handler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func filePlayingHandler(svc svc, transport FilePlayingTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
-	s := &filePlaying{
+func filePlayHandler(svc server.Server, transport FilePlayTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+	s := &filePlay{
+		svc:             svc,
+		transport:       transport,
+		errorProcessing: errorProcessing,
+	}
+	return s.handler
+}
+
+type fileStop struct {
+	svc             server.Server
+	transport       FileStopTransport
+	errorProcessing errorProcessing
+}
+
+func (s *fileStop) handler(ctx *fasthttp.RequestCtx) {
+	var (
+		err                                          error
+		playerIP, playerPort, playerDeviceName, uuid string
+	)
+	if playerIP, playerPort, playerDeviceName, uuid, err = s.transport.Decode(ctx); err != nil {
+		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
+		return
+	}
+
+	if err = s.svc.FileStop(ctx, playerIP, playerPort, playerDeviceName, uuid); err != nil {
+		s.errorProcessing(&ctx.Response, err, -1)
+		return
+	}
+
+	if err = s.transport.Encode(&ctx.Response); err != nil {
+		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
+		return
+	}
+}
+
+func fileStopHandler(svc server.Server, transport FileStopTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+	s := &fileStop{
 		svc:             svc,
 		transport:       transport,
 		errorProcessing: errorProcessing,
@@ -64,7 +83,7 @@ func filePlayingHandler(svc svc, transport FilePlayingTransport, errorProcessing
 }
 
 type playerReceiveStart struct {
-	svc             svc
+	svc             server.Server
 	transport       PlayerReceiveStartTransport
 	errorProcessing errorProcessing
 }
@@ -91,7 +110,7 @@ func (s *playerReceiveStart) handler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func playerReceiveStartHandler(svc svc, transport PlayerReceiveStartTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+func playerReceiveStartHandler(svc server.Server, transport PlayerReceiveStartTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
 	s := &playerReceiveStart{
 		svc:             svc,
 		transport:       transport,
@@ -101,7 +120,7 @@ func playerReceiveStartHandler(svc svc, transport PlayerReceiveStartTransport, e
 }
 
 type playerReceiveStop struct {
-	svc             svc
+	svc             server.Server
 	transport       PlayerReceiveStopTransport
 	errorProcessing errorProcessing
 }
@@ -127,7 +146,7 @@ func (s *playerReceiveStop) handler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func playerReceiveStopHandler(svc svc, transport PlayerReceiveStopTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+func playerReceiveStopHandler(svc server.Server, transport PlayerReceiveStopTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
 	s := &playerReceiveStop{
 		svc:             svc,
 		transport:       transport,
@@ -137,7 +156,7 @@ func playerReceiveStopHandler(svc svc, transport PlayerReceiveStopTransport, err
 }
 
 type playerPlay struct {
-	svc             svc
+	svc             server.Server
 	transport       PlayerPlayTransport
 	errorProcessing errorProcessing
 }
@@ -164,7 +183,7 @@ func (s *playerPlay) handler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func playerPlayHandler(svc svc, transport PlayerPlayTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+func playerPlayHandler(svc server.Server, transport PlayerPlayTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
 	s := &playerPlay{
 		svc:             svc,
 		transport:       transport,
@@ -173,13 +192,13 @@ func playerPlayHandler(svc svc, transport PlayerPlayTransport, errorProcessing e
 	return s.handler
 }
 
-type playerPause struct {
-	svc             svc
-	transport       PlayerPauseTransport
+type playerStop struct {
+	svc             server.Server
+	transport       PlayerStopTransport
 	errorProcessing errorProcessing
 }
 
-func (s *playerPause) handler(ctx *fasthttp.RequestCtx) {
+func (s *playerStop) handler(ctx *fasthttp.RequestCtx) {
 	var (
 		err                        error
 		playerIP, playerDeviceName string
@@ -189,7 +208,7 @@ func (s *playerPause) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.svc.PlayerPause(ctx, playerIP, playerDeviceName); err != nil {
+	if err = s.svc.PlayerStop(ctx, playerIP, playerDeviceName); err != nil {
 		s.errorProcessing(&ctx.Response, err, -1)
 		return
 	}
@@ -200,43 +219,7 @@ func (s *playerPause) handler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func playerPauseHandler(svc svc, transport PlayerPauseTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
-	s := &playerPause{
-		svc:             svc,
-		transport:       transport,
-		errorProcessing: errorProcessing,
-	}
-	return s.handler
-}
-
-type playerStop struct {
-	svc             svc
-	transport       PlayerStopTransport
-	errorProcessing errorProcessing
-}
-
-func (s *playerStop) handler(ctx *fasthttp.RequestCtx) {
-	var (
-		err                                          error
-		playerIP, playerPort, playerDeviceName, uuid string
-	)
-	if playerIP, playerPort, playerDeviceName, uuid, err = s.transport.Decode(ctx); err != nil {
-		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
-		return
-	}
-
-	if err = s.svc.PlayerStop(ctx, playerIP, playerPort, playerDeviceName, uuid); err != nil {
-		s.errorProcessing(&ctx.Response, err, -1)
-		return
-	}
-
-	if err = s.transport.Encode(&ctx.Response); err != nil {
-		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
-		return
-	}
-}
-
-func playerStopHandler(svc svc, transport PlayerStopTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+func playerStopHandler(svc server.Server, transport PlayerStopTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
 	s := &playerStop{
 		svc:             svc,
 		transport:       transport,
@@ -245,8 +228,44 @@ func playerStopHandler(svc svc, transport PlayerStopTransport, errorProcessing e
 	return s.handler
 }
 
+type playerClearStorage struct {
+	svc             server.Server
+	transport       PlayerClearStorageTransport
+	errorProcessing errorProcessing
+}
+
+func (s *playerClearStorage) handler(ctx *fasthttp.RequestCtx) {
+	var (
+		err            error
+		playerIP, uuid string
+	)
+	if playerIP, uuid, err = s.transport.Decode(ctx); err != nil {
+		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
+		return
+	}
+
+	if err = s.svc.PlayerClearStorage(ctx, playerIP, uuid); err != nil {
+		s.errorProcessing(&ctx.Response, err, -1)
+		return
+	}
+
+	if err = s.transport.Encode(&ctx.Response); err != nil {
+		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
+		return
+	}
+}
+
+func playerClearStorageHandler(svc server.Server, transport PlayerClearStorageTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+	s := &playerClearStorage{
+		svc:             svc,
+		transport:       transport,
+		errorProcessing: errorProcessing,
+	}
+	return s.handler
+}
+
 type startFileRecoding struct {
-	svc             svc
+	svc             server.Server
 	transport       StartFileRecodingTransport
 	errorProcessing errorProcessing
 }
@@ -273,7 +292,7 @@ func (s *startFileRecoding) handler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func startFileRecodingHandler(svc svc, transport StartFileRecodingTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+func startFileRecodingHandler(svc server.Server, transport StartFileRecodingTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
 	s := &startFileRecoding{
 		svc:             svc,
 		transport:       transport,
@@ -283,7 +302,7 @@ func startFileRecodingHandler(svc svc, transport StartFileRecodingTransport, err
 }
 
 type stopFileRecoding struct {
-	svc             svc
+	svc             server.Server
 	transport       StopFileRecodingTransport
 	errorProcessing errorProcessing
 }
@@ -309,7 +328,7 @@ func (s *stopFileRecoding) handler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func stopFileRecodingHandler(svc svc, transport StopFileRecodingTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+func stopFileRecodingHandler(svc server.Server, transport StopFileRecodingTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
 	s := &stopFileRecoding{
 		svc:             svc,
 		transport:       transport,
@@ -319,7 +338,7 @@ func stopFileRecodingHandler(svc svc, transport StopFileRecodingTransport, error
 }
 
 type playFromRecorder struct {
-	svc             svc
+	svc             server.Server
 	transport       PlayFromRecorderTransport
 	errorProcessing errorProcessing
 }
@@ -346,7 +365,7 @@ func (s *playFromRecorder) handler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func playFromRecorderHandler(svc svc, transport PlayFromRecorderTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+func playFromRecorderHandler(svc server.Server, transport PlayFromRecorderTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
 	s := &playFromRecorder{
 		svc:             svc,
 		transport:       transport,
@@ -356,7 +375,7 @@ func playFromRecorderHandler(svc svc, transport PlayFromRecorderTransport, error
 }
 
 type stopFromRecorder struct {
-	svc             svc
+	svc             server.Server
 	transport       StopFromRecorderTransport
 	errorProcessing errorProcessing
 }
@@ -382,7 +401,7 @@ func (s *stopFromRecorder) handler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func stopFromRecorderHandler(svc svc, transport StopFromRecorderTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+func stopFromRecorderHandler(svc server.Server, transport StopFromRecorderTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
 	s := &stopFromRecorder{
 		svc:             svc,
 		transport:       transport,
@@ -392,7 +411,7 @@ func stopFromRecorderHandler(svc svc, transport StopFromRecorderTransport, error
 }
 
 type recorderStart struct {
-	svc             svc
+	svc             server.Server
 	transport       RecorderStartTransport
 	errorProcessing errorProcessing
 }
@@ -419,7 +438,7 @@ func (s *recorderStart) handler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func recorderStartHandler(svc svc, transport RecorderStartTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+func recorderStartHandler(svc server.Server, transport RecorderStartTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
 	s := &recorderStart{
 		svc:             svc,
 		transport:       transport,
@@ -429,7 +448,7 @@ func recorderStartHandler(svc svc, transport RecorderStartTransport, errorProces
 }
 
 type recorderStop struct {
-	svc             svc
+	svc             server.Server
 	transport       RecorderStopTransport
 	errorProcessing errorProcessing
 }
@@ -455,7 +474,7 @@ func (s *recorderStop) handler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func recorderStopHandler(svc svc, transport RecorderStopTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+func recorderStopHandler(svc server.Server, transport RecorderStopTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
 	s := &recorderStop{
 		svc:             svc,
 		transport:       transport,

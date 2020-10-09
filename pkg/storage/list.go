@@ -9,7 +9,7 @@ type element struct {
 	next *element
 }
 
-// Queue FIFO data struct
+// Queue FIFO data struct.
 type queue struct {
 	top  *element
 	back *element

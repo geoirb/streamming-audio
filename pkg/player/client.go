@@ -24,10 +24,10 @@ func (c *Client) ReceiveStart(ctx context.Context, ip, port string, uuid *string
 		// todo
 		grpc.WithInsecure(),
 	)
-	defer conn.Close()
 	if err != nil {
 		return
 	}
+	defer conn.Close()
 	req := &StartReceiveRequest{
 		Port: port,
 	}
@@ -54,10 +54,10 @@ func (c *Client) ReceiveStop(ctx context.Context, ip, port string) (err error) {
 		// todo
 		grpc.WithInsecure(),
 	)
-	defer conn.Close()
 	if err != nil {
 		return
 	}
+	defer conn.Close()
 
 	_, err = NewPlayerClient(conn).
 		ReceiveStop(
@@ -76,10 +76,10 @@ func (c *Client) Play(ctx context.Context, ip, UUID, deviceName string, channels
 		// todo
 		grpc.WithInsecure(),
 	)
-	defer conn.Close()
 	if err != nil {
 		return
 	}
+	defer conn.Close()
 
 	_, err = NewPlayerClient(conn).
 		Play(
@@ -100,10 +100,10 @@ func (c *Client) Stop(ctx context.Context, playerIP, deviceName string) (err err
 		// todo
 		grpc.WithInsecure(),
 	)
-	defer conn.Close()
 	if err != nil {
 		return
 	}
+	defer conn.Close()
 
 	_, err = NewPlayerClient(conn).
 		Stop(
@@ -122,10 +122,10 @@ func (c *Client) ClearStorage(ctx context.Context, ip, UUID string) (err error) 
 		// todo
 		grpc.WithInsecure(),
 	)
-	defer conn.Close()
 	if err != nil {
 		return
 	}
+	defer conn.Close()
 
 	_, err = NewPlayerClient(conn).
 		ClearStorage(

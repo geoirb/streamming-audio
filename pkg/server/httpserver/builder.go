@@ -7,11 +7,15 @@ import (
 	"github.com/buaazp/fasthttprouter"
 	"github.com/valyala/fasthttp"
 	"github.com/valyala/fasthttp/fasthttpadaptor"
+
+	"github.com/geoirb/sound-ethernet-streaming/pkg/server"
 )
 
 const (
-	methodFilePlaying = http.MethodPost
-	uriFilePlaying    = "/player/file"
+	methodFilePlay = http.MethodPost
+	uriFilePlay    = "/player/file/play"
+	methodFileStop = http.MethodPost
+	uriFileStop    = "/player/file/stop"
 
 	methodPlayerReceiveStart = http.MethodPost
 	uriPlayerReceiveStart    = "/player/receive/start"
@@ -19,10 +23,10 @@ const (
 	uriPlayerReceiveStop     = "/player/receive/stop"
 	methodPlayerPlay         = http.MethodPost
 	uriPlayerPlay            = "/player/play"
-	methodPlayerPause        = http.MethodPost
-	uriPlayerPause           = "/player/pause"
 	methodPlayerStop         = http.MethodPost
 	uriPlayerStop            = "/player/stop"
+	methodPlayerClearStorage = http.MethodPost
+	uriPlayerClearStorage    = "/player/clearstorage"
 
 	methodStartFileRecoding = http.MethodPost
 	uriStartFileRecoding    = "/recoder/file/start"
@@ -40,24 +44,25 @@ const (
 )
 
 // NewServer return http server
-func NewServer(svc svc) *fasthttp.Server {
+func NewServer(svc server.Server) *fasthttp.Server {
 	router := fasthttprouter.New()
 
-	router.Handle(methodFilePlaying, uriFilePlaying, filePlayingHandler(svc, newFilePlayingTransport(), ErrorProcessing))
+	router.Handle(methodFilePlay, uriFilePlay, filePlayHandler(svc, newFilePlayTransport(), ErrorProcessing))
+	router.Handle(methodFileStop, uriFileStop, fileStopHandler(svc, newFileStopTransport(), ErrorProcessing))
 
 	router.Handle(methodPlayerReceiveStart, uriPlayerReceiveStart, playerReceiveStartHandler(svc, newPlayerReceiveStartTransport(), ErrorProcessing))
 	router.Handle(methodPlayerReceiveStop, uriPlayerReceiveStop, playerReceiveStopHandler(svc, newPlayerReceiveStopTransport(), ErrorProcessing))
 	router.Handle(methodPlayerPlay, uriPlayerPlay, playerPlayHandler(svc, newPlayerPlayTransport(), ErrorProcessing))
-	router.Handle(methodPlayerPause, uriPlayerPause, playerPauseHandler(svc, newPlayerPauseTransport(), ErrorProcessing))
 	router.Handle(methodPlayerStop, uriPlayerStop, playerStopHandler(svc, newPlayerStopTransport(), ErrorProcessing))
+	router.Handle(methodPlayerClearStorage, uriPlayerClearStorage, playerClearStorageHandler(svc, newPlayerClearStorageTransport(), ErrorProcessing))
 
 	router.Handle(methodStartFileRecoding, uriStartFileRecoding, startFileRecodingHandler(svc, newStartFileRecodingTransport(), ErrorProcessing))
 	router.Handle(methodStopFileRecoding, uriStopFileRecoding, stopFileRecodingHandler(svc, newStopFileRecodingTransport(), ErrorProcessing))
-	router.Handle(methodStopFileRecoding, uriStopFileRecoding, playFromRecorderHandler(svc, newPlayFromRecorderTransport(), ErrorProcessing))
-	router.Handle(methodStopFileRecoding, uriStopFileRecoding, stopFromRecorderHandler(svc, newStopFromRecorderTransport(), ErrorProcessing))
+	router.Handle(methodPlayFromRecorder, uriPlayFromRecorder, playFromRecorderHandler(svc, newPlayFromRecorderTransport(), ErrorProcessing))
+	router.Handle(methodStopFromRecorder, uriStopFileRecoding, stopFromRecorderHandler(svc, newStopFromRecorderTransport(), ErrorProcessing))
 
 	router.Handle(methodRecorderStart, uriRecorderStart, recorderStartHandler(svc, newRecorderStartTransport(), ErrorProcessing))
-	router.Handle(methodRecorderStart, uriRecorderStart, recorderStopHandler(svc, newRecorderStopTransport(), ErrorProcessing))
+	router.Handle(methodRecoderStop, uriRecorderStop, recorderStopHandler(svc, newRecorderStopTransport(), ErrorProcessing))
 
 	router.Handle("GET", "/debug/pprof/", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Index))
 	router.Handle("GET", "/debug/pprof/profile", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Profile))

@@ -11,11 +11,11 @@ type loggerMiddleware struct {
 	logger log.Logger
 }
 
-func (l *loggerMiddleware) FilePlaying(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, err error) {
-	l.logger.Log("FilePlaying", "start")
-	if uuid, channels, rate, err = l.server.FilePlaying(ctx, file, playerIP, playerPort, playerDeviceName); err != nil {
+func (l *loggerMiddleware) FilePlay(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, err error) {
+	l.logger.Log("FilePlay", "start")
+	if uuid, channels, rate, err = l.server.FilePlay(ctx, file, playerIP, playerPort, playerDeviceName); err != nil {
 		l.logger.Log(
-			"FilePlaying", "err",
+			"FilePlay", "err",
 			"file", file,
 			"playerIP", playerIP,
 			"playerPort", playerPort,
@@ -25,11 +25,28 @@ func (l *loggerMiddleware) FilePlaying(ctx context.Context, file, playerIP, play
 		return
 	}
 	l.logger.Log(
-		"FilePlaying", "end",
+		"FilePlay", "end",
 		"uuid", uuid,
 		"channels", channels,
 		"rate", rate,
 	)
+	return
+}
+
+func (l *loggerMiddleware) FileStop(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid string) (err error) {
+	l.logger.Log("FilePlay", "start")
+	if err = l.server.FileStop(ctx, playerIP, playerPort, playerDeviceName, uuid); err != nil {
+		l.logger.Log(
+			"FilePlay", "err",
+			"playerIP", playerIP,
+			"playerPort", playerPort,
+			"playerDeviceName", playerDeviceName,
+			"uuid", uuid,
+			"err", err,
+		)
+		return
+	}
+	l.logger.Log("FilePlay", "end")
 	return
 }
 
@@ -82,33 +99,31 @@ func (l *loggerMiddleware) PlayerPlay(ctx context.Context, playerIP, uuid, playe
 	return
 }
 
-func (l *loggerMiddleware) PlayerPause(ctx context.Context, playerIP, playerDeviceName string) (err error) {
-	l.logger.Log("PlayerPause", "start")
-	if err = l.server.PlayerPause(ctx, playerIP, playerDeviceName); err != nil {
-		l.logger.Log(
-			"PlayerPause", "err",
-			"playerIP", playerIP,
-			"playerDeviceName", playerDeviceName,
-			"err", err,
-		)
-	}
-	l.logger.Log("PlayerPause", "end")
-	return
-}
-
-func (l *loggerMiddleware) PlayerStop(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid string) (err error) {
+func (l *loggerMiddleware) PlayerStop(ctx context.Context, playerIP, playerDeviceName string) (err error) {
 	l.logger.Log("PlayerStop", "start")
-	if err = l.server.PlayerStop(ctx, playerIP, playerPort, playerDeviceName, uuid); err != nil {
+	if err = l.server.PlayerStop(ctx, playerIP, playerDeviceName); err != nil {
 		l.logger.Log(
 			"PlayerStop", "err",
 			"playerIP", playerIP,
-			"playerPort", playerPort,
 			"playerDeviceName", playerDeviceName,
-			"uuid", uuid,
 			"err", err,
 		)
 	}
 	l.logger.Log("PlayerStop", "end")
+	return
+}
+
+func (l *loggerMiddleware) PlayerClearStorage(ctx context.Context, playerIP, uuid string) (err error) {
+	l.logger.Log("PlayerClearStorage", "start")
+	if err = l.server.PlayerClearStorage(ctx, playerIP, uuid); err != nil {
+		l.logger.Log(
+			"PlayerClearStorage", "err",
+			"playerIP", playerIP,
+			"uuid", uuid,
+			"err", err,
+		)
+	}
+	l.logger.Log("PlayerClearStorage", "end")
 	return
 }
 
@@ -216,7 +231,7 @@ func (l *loggerMiddleware) RecoderStop(ctx context.Context, recorderIP, recorder
 	return
 }
 
-// NewLoggerMiddleware logger middleware for server
+// NewLoggerMiddleware logger middleware for server.
 func NewLoggerMiddleware(server Server, logger log.Logger) Server {
 	return &loggerMiddleware{
 		server: server,

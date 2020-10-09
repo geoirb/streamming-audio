@@ -7,35 +7,35 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-// FilePlayingTransport ...
-type FilePlayingTransport interface {
+// FilePlayTransport ...
+type FilePlayTransport interface {
 	Decode(ctx *fasthttp.RequestCtx) (file, playerIP, playerPort, playerDeviceName string, err error)
 	Encode(res *fasthttp.Response, uuid string, channels uint16, rate uint32) (err error)
 }
 
-type filePlayingTransport struct{}
+type filePlayTransport struct{}
 
-type filePlayingRequest struct {
+type filePlayRequest struct {
 	File             string `json:"file"`
 	PlayerIP         string `json:"playerIP"`
 	PlayerPort       string `json:"playerPort"`
 	PlayerDeviceName string `json:"playerDeviceName"`
 }
 
-func (t *filePlayingTransport) Decode(ctx *fasthttp.RequestCtx) (string, string, string, string, error) {
-	var request filePlayingRequest
+func (t *filePlayTransport) Decode(ctx *fasthttp.RequestCtx) (string, string, string, string, error) {
+	var request filePlayRequest
 	err := json.Unmarshal(ctx.Request.Body(), &request)
 	return request.File, request.PlayerIP, request.PlayerPort, request.PlayerDeviceName, err
 }
 
-type filePlayingResponse struct {
+type filePlayResponse struct {
 	UUID     string `json:"uuid"`
 	Channels uint16 `json:"channels"`
 	Rate     uint32 `json:"rate"`
 }
 
-func (t *filePlayingTransport) Encode(res *fasthttp.Response, uuid string, channels uint16, rate uint32) (err error) {
-	response := &filePlayingResponse{
+func (t *filePlayTransport) Encode(res *fasthttp.Response, uuid string, channels uint16, rate uint32) (err error) {
+	response := &filePlayResponse{
 		UUID:     uuid,
 		Channels: channels,
 		Rate:     rate,
@@ -46,8 +46,43 @@ func (t *filePlayingTransport) Encode(res *fasthttp.Response, uuid string, chann
 	return
 }
 
-func newFilePlayingTransport() FilePlayingTransport {
-	return &filePlayingTransport{}
+func newFilePlayTransport() FilePlayTransport {
+	return &filePlayTransport{}
+}
+
+// FileStopTransport ...
+type FileStopTransport interface {
+	Decode(ctx *fasthttp.RequestCtx) (playerIP, playerPort, playerDeviceName, uuid string, err error)
+	Encode(res *fasthttp.Response) (err error)
+}
+
+type fileStopTransport struct{}
+
+type fileStopRequest struct {
+	PlayerIP         string `json:"playerIP"`
+	PlayerPort       string `json:"playerPort"`
+	PlayerDeviceName string `json:"playerDeviceName"`
+	UUID             string `json:"uuid"`
+}
+
+func (t *fileStopTransport) Decode(ctx *fasthttp.RequestCtx) (string, string, string, string, error) {
+	var request fileStopRequest
+	err := json.Unmarshal(ctx.Request.Body(), &request)
+	return request.PlayerIP, request.PlayerPort, request.PlayerDeviceName, request.UUID, err
+}
+
+type fileStopResponse struct{}
+
+func (t *fileStopTransport) Encode(res *fasthttp.Response) (err error) {
+	response := &fileStopResponse{}
+	body, err := json.Marshal(response)
+	res.SetBody(body)
+	res.SetStatusCode(http.StatusOK)
+	return
+}
+
+func newFileStopTransport() FileStopTransport {
+	return &fileStopTransport{}
 }
 
 // PlayerReceiveStartTransport ...
@@ -157,42 +192,9 @@ func newPlayerPlayTransport() PlayerPlayTransport {
 	return &playerPlayTransport{}
 }
 
-// PlayerPauseTransport ...
-type PlayerPauseTransport interface {
-	Decode(ctx *fasthttp.RequestCtx) (playerIP, playerDeviceName string, err error)
-	Encode(res *fasthttp.Response) (err error)
-}
-
-type playerPauseTransport struct{}
-
-type playerPauseRequest struct {
-	PlayerIP         string `json:"playerIP"`
-	PlayerDeviceName string `json:"playerDeviceName"`
-}
-
-func (t *playerPauseTransport) Decode(ctx *fasthttp.RequestCtx) (string, string, error) {
-	var request playerPauseRequest
-	err := json.Unmarshal(ctx.Request.Body(), &request)
-	return request.PlayerIP, request.PlayerDeviceName, err
-}
-
-type playerPauseResponse struct{}
-
-func (t *playerPauseTransport) Encode(res *fasthttp.Response) (err error) {
-	response := &playerPauseResponse{}
-	body, err := json.Marshal(response)
-	res.SetBody(body)
-	res.SetStatusCode(http.StatusOK)
-	return
-}
-
-func newPlayerPauseTransport() PlayerPauseTransport {
-	return &playerPauseTransport{}
-}
-
 // PlayerStopTransport ...
 type PlayerStopTransport interface {
-	Decode(ctx *fasthttp.RequestCtx) (playerIP, playerPort, playerDeviceName, uuid string, err error)
+	Decode(ctx *fasthttp.RequestCtx) (playerIP, playerDeviceName string, err error)
 	Encode(res *fasthttp.Response) (err error)
 }
 
@@ -200,15 +202,13 @@ type playerStopTransport struct{}
 
 type playerStopRequest struct {
 	PlayerIP         string `json:"playerIP"`
-	PlayerPort       string `json:"playerPort"`
 	PlayerDeviceName string `json:"playerDeviceName"`
-	UUID             string `json:"uuid"`
 }
 
-func (t *playerStopTransport) Decode(ctx *fasthttp.RequestCtx) (string, string, string, string, error) {
+func (t *playerStopTransport) Decode(ctx *fasthttp.RequestCtx) (string, string, error) {
 	var request playerStopRequest
 	err := json.Unmarshal(ctx.Request.Body(), &request)
-	return request.PlayerIP, request.PlayerPort, request.PlayerDeviceName, request.UUID, err
+	return request.PlayerIP, request.PlayerDeviceName, err
 }
 
 type playerStopResponse struct{}
@@ -223,6 +223,39 @@ func (t *playerStopTransport) Encode(res *fasthttp.Response) (err error) {
 
 func newPlayerStopTransport() PlayerStopTransport {
 	return &playerStopTransport{}
+}
+
+// PlayerClearStorageTransport ...
+type PlayerClearStorageTransport interface {
+	Decode(ctx *fasthttp.RequestCtx) (playerIP, uuid string, err error)
+	Encode(res *fasthttp.Response) (err error)
+}
+
+type playerClearStorageTransport struct{}
+
+type playerClearStorageRequest struct {
+	PlayerIP string `json:"playerIP"`
+	UUID     string `json:"uuid"`
+}
+
+func (t *playerClearStorageTransport) Decode(ctx *fasthttp.RequestCtx) (string, string, error) {
+	var request playerClearStorageRequest
+	err := json.Unmarshal(ctx.Request.Body(), &request)
+	return request.PlayerIP, request.UUID, err
+}
+
+type playerClearStorageResponse struct{}
+
+func (t *playerClearStorageTransport) Encode(res *fasthttp.Response) (err error) {
+	response := &playerClearStorageResponse{}
+	body, err := json.Marshal(response)
+	res.SetBody(body)
+	res.SetStatusCode(http.StatusOK)
+	return
+}
+
+func newPlayerClearStorageTransport() PlayerClearStorageTransport {
+	return &playerClearStorageTransport{}
 }
 
 // StartFileRecodingTransport ...
@@ -400,7 +433,7 @@ func (t *recorderStartTransport) Decode(ctx *fasthttp.RequestCtx) (string, strin
 type recorderStartResponse struct{}
 
 func (t *recorderStartTransport) Encode(res *fasthttp.Response) (err error) {
-	response := &stopFromRecorderResponse{}
+	response := &recorderStartResponse{}
 	body, err := json.Marshal(response)
 	res.SetBody(body)
 	res.SetStatusCode(http.StatusOK)

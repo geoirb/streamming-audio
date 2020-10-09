@@ -40,7 +40,7 @@ Streaming audio
 1. Скачать проект на машину, на которой будет развернут server
 
         git clone git@github.com:GeoIrb/sound-ethernet-streaming.git
-2. Поместите аудиофайл, который необходимо будет стримить в папку `audio/`
+2. Поместите аудиофайл, который необходимо будет стриммить в папку `audio/`
 
 3. Собрать образ сервера
 
@@ -49,12 +49,12 @@ Streaming audio
 
         docker run -d --rm \
         -p PORT:PORT \ 
-        -e ENVIROMENTS \ 
+        -e ENVIRONMENTS \ 
         IMAGE-NAME
 
 **PORT** - порт, на который будет раздача (возможно это лишнее)
 
-**ENVIROMENTS** - переменные окружения
+**ENVIRONMENTS** - переменные окружения
 
 - FILE=/audio/`FILE`.wav - файл для стримминга
 - DST_ADDRESS="IP:PORT" - на какой IP и на какой PORT будет рассылка, по умолчанию 255.255.255.255:8080 - рассылка по всей сети на порт 8080
@@ -76,12 +76,12 @@ Streaming audio
         -p 0.0.0.0:8081:8081/tcp \ 
         -p 0.0.0.0:PORT:PORT -p 0.0.0.0:PORT:PORT/udp \
         --device /dev/snd \
-        -e ENVIROMENTS \
+        -e ENVIRONMENTS \
         IMAGE-NAME
 
 **PORT** - порт, на котором будет работать клиент
 
-**ENVIROMENTS** - переменные окружения
+**ENVIRONMENTS** - переменные окружения
 
 - PORT - порт, на котором будет работать клиент
 - PLAYBACK_DEVICE_NAME - устройство, на котором будет воспроизводиться принятый аудио сигнал

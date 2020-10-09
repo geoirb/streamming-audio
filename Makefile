@@ -1,13 +1,12 @@
 lint:
-	go mod tidy
 	go fmt ./...
 	go vet ./...
-	go get -u golang.org/x/lint/golint	
+	go get golang.org/x/lint/golint	
 	golint -set_exit_status $(go list ./...)
-	go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
-	golangci-lint run -E gofmt -E golint -E vet
+	go get github.com/golangci/golangci-lint/cmd/golangci-lint
+	golangci-lint run -E gofmt -E golint -E vet 
 
-build-server:
+build-recorder:
 	docker build -t $(tag) -f build/recorder/Dockerfile .
 
 build-player:

@@ -20,10 +20,10 @@ func (c *Client) Start(ctx context.Context, destAddr, recorderIP, deviceName str
 		// todo
 		grpc.WithInsecure(),
 	)
-	defer conn.Close()
 	if err != nil {
 		return
 	}
+	defer conn.Close()
 
 	_, err = NewRecorderClient(conn).
 		Start(
@@ -47,10 +47,10 @@ func (c *Client) Stop(ctx context.Context, recorderIP, deviceName string) (err e
 		// todo
 		grpc.WithInsecure(),
 	)
-	defer conn.Close()
 	if err != nil {
 		return
 	}
+	defer conn.Close()
 
 	_, err = NewRecorderClient(conn).
 		Stop(
