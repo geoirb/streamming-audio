@@ -40,7 +40,7 @@ type recorder interface {
 	Stop(ctx context.Context, recorderIP, deviceName string) (err error)
 }
 
-// Server ...
+// Server for control recorder and player
 type Server interface {
 	FilePlay(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, err error)
 	FileStop(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid string) (err error)
@@ -118,7 +118,7 @@ func (s *server) FileStop(ctx context.Context, playerIP, playerPort, playerDevic
 	if err = s.PlayerStop(ctx, playerIP, playerDeviceName); err != nil {
 		return
 	}
-	return s.stopSending(ctx, playerIP, playerPort)
+	return s.PlayerClearStorage(ctx, playerIP, uuid)
 }
 
 // PlayerReceiveStart player with playerIP start receive signal from server on playerPort.
@@ -149,9 +149,6 @@ func (s *server) PlayerStop(ctx context.Context, playerIP, playerDeviceName stri
 func (s *server) PlayerClearStorage(ctx context.Context, playerIP, uuid string) (err error) {
 	return s.player.ClearStorage(ctx, playerIP, uuid)
 }
-
-//todo
-// s.stopSending(ctx, playerIP, playerPort)
 
 // StartFileRecoding start receive on receivePort audio signal from recorder with recorderIP from recordeDeviceName and write in file
 // channels, rate - params audio

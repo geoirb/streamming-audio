@@ -6,7 +6,10 @@ package recorder;
 
 // grpc service to record audio
 service Recorder {
+  // todo Info
+  // Start record from deviceName and send audio on destAddr
   rpc Start (StartSendRequest) returns (StartSendResponse) {}
+  // Stop record from deviceName
   rpc Stop (StopSendRequest) returns (StopSendResponse) {}
 }
 

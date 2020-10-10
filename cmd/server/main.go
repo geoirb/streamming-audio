@@ -28,9 +28,6 @@ type configuration struct {
 
 	AddrLayout   string `envconfig:"ADDRESS_LAYOUT" default:"%s:%s"`
 	DeviceLayout string `envconfig:"DEVICE_LAYOUT" default:"%s:%s"`
-
-	PlayFile   string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/test.wav"`
-	RecodeFile string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/testRecode.wav"`
 }
 
 func main() {
@@ -81,8 +78,8 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Info(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
-
-	if err := server.Shutdown(); err != nil {
-		level.Info(logger).Log("server shutdown failure %v", err)
-	}
+	// todo
+	// if err := server.Shutdown(); err != nil {
+	// 	level.Error(logger).Log("server shutdown failure %v", err)
+	// }
 }

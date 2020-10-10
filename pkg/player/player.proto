@@ -7,9 +7,13 @@ import "google/protobuf/wrappers.proto";
 
 // grpc service to play audio
 service Player {
+  // todo info
+  // Start receive data on port and save on storage
   rpc ReceiveStart (StartReceiveRequest) returns (StartReceiveResponse) {}
   rpc ReceiveStop (StopReceiveRequest) returns (StopReceiveResponse) {}
+  // Play audio on deviceName drom storage
   rpc Play (StartPlayRequest) returns (StartPlayResponse) {}
+  // Stop audio on deviceName
   rpc Stop (StopPlayRequest) returns (StopPlayResponse) {}
   rpc ClearStorage(ClearStorageRequest) returns (ClearStorageResponse) {}
 }

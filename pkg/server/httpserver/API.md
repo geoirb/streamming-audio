@@ -58,13 +58,20 @@ POST
 * Тело запроса:
 ```json
 {
+	"playerIP": "string",
+	"playerPort": "string",
+	"playerDeviceName": "string",
+	"uuid": "string"
 }
 ```
-* Тело ответа:
-```json
-{
-}
-```
+> playerIP - ip плеера, на котором будет воспроизводиться файл
+> 
+> playerPort - порт плеера, на который сервер будет отсылать аудио сигнал
+> 
+> playerDeviceName - устройство, на котором будет идти воспроизведение
+> 
+> uuid - хранилище, из которого будет идти воспроизведение
+
 * Описание:
 
 Сервер перестает передавать аудио данные на порт `playerPort` плеера `playerIP`. Плеер останавливает воспроизведение на аудиоустройстве `playerDeviceName` и очищает хранилище `uuid`
@@ -82,13 +89,25 @@ POST
 * Тело запроса:
 ```json
 {
+	"playerIP": "string",
+	"playerPort": "string",
+	"uuid": "string"
 }
 ```
+> playerIP - ip плеера
+> 
+> playerPort - порт плеера, на который сервер будет отсылать аудио сигнал
+> 
+> uuid - хранилище, куда будет сохраняться данные, необязательное поле
+
 * Тело ответа:
 ```json
 {
+	"uuid": "string"
 }
 ```
+> uuid - хранилище, куда будет сохраняться данные
+
 * Описание:
 
 Плеер `playerIP` начинает прием данных на порте `playerPort` и сохраняет их в хранилище `uuid`
@@ -106,13 +125,14 @@ POST
 * Тело запроса:
 ```json
 {
+	"playerIP": "string",
+	"playerPort": "string"
 }
 ```
-* Тело ответа:
-```json
-{
-}
-```
+> playerIP - ip плеера
+> 
+> playerPort - порт плеера, на который сервер передает аудио сигнал
+
 * Описание:
   
 Плеер `playerIP` прекращает прием данных на порте `playerPort`
@@ -165,14 +185,17 @@ POST
 * Тело запроса:
 ```json
 {
+	"playerIP": "string",
+	"playerDeviceName": "string"
 }
 ```
-* Тело ответа:
-```json
-{
-}
-```
+> playerIP - ip плеера
+> 
+> playerDeviceName - устройство, на котором идет воспроизведение
+
 * Описание:
+
+Останавливает воспроизведение на устройстве `playerDeviceName` на плеере `playerIP`
 
 Очистить хранилище на плеере
 ---
@@ -187,14 +210,17 @@ POST
 * Тело запроса:
 ```json
 {
+	"playerIP": "string",
+	"uuid": "string"
 }
 ```
-* Тело ответа:
-```json
-{
-}
-```
+> playerIP - ip плеера
+>
+> uuid - хранилище
+
 * Описание:
+ 
+Очищает хранилище `uuid` на плеере `playerIP` 
 
 Начать запись аудио в файл
 ---
@@ -209,14 +235,29 @@ POST
 * Тело запроса:
 ```json
 {
+	"recorderIP": "string",
+	"recorderDeviceName": "string",
+	"channels": uint32,
+	"rate": uint32,
+	"receivePort": "string",
+	"file": "string"
 }
 ```
-* Тело ответа:
-```json
-{
-}
-```
+>recorderIP - ip рекордера
+>
+>recorderDeviceName - устройство записи
+>
+>channels - количество аудиопотоков
+>
+>rate - частота дискретизации 
+>
+>receivePort - порт сервера на который рекордер отправляет аудиосигнал 
+>
+>file - имя файла для записи
+
 * Описание:
+
+Начинает запись аудио с рекордера `recorderIP` в wav файл `file`
 
 Остановить запись аудио в файл
 ---
@@ -231,14 +272,21 @@ POST
 * Тело запроса:
 ```json
 {
+	"recorderIP": "string",
+	"recorderDeviceName": "string",
+	"receivePort": "string"
 }
 ```
-* Тело ответа:
-```json
-{
-}
-```
+
+>recorderIP - ip рекордера
+>
+>recorderDeviceName - устройство записи
+>
+>receivePort - порт сервера на который рекордер отправляет аудиосигнал 
+
 * Описание:
+
+Остановка записи аудио в файл
   
 Начать передачу аудио с рекордера на плеер
 ---
@@ -253,14 +301,41 @@ POST
 * Тело запроса:
 ```json
 {
+	"playerIP": "string",
+	"playerPort": "string",
+	"playerDeviceName": "string",
+	"channels": uint32,
+	"rate": uint32,
+	"recorderIP": "string",
+	"recorderDeviceName": "string"
 }
 ```
+
+>playerIP - ip плеера
+> 
+>playerPort - порт плеера, на который рекордер передает аудио сигнал
+>
+>playerDeviceName - устройство воспроизведение
+>
+>channels - количество аудиопотоков
+>
+>rate - частота дискретизации
+> 
+>recorderIP - ip рекордера
+>
+>recorderDeviceName - устройство записи
+
 * Тело ответа:
 ```json
 {
+	"uuid": "string"
 }
 ```
+>uuid - хранилище на плеере с данными с рекордера
+
 * Описание:
+
+Рекордер `recorderIP` начинает получать аудио с устройства `recorderDeviceName` и отправляет его на плеер `playerIP` на порт `playerPort`. Плеер сохранет аудио данные в хранилище `uuid` и, постепенно вычитывая из хранилища, воспроизводит на аудиоустройстве `playerDeviceName`
 
 Завершить передачу данных с рекордера на плеер
 ---
@@ -275,15 +350,31 @@ POST
 * Тело запроса:
 ```json
 {
+	"playerIP": "string",
+	"playerPort": "string",
+	"playerDeviceName": "string",
+	"uuid": "string",
+	"recorderIP": "string",
+	"recorderDeviceName": "string"
 }
 ```
-* Тело ответа:
-```json
-{
-}
-```
+
+>playerIP - ip плеера
+> 
+>playerPort - порт плеера, на который рекордер передает аудио сигнал
+>
+>playerDeviceName - устройство воспроизведение
+>
+>uuid - хранилище на плеере с данными с рекордера
+> 
+>recorderIP - ip рекордера
+>
+>recorderDeviceName - устройство записи
+
 * Описание:
-  
+
+Останавливает получение аудио на рекордере `recorderIP` и передачу на плеер `playerIP`. Плеер прекращает воспроизведение аудио и очищает хранилище `uuid`
+
 Запустить рекордер
 ---
 * URI:
@@ -297,14 +388,26 @@ POST
 * Тело запроса:
 ```json
 {
+	"recorderIP": "string",
+	"recorderDeviceName": "string",
+	"channels": uint32,
+	"rate": uint32,
+	"dstAddr": "string"
 }
 ```
-* Тело ответа:
-```json
-{
-}
-```
+>recorderIP - ip рекордера
+>
+>recorderDeviceName - устройство записи
+>
+>channels - количество аудиопотоков
+>
+>rate - частота дискретизации
+>
+>dstAddr - адрес, на который необходимо отправлять аудио 
+
 * Описание:
+
+Запускает получение аудио с устройства `recorderDeviceName` на рекордере `recorderIP` и передает на адрес `dstAddr`
 
 Остановить рекордер 
 ---
@@ -319,12 +422,15 @@ POST
 * Тело запроса:
 ```json
 {
+	"recorderIP": "string",
+	"recorderDeviceName"`: "string"
 }
 ```
-* Тело ответа:
-```json
-{
-}
-```
+
+>recorderIP - ip рекордера
+>
+>recorderDeviceName - устройство записи
+
 * Описание:
   
+Останавливает получение аудио с устройства `recorderDeviceName` на рекордере `recorderIP` и передачу 

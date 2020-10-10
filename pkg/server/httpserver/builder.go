@@ -59,7 +59,7 @@ func NewServer(svc server.Server) *fasthttp.Server {
 	router.Handle(methodStartFileRecoding, uriStartFileRecoding, startFileRecodingHandler(svc, newStartFileRecodingTransport(), ErrorProcessing))
 	router.Handle(methodStopFileRecoding, uriStopFileRecoding, stopFileRecodingHandler(svc, newStopFileRecodingTransport(), ErrorProcessing))
 	router.Handle(methodPlayFromRecorder, uriPlayFromRecorder, playFromRecorderHandler(svc, newPlayFromRecorderTransport(), ErrorProcessing))
-	router.Handle(methodStopFromRecorder, uriStopFileRecoding, stopFromRecorderHandler(svc, newStopFromRecorderTransport(), ErrorProcessing))
+	router.Handle(methodStopFromRecorder, uriStopFromRecorder, stopFromRecorderHandler(svc, newStopFromRecorderTransport(), ErrorProcessing))
 
 	router.Handle(methodRecorderStart, uriRecorderStart, recorderStartHandler(svc, newRecorderStartTransport(), ErrorProcessing))
 	router.Handle(methodRecoderStop, uriRecorderStop, recorderStopHandler(svc, newRecorderStopTransport(), ErrorProcessing))
