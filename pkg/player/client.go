@@ -14,6 +14,28 @@ type Client struct {
 	controlPort string
 }
 
+// State todo
+func (c *Client) State(ctx context.Context, ip string) (ports, storages, devices []string, err error) {
+	conn, err := grpc.Dial(
+		fmt.Sprintf(c.hostLayout, ip, c.controlPort),
+		// todo
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		return
+	}
+	defer conn.Close()
+
+	if res, err := NewPlayerClient(conn).
+		State(
+			ctx,
+			&StateRequest{},
+		); err == nil {
+		ports, storages, devices = res.Ports, res.Storages, res.Devices
+	}
+	return
+}
+
 // ReceiveStart rpc request to player with ip for start receive signal from server on port.
 // UUID of the storage existing on the player
 // if the storage with UUID does not exist or the UUID is zero, a new storage will be created on the player

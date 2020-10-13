@@ -9,7 +9,7 @@ import (
 	"github.com/twinj/uuid"
 )
 
-type storage interface {
+type storageCreator interface {
 	List() io.ReadWriteCloser
 }
 
@@ -23,17 +23,43 @@ type device interface {
 
 type player struct {
 	receivingMutex sync.Mutex
-	receiving      map[string]func()
+	receivingPort  map[string]func()
 
-	storagingMutex sync.Mutex
-	storaging      map[string]io.ReadWriteCloser
+	storageMutex sync.Mutex
+	storage      map[string]io.ReadWriteCloser
 
-	playingMutex sync.Mutex
-	playing      map[string]func()
+	playbackDeviceMutex sync.Mutex
+	playbackDevice      map[string]func()
 
-	udp     udp
-	device  device
-	storage storage
+	udp            udp
+	device         device
+	storageCreator storageCreator
+}
+
+func (p *player) State(ctx context.Context, in *StateRequest) (out *StateResponse, err error) {
+	out = &StateResponse{}
+
+	p.receivingMutex.Lock()
+	out.Ports = make([]string, 0, len(p.receivingPort))
+	for port := range p.receivingPort {
+		out.Ports = append(out.Ports, port)
+	}
+	p.receivingMutex.Unlock()
+
+	p.storageMutex.Lock()
+	out.Storages = make([]string, 0, len(p.storage))
+	for uuid := range p.receivingPort {
+		out.Storages = append(out.Storages, uuid)
+	}
+	p.storageMutex.Unlock()
+
+	p.playbackDeviceMutex.Lock()
+	out.Devices = make([]string, 0, len(p.playbackDevice))
+	for device := range p.playbackDevice {
+		out.Devices = append(out.Devices, device)
+	}
+	p.playbackDeviceMutex.Unlock()
+	return
 }
 
 // ReceiveStart start receive data from server and save
@@ -41,21 +67,21 @@ func (p *player) ReceiveStart(c context.Context, in *StartReceiveRequest) (out *
 	p.receivingMutex.Lock()
 	defer p.receivingMutex.Unlock()
 
-	if _, isExist := p.receiving[in.Port]; !isExist {
-		storage := p.storage.List()
+	if _, isExist := p.receivingPort[in.Port]; !isExist {
+		storage := p.storageCreator.List()
 		uuid := uuid.NewV4().String()
 
 		if in.StorageUUID != nil {
 			uuid = in.StorageUUID.Value
-			if sTmp, isExist := p.storaging[uuid]; isExist {
+			if sTmp, isExist := p.storage[uuid]; isExist {
 				storage = sTmp
 			}
 		}
 
 		ctx, stop := context.WithCancel(context.Background())
 		if err = p.udp.Receive(ctx, in.Port, storage); err == nil {
-			p.storaging[uuid] = storage
-			p.receiving[in.Port] = stop
+			p.storage[uuid] = storage
+			p.receivingPort[in.Port] = stop
 			out = &StartReceiveResponse{
 				StorageUUID: uuid,
 			}
@@ -73,9 +99,9 @@ func (p *player) ReceiveStop(c context.Context, in *StopReceiveRequest) (out *St
 	p.receivingMutex.Lock()
 	defer p.receivingMutex.Unlock()
 
-	if stop, isExist := p.receiving[in.Port]; isExist {
+	if stop, isExist := p.receivingPort[in.Port]; isExist {
 		stop()
-		delete(p.receiving, in.Port)
+		delete(p.receivingPort, in.Port)
 		out = &StopReceiveResponse{}
 		return
 	}
@@ -85,19 +111,19 @@ func (p *player) ReceiveStop(c context.Context, in *StopReceiveRequest) (out *St
 
 // Play play audio on device
 func (p *player) Play(c context.Context, in *StartPlayRequest) (out *StartPlayResponse, err error) {
-	p.storagingMutex.Lock()
-	defer p.storagingMutex.Unlock()
+	p.storageMutex.Lock()
+	defer p.storageMutex.Unlock()
 
-	storage, isExist := p.storaging[in.StorageUUID]
+	storage, isExist := p.storage[in.StorageUUID]
 	if !isExist {
 		err = fmt.Errorf("storage %v is not exist", in.StorageUUID)
 		return
 	}
 
-	if _, isExist := p.playing[in.DeviceName]; !isExist {
+	if _, isExist := p.playbackDevice[in.DeviceName]; !isExist {
 		ctx, stop := context.WithCancel(context.Background())
 		if err = p.device.Play(ctx, in.DeviceName, int(in.Channels), int(in.Rate), storage); err == nil {
-			p.playing[in.DeviceName] = stop
+			p.playbackDevice[in.DeviceName] = stop
 			out = &StartPlayResponse{}
 			return
 		}
@@ -110,12 +136,12 @@ func (p *player) Play(c context.Context, in *StartPlayRequest) (out *StartPlayRe
 
 // Stop stop play on device
 func (p *player) Stop(c context.Context, in *StopPlayRequest) (out *StopPlayResponse, err error) {
-	p.playingMutex.Lock()
-	defer p.playingMutex.Unlock()
+	p.playbackDeviceMutex.Lock()
+	defer p.playbackDeviceMutex.Unlock()
 
-	if stop, isExist := p.playing[in.DeviceName]; isExist {
+	if stop, isExist := p.playbackDevice[in.DeviceName]; isExist {
 		stop()
-		delete(p.playing, in.DeviceName)
+		delete(p.playbackDevice, in.DeviceName)
 		out = &StopPlayResponse{}
 		return
 	}
@@ -125,12 +151,12 @@ func (p *player) Stop(c context.Context, in *StopPlayRequest) (out *StopPlayResp
 
 // ClearStorage with StorageUUID
 func (p *player) ClearStorage(c context.Context, in *ClearStorageRequest) (out *ClearStorageResponse, err error) {
-	p.storagingMutex.Lock()
-	defer p.storagingMutex.Unlock()
+	p.storageMutex.Lock()
+	defer p.storageMutex.Unlock()
 
-	if storage, isExist := p.storaging[in.StorageUUID]; isExist {
+	if storage, isExist := p.storage[in.StorageUUID]; isExist {
 		storage.Close()
-		delete(p.storaging, in.StorageUUID)
+		delete(p.storage, in.StorageUUID)
 		out = &ClearStorageResponse{}
 		return
 	}
@@ -138,19 +164,19 @@ func (p *player) ClearStorage(c context.Context, in *ClearStorageRequest) (out *
 	return
 }
 
-// NewPlayer ...
+// NewPlayer todo
 func NewPlayer(
 	udp udp,
 	device device,
-	storage storage,
+	storage storageCreator,
 ) PlayerServer {
 	return &player{
-		receiving: make(map[string]func()),
-		storaging: make(map[string]io.ReadWriteCloser),
-		playing:   make(map[string]func()),
+		receivingPort:  make(map[string]func()),
+		storage:        make(map[string]io.ReadWriteCloser),
+		playbackDevice: make(map[string]func()),
 
-		udp:     udp,
-		device:  device,
-		storage: storage,
+		udp:            udp,
+		device:         device,
+		storageCreator: storage,
 	}
 }

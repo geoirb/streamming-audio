@@ -13,6 +13,28 @@ type Client struct {
 	controlPort string
 }
 
+// State todo
+func (c *Client) State(ctx context.Context, ip string) (devices []string, err error) {
+	conn, err := grpc.Dial(
+		fmt.Sprintf(c.hostLayout, ip, c.controlPort),
+		// todo
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		return
+	}
+	defer conn.Close()
+
+	if res, err := NewRecorderClient(conn).
+		State(
+			ctx,
+			&StateRequest{},
+		); err == nil {
+		devices = res.Devices
+	}
+	return
+}
+
 // Start rpc request for start record and send audio signal on server
 func (c *Client) Start(ctx context.Context, destAddr, recorderIP, deviceName string, channels, rate uint32) (err error) {
 	conn, err := grpc.Dial(

@@ -28,6 +28,7 @@ type udp interface {
 }
 
 type player interface {
+	State(ctx context.Context, ip string) (ports, storages, devices []string, err error)
 	ReceiveStart(ctx context.Context, ip, port string, uuid *string) (sUUID string, err error)
 	ReceiveStop(ctx context.Context, ip, port string) (err error)
 	Play(ctx context.Context, ip, uuid, deviceName string, channels, rate uint32) (err error)
@@ -36,6 +37,7 @@ type player interface {
 }
 
 type recorder interface {
+	State(ctx context.Context, ip string) (devices []string, err error)
 	Start(ctx context.Context, destAddr, recorderIP, deviceName string, channels, rate uint32) (err error)
 	Stop(ctx context.Context, recorderIP, deviceName string) (err error)
 }

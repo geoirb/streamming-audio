@@ -15,26 +15,39 @@ type device interface {
 	Record(context.Context, string, int, int, io.WriteCloser) error
 }
 
-// Recorder audio signal
-type Recorder struct {
-	mutex    sync.Mutex
-	recoding map[string]func()
+type recorder struct {
+	mutex         sync.Mutex
+	captureDevice map[string]func()
 
 	udp    udp
 	device device
 }
 
-// Start ...
-func (r *Recorder) Start(c context.Context, in *StartSendRequest) (out *StartSendResponse, err error) {
+// State todo
+func (r *recorder) State(ctx context.Context, in *StateRequest) (out *StateResponse, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	if _, isExist := r.recoding[in.DeviceName]; !isExist {
+	out = &StateResponse{
+		Devices: make([]string, 0, len(r.captureDevice)),
+	}
+	for device := range r.captureDevice {
+		out.Devices = append(out.Devices, device)
+	}
+	return
+}
+
+// Start todo
+func (r *recorder) Start(c context.Context, in *StartSendRequest) (out *StartSendResponse, err error) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	if _, isExist := r.captureDevice[in.DeviceName]; !isExist {
 		var destination io.WriteCloser
 		if destination, err = r.udp.TurnOnSender(in.DestAddr); err == nil {
 			ctx, stop := context.WithCancel(context.Background())
 			if err = r.device.Record(ctx, in.DeviceName, int(in.Channels), int(in.Rate), destination); err == nil {
-				r.recoding[in.DeviceName] = stop
+				r.captureDevice[in.DeviceName] = stop
 				out = &StartSendResponse{}
 				return
 			}
@@ -46,14 +59,14 @@ func (r *Recorder) Start(c context.Context, in *StartSendRequest) (out *StartSen
 	return
 }
 
-// Stop ...
-func (r *Recorder) Stop(ctx context.Context, in *StopSendRequest) (out *StopSendResponse, err error) {
+// Stop todo
+func (r *recorder) Stop(ctx context.Context, in *StopSendRequest) (out *StopSendResponse, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	if stop, isExist := r.recoding[in.DeviceName]; isExist {
+	if stop, isExist := r.captureDevice[in.DeviceName]; isExist {
 		stop()
-		delete(r.recoding, in.DeviceName)
+		delete(r.captureDevice, in.DeviceName)
 		out = &StopSendResponse{}
 		return
 	}
@@ -61,13 +74,13 @@ func (r *Recorder) Stop(ctx context.Context, in *StopSendRequest) (out *StopSend
 	return
 }
 
-// NewRecorder ...
+// NewRecorder todo
 func NewRecorder(
 	udp udp,
 	device device,
 ) RecorderServer {
-	return &Recorder{
-		recoding: make(map[string]func()),
+	return &recorder{
+		captureDevice: make(map[string]func()),
 
 		udp:    udp,
 		device: device,
