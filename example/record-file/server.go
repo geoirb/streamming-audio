@@ -11,10 +11,10 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/kelseyhightower/envconfig"
 
-	"github.com/geoirb/sound-ethernet-streaming/pkg/recorder"
-	"github.com/geoirb/sound-ethernet-streaming/pkg/server"
-	"github.com/geoirb/sound-ethernet-streaming/pkg/udp"
-	"github.com/geoirb/sound-ethernet-streaming/pkg/wav"
+	"github.com/geoirb/sound-server/pkg/recorder"
+	"github.com/geoirb/sound-server/pkg/server"
+	"github.com/geoirb/sound-server/pkg/udp"
+	"github.com/geoirb/sound-server/pkg/wav"
 )
 
 type configuration struct {
@@ -28,7 +28,7 @@ type configuration struct {
 	AddrLayout   string `envconfig:"ADDRESS_LAYOUT" default:"%s:%s"`
 	DeviceLayout string `envconfig:"DEVICE_LAYOUT" default:"%s:%s"`
 
-	RecodeFile string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/audio/testRecode.wav"`
+	RecodeFile string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/sound-server/audio/testRecode.wav"`
 }
 
 func main() {
@@ -64,7 +64,7 @@ func main() {
 	recorderIP := "127.0.0.1"
 	receivePort := "8083"
 	recorderDevice := "hw:0,0"
-	file := "/home/geo/go/src/github.com/geoirb/sound-ethernet-streaming/example/record-file/test.wav"
+	file := "/home/geo/go/src/github.com/geoirb/sound-server/example/record-file/test.wav"
 	svc = server.NewLoggerMiddleware(svc, logger)
 	svc.StartFileRecoding(context.Background(), recorderIP, recorderDevice, 2, 44100, receivePort, file)
 	level.Info(logger).Log("msg", "server start")

@@ -1,4 +1,4 @@
-module github.com/geoirb/sound-ethernet-streaming
+module github.com/geoirb/sound-server
 
 go 1.15
 

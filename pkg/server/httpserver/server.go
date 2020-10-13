@@ -5,7 +5,7 @@ import (
 
 	"github.com/valyala/fasthttp"
 
-	"github.com/geoirb/sound-ethernet-streaming/pkg/server"
+	"github.com/geoirb/sound-server/pkg/server"
 )
 
 type filePlay struct {
