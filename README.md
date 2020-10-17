@@ -1,4 +1,4 @@
-# sound-service
+# ausio-service
 
 Streaming audio
 
@@ -39,7 +39,7 @@ Streaming audio
 
 1. Скачать проект на машину, на которой будет развернут server
 
-        git clone git@github.com:GeoIrb/sound-service.git
+        git clone git@github.com:GeoIrb/ausio-service.git
 2. Поместите аудиофайл, который необходимо будет стриммить в папку `audio/`
 
 3. Собрать образ сервера
@@ -66,7 +66,7 @@ Streaming audio
 
 1. Скачать проект на машину, на которой будет развернут player
 
-        git clone git@github.com:GeoIrb/sound-service.git
+        git clone git@github.com:GeoIrb/ausio-service.git
 2. Собрать образ клиент
 
         make build-player tag=IMAGE-NAME

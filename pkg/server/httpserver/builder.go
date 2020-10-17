@@ -8,7 +8,7 @@ import (
 	"github.com/valyala/fasthttp"
 	"github.com/valyala/fasthttp/fasthttpadaptor"
 
-	"github.com/geoirb/sound-service/pkg/server"
+	"github.com/geoirb/ausio-service/pkg/server"
 )
 
 const (

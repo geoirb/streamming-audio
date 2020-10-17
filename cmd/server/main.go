@@ -9,12 +9,12 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/kelseyhightower/envconfig"
 
-	"github.com/geoirb/sound-service/pkg/player"
-	"github.com/geoirb/sound-service/pkg/recorder"
-	"github.com/geoirb/sound-service/pkg/server"
-	"github.com/geoirb/sound-service/pkg/server/httpserver"
-	"github.com/geoirb/sound-service/pkg/udp"
-	"github.com/geoirb/sound-service/pkg/wav"
+	"github.com/geoirb/ausio-service/pkg/player"
+	"github.com/geoirb/ausio-service/pkg/recorder"
+	"github.com/geoirb/ausio-service/pkg/server"
+	"github.com/geoirb/ausio-service/pkg/server/httpserver"
+	"github.com/geoirb/ausio-service/pkg/udp"
+	"github.com/geoirb/ausio-service/pkg/wav"
 )
 
 type configuration struct {

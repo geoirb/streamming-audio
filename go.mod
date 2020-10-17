@@ -1,4 +1,4 @@
-module github.com/geoirb/sound-service
+module github.com/geoirb/ausio-service
 
 go 1.15
 
