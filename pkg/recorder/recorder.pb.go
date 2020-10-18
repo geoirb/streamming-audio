@@ -38,22 +38,22 @@ func (*StateRequest) Descriptor() ([]byte, []int) {
 }
 
 func (m *StateRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StateRequest.Unmarshal(m, b)
+	return xxx_messageInfo_StateRequest.Unmarshal(m, b)
 }
 func (m *StateRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StateRequest.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StateRequest.Marshal(b, m, deterministic)
 }
 func (m *StateRequest) XXX_Merge(src proto.Message) {
-	xxx_messageState_StateRequest.Merge(m, src)
+	xxx_messageInfo_StateRequest.Merge(m, src)
 }
 func (m *StateRequest) XXX_Size() int {
-	return xxx_messageState_StateRequest.Size(m)
+	return xxx_messageInfo_StateRequest.Size(m)
 }
 func (m *StateRequest) XXX_DiscardUnknown() {
-	xxx_messageState_StateRequest.DiscardUnknown(m)
+	xxx_messageInfo_StateRequest.DiscardUnknown(m)
 }
 
-var xxx_messageState_StateRequest proto.InternalMessageInfo
+var xxx_messageInfo_StateRequest proto.InternalMessageInfo
 
 type StateResponse struct {
 	Devices              []string `protobuf:"bytes,1,rep,name=devices,proto3" json:"devices,omitempty"`
@@ -70,22 +70,22 @@ func (*StateResponse) Descriptor() ([]byte, []int) {
 }
 
 func (m *StateResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StateResponse.Unmarshal(m, b)
+	return xxx_messageInfo_StateResponse.Unmarshal(m, b)
 }
 func (m *StateResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StateResponse.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StateResponse.Marshal(b, m, deterministic)
 }
 func (m *StateResponse) XXX_Merge(src proto.Message) {
-	xxx_messageState_StateResponse.Merge(m, src)
+	xxx_messageInfo_StateResponse.Merge(m, src)
 }
 func (m *StateResponse) XXX_Size() int {
-	return xxx_messageState_StateResponse.Size(m)
+	return xxx_messageInfo_StateResponse.Size(m)
 }
 func (m *StateResponse) XXX_DiscardUnknown() {
-	xxx_messageState_StateResponse.DiscardUnknown(m)
+	xxx_messageInfo_StateResponse.DiscardUnknown(m)
 }
 
-var xxx_messageState_StateResponse proto.InternalMessageInfo
+var xxx_messageInfo_StateResponse proto.InternalMessageInfo
 
 func (m *StateResponse) GetDevices() []string {
 	if m != nil {
@@ -112,22 +112,22 @@ func (*StartSendRequest) Descriptor() ([]byte, []int) {
 }
 
 func (m *StartSendRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StartSendRequest.Unmarshal(m, b)
+	return xxx_messageInfo_StartSendRequest.Unmarshal(m, b)
 }
 func (m *StartSendRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StartSendRequest.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StartSendRequest.Marshal(b, m, deterministic)
 }
 func (m *StartSendRequest) XXX_Merge(src proto.Message) {
-	xxx_messageState_StartSendRequest.Merge(m, src)
+	xxx_messageInfo_StartSendRequest.Merge(m, src)
 }
 func (m *StartSendRequest) XXX_Size() int {
-	return xxx_messageState_StartSendRequest.Size(m)
+	return xxx_messageInfo_StartSendRequest.Size(m)
 }
 func (m *StartSendRequest) XXX_DiscardUnknown() {
-	xxx_messageState_StartSendRequest.DiscardUnknown(m)
+	xxx_messageInfo_StartSendRequest.DiscardUnknown(m)
 }
 
-var xxx_messageState_StartSendRequest proto.InternalMessageInfo
+var xxx_messageInfo_StartSendRequest proto.InternalMessageInfo
 
 func (m *StartSendRequest) GetDeviceName() string {
 	if m != nil {
@@ -171,22 +171,22 @@ func (*StartSendResponse) Descriptor() ([]byte, []int) {
 }
 
 func (m *StartSendResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StartSendResponse.Unmarshal(m, b)
+	return xxx_messageInfo_StartSendResponse.Unmarshal(m, b)
 }
 func (m *StartSendResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StartSendResponse.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StartSendResponse.Marshal(b, m, deterministic)
 }
 func (m *StartSendResponse) XXX_Merge(src proto.Message) {
-	xxx_messageState_StartSendResponse.Merge(m, src)
+	xxx_messageInfo_StartSendResponse.Merge(m, src)
 }
 func (m *StartSendResponse) XXX_Size() int {
-	return xxx_messageState_StartSendResponse.Size(m)
+	return xxx_messageInfo_StartSendResponse.Size(m)
 }
 func (m *StartSendResponse) XXX_DiscardUnknown() {
-	xxx_messageState_StartSendResponse.DiscardUnknown(m)
+	xxx_messageInfo_StartSendResponse.DiscardUnknown(m)
 }
 
-var xxx_messageState_StartSendResponse proto.InternalMessageInfo
+var xxx_messageInfo_StartSendResponse proto.InternalMessageInfo
 
 type StopSendRequest struct {
 	DeviceName           string   `protobuf:"bytes,1,opt,name=deviceName,proto3" json:"deviceName,omitempty"`
@@ -203,22 +203,22 @@ func (*StopSendRequest) Descriptor() ([]byte, []int) {
 }
 
 func (m *StopSendRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StopSendRequest.Unmarshal(m, b)
+	return xxx_messageInfo_StopSendRequest.Unmarshal(m, b)
 }
 func (m *StopSendRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StopSendRequest.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StopSendRequest.Marshal(b, m, deterministic)
 }
 func (m *StopSendRequest) XXX_Merge(src proto.Message) {
-	xxx_messageState_StopSendRequest.Merge(m, src)
+	xxx_messageInfo_StopSendRequest.Merge(m, src)
 }
 func (m *StopSendRequest) XXX_Size() int {
-	return xxx_messageState_StopSendRequest.Size(m)
+	return xxx_messageInfo_StopSendRequest.Size(m)
 }
 func (m *StopSendRequest) XXX_DiscardUnknown() {
-	xxx_messageState_StopSendRequest.DiscardUnknown(m)
+	xxx_messageInfo_StopSendRequest.DiscardUnknown(m)
 }
 
-var xxx_messageState_StopSendRequest proto.InternalMessageInfo
+var xxx_messageInfo_StopSendRequest proto.InternalMessageInfo
 
 func (m *StopSendRequest) GetDeviceName() string {
 	if m != nil {
@@ -241,22 +241,22 @@ func (*StopSendResponse) Descriptor() ([]byte, []int) {
 }
 
 func (m *StopSendResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StopSendResponse.Unmarshal(m, b)
+	return xxx_messageInfo_StopSendResponse.Unmarshal(m, b)
 }
 func (m *StopSendResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StopSendResponse.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StopSendResponse.Marshal(b, m, deterministic)
 }
 func (m *StopSendResponse) XXX_Merge(src proto.Message) {
-	xxx_messageState_StopSendResponse.Merge(m, src)
+	xxx_messageInfo_StopSendResponse.Merge(m, src)
 }
 func (m *StopSendResponse) XXX_Size() int {
-	return xxx_messageState_StopSendResponse.Size(m)
+	return xxx_messageInfo_StopSendResponse.Size(m)
 }
 func (m *StopSendResponse) XXX_DiscardUnknown() {
-	xxx_messageState_StopSendResponse.DiscardUnknown(m)
+	xxx_messageInfo_StopSendResponse.DiscardUnknown(m)
 }
 
-var xxx_messageState_StopSendResponse proto.InternalMessageInfo
+var xxx_messageInfo_StopSendResponse proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*StateRequest)(nil), "recorder.StateRequest")
@@ -270,24 +270,24 @@ func init() {
 func init() { proto.RegisterFile("recorder.proto", fileDescriptor_b063ffe85a4e6395) }
 
 var fileDescriptor_b063ffe85a4e6395 = []byte{
-	// 266 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x51, 0xbb, 0x4e, 0xc4, 0x30,
-	0x10, 0xc4, 0x5c, 0x80, 0xdc, 0xc2, 0xf1, 0x58, 0x04, 0x32, 0x46, 0x42, 0x91, 0xab, 0x54, 0x27,
-	0x01, 0x05, 0x25, 0x82, 0x8e, 0x86, 0xc2, 0xf9, 0x82, 0x10, 0x2f, 0x02, 0x09, 0xec, 0x60, 0x1b,
-	0x4a, 0xbe, 0x8f, 0xcf, 0x42, 0x71, 0x1e, 0x84, 0x53, 0x9a, 0xeb, 0x32, 0x3b, 0xb3, 0x93, 0xd9,
-	0x31, 0xec, 0x3b, 0xaa, 0xac, 0xd3, 0xe4, 0x96, 0xb5, 0xb3, 0xc1, 0x62, 0xda, 0x63, 0xb9, 0x80,
-	0xdd, 0x07, 0xf3, 0x6c, 0x15, 0x7d, 0x7c, 0x92, 0x0f, 0x32, 0x87, 0xbd, 0x16, 0xfa, 0xda, 0x1a,
-	0x4f, 0xc8, 0x61, 0x47, 0xd3, 0xd7, 0x6b, 0x45, 0x9e, 0xb3, 0x6c, 0x96, 0xcf, 0x55, 0x0f, 0xe5,
-	0x37, 0x1c, 0x16, 0xa1, 0x74, 0xa1, 0x20, 0xa3, 0xbb, 0x6d, 0xbc, 0x00, 0x68, 0xe9, 0xc7, 0xf2,
-	0x9d, 0x38, 0xcb, 0x58, 0x3e, 0x57, 0xa3, 0x09, 0x0a, 0x48, 0xab, 0x97, 0xd2, 0x18, 0x7a, 0xf3,
-	0x7c, 0x33, 0x63, 0xf9, 0x42, 0x0d, 0x18, 0x11, 0x12, 0x57, 0x06, 0xe2, 0xb3, 0x38, 0x8f, 0xdf,
-	0x8d, 0x5e, 0x93, 0x0f, 0x77, 0x5a, 0x3b, 0x9e, 0x44, 0xb7, 0x01, 0xcb, 0x63, 0x38, 0x1a, 0xfd,
-	0xbf, 0x8d, 0x2b, 0x2f, 0xe1, 0xa0, 0x08, 0xb6, 0x5e, 0x23, 0x93, 0xc4, 0xe6, 0x8e, 0x7e, 0xa5,
-	0xb5, 0xb9, 0xfa, 0x61, 0x90, 0xaa, 0xae, 0x21, 0xbc, 0x81, 0xa4, 0xa9, 0x04, 0x4f, 0x96, 0x43,
-	0x89, 0xa3, 0xc6, 0xc4, 0xe9, 0xea, 0xb8, 0x8b, 0xb2, 0x81, 0xf7, 0xb0, 0x15, 0x13, 0xa2, 0xf8,
-	0x93, 0xac, 0x56, 0x26, 0xce, 0x27, 0xb9, 0xc1, 0xe3, 0x16, 0x92, 0x26, 0x1d, 0x9e, 0x8d, 0x65,
-	0xff, 0x0e, 0x14, 0x62, 0x8a, 0xea, 0x0d, 0x9e, 0xb6, 0xe3, 0x83, 0x5f, 0xff, 0x06, 0x00, 0x00,
-	0xff, 0xff, 0xc7, 0x1b, 0x49, 0x00, 0x02, 0x02, 0x00, 0x00,
+	// 267 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x51, 0xbd, 0x4e, 0xf4, 0x30,
+	0x10, 0xfc, 0xf2, 0x5d, 0x80, 0xdc, 0x8a, 0x3b, 0x60, 0x91, 0xc0, 0x18, 0x09, 0x45, 0xae, 0x42,
+	0x73, 0x12, 0xd0, 0xd1, 0x20, 0x78, 0x00, 0x0a, 0xe7, 0x09, 0x4c, 0xbc, 0x12, 0x48, 0x10, 0x07,
+	0x7b, 0xa1, 0xe4, 0x05, 0x79, 0x29, 0x14, 0xe7, 0x47, 0x89, 0xb8, 0x86, 0x2e, 0xb3, 0x3b, 0x33,
+	0x99, 0x1d, 0xc3, 0xda, 0x53, 0xe5, 0xbc, 0x25, 0xbf, 0x69, 0xbc, 0x63, 0x87, 0xd9, 0x80, 0xd5,
+	0x1a, 0xf6, 0x4b, 0x36, 0x4c, 0x9a, 0xde, 0x3f, 0x28, 0xb0, 0xba, 0x84, 0x55, 0x8f, 0x43, 0xe3,
+	0xea, 0x40, 0x28, 0x60, 0xcf, 0xd2, 0xe7, 0x4b, 0x45, 0x41, 0x24, 0xf9, 0xa2, 0x58, 0xea, 0x01,
+	0xaa, 0x2f, 0x38, 0x2c, 0xd9, 0x78, 0x2e, 0xa9, 0xb6, 0xbd, 0x1c, 0x2f, 0x00, 0xba, 0xf5, 0xa3,
+	0x79, 0x23, 0x91, 0xe4, 0x49, 0xb1, 0xd4, 0x93, 0x09, 0x4a, 0xc8, 0xaa, 0x67, 0x53, 0xd7, 0xf4,
+	0x1a, 0xc4, 0xff, 0x3c, 0x29, 0x56, 0x7a, 0xc4, 0x88, 0x90, 0x7a, 0xc3, 0x24, 0x16, 0x71, 0x1e,
+	0xbf, 0x5b, 0xbe, 0xa5, 0xc0, 0xf7, 0xd6, 0x7a, 0x91, 0x46, 0xb7, 0x11, 0xab, 0x63, 0x38, 0x9a,
+	0xfc, 0xbf, 0x8b, 0xab, 0xae, 0xe0, 0xa0, 0x64, 0xd7, 0xfc, 0x21, 0x93, 0xc2, 0xf6, 0x8e, 0x41,
+	0xd2, 0xd9, 0x5c, 0x7f, 0x27, 0x90, 0xe9, 0xbe, 0x23, 0xbc, 0x85, 0x9d, 0xd8, 0x09, 0x9e, 0x6c,
+	0xc6, 0x1e, 0xa7, 0xa5, 0xc9, 0xd3, 0x5f, 0xf3, 0x3e, 0xcd, 0x3f, 0x7c, 0x88, 0x5a, 0xcf, 0x28,
+	0x67, 0x9c, 0x59, 0x6b, 0xf2, 0x7c, 0xeb, 0x6e, 0xf4, 0xb8, 0x83, 0xb4, 0x0d, 0x88, 0x67, 0x53,
+	0xda, 0xec, 0x46, 0x29, 0xb7, 0xad, 0x06, 0x83, 0xa7, 0xdd, 0xf8, 0xea, 0x37, 0x3f, 0x01, 0x00,
+	0x00, 0xff, 0xff, 0x72, 0xe9, 0xdb, 0xbe, 0x07, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -381,14 +381,14 @@ func _Recorder_State_Handler(srv interface{}, ctx context.Context, dec func(inte
 	if interceptor == nil {
 		return srv.(RecorderServer).State(ctx, in)
 	}
-	State := &grpc.UnaryServerInfo{
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/recorder.Recorder/State",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RecorderServer).State(ctx, req.(*StateRequest))
 	}
-	return interceptor(ctx, in, State, handler)
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Recorder_Start_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -399,14 +399,14 @@ func _Recorder_Start_Handler(srv interface{}, ctx context.Context, dec func(inte
 	if interceptor == nil {
 		return srv.(RecorderServer).Start(ctx, in)
 	}
-	State := &grpc.UnaryServerInfo{
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/recorder.Recorder/Start",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RecorderServer).Start(ctx, req.(*StartSendRequest))
 	}
-	return interceptor(ctx, in, State, handler)
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Recorder_Stop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -417,14 +417,14 @@ func _Recorder_Stop_Handler(srv interface{}, ctx context.Context, dec func(inter
 	if interceptor == nil {
 		return srv.(RecorderServer).Stop(ctx, in)
 	}
-	State := &grpc.UnaryServerInfo{
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/recorder.Recorder/Stop",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RecorderServer).Stop(ctx, req.(*StopSendRequest))
 	}
-	return interceptor(ctx, in, State, handler)
+	return interceptor(ctx, in, info, handler)
 }
 
 var _Recorder_serviceDesc = grpc.ServiceDesc{

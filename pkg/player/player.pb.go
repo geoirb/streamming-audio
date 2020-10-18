@@ -39,22 +39,22 @@ func (*StateRequest) Descriptor() ([]byte, []int) {
 }
 
 func (m *StateRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StateRequest.Unmarshal(m, b)
+	return xxx_messageInfo_StateRequest.Unmarshal(m, b)
 }
 func (m *StateRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StateRequest.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StateRequest.Marshal(b, m, deterministic)
 }
 func (m *StateRequest) XXX_Merge(src proto.Message) {
-	xxx_messageState_StateRequest.Merge(m, src)
+	xxx_messageInfo_StateRequest.Merge(m, src)
 }
 func (m *StateRequest) XXX_Size() int {
-	return xxx_messageState_StateRequest.Size(m)
+	return xxx_messageInfo_StateRequest.Size(m)
 }
 func (m *StateRequest) XXX_DiscardUnknown() {
-	xxx_messageState_StateRequest.DiscardUnknown(m)
+	xxx_messageInfo_StateRequest.DiscardUnknown(m)
 }
 
-var xxx_messageState_StateRequest proto.InternalMessageInfo
+var xxx_messageInfo_StateRequest proto.InternalMessageInfo
 
 type StateResponse struct {
 	Ports                []string `protobuf:"bytes,1,rep,name=ports,proto3" json:"ports,omitempty"`
@@ -73,22 +73,22 @@ func (*StateResponse) Descriptor() ([]byte, []int) {
 }
 
 func (m *StateResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StateResponse.Unmarshal(m, b)
+	return xxx_messageInfo_StateResponse.Unmarshal(m, b)
 }
 func (m *StateResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StateResponse.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StateResponse.Marshal(b, m, deterministic)
 }
 func (m *StateResponse) XXX_Merge(src proto.Message) {
-	xxx_messageState_StateResponse.Merge(m, src)
+	xxx_messageInfo_StateResponse.Merge(m, src)
 }
 func (m *StateResponse) XXX_Size() int {
-	return xxx_messageState_StateResponse.Size(m)
+	return xxx_messageInfo_StateResponse.Size(m)
 }
 func (m *StateResponse) XXX_DiscardUnknown() {
-	xxx_messageState_StateResponse.DiscardUnknown(m)
+	xxx_messageInfo_StateResponse.DiscardUnknown(m)
 }
 
-var xxx_messageState_StateResponse proto.InternalMessageInfo
+var xxx_messageInfo_StateResponse proto.InternalMessageInfo
 
 func (m *StateResponse) GetPorts() []string {
 	if m != nil {
@@ -127,22 +127,22 @@ func (*StartReceiveRequest) Descriptor() ([]byte, []int) {
 }
 
 func (m *StartReceiveRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StartReceiveRequest.Unmarshal(m, b)
+	return xxx_messageInfo_StartReceiveRequest.Unmarshal(m, b)
 }
 func (m *StartReceiveRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StartReceiveRequest.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StartReceiveRequest.Marshal(b, m, deterministic)
 }
 func (m *StartReceiveRequest) XXX_Merge(src proto.Message) {
-	xxx_messageState_StartReceiveRequest.Merge(m, src)
+	xxx_messageInfo_StartReceiveRequest.Merge(m, src)
 }
 func (m *StartReceiveRequest) XXX_Size() int {
-	return xxx_messageState_StartReceiveRequest.Size(m)
+	return xxx_messageInfo_StartReceiveRequest.Size(m)
 }
 func (m *StartReceiveRequest) XXX_DiscardUnknown() {
-	xxx_messageState_StartReceiveRequest.DiscardUnknown(m)
+	xxx_messageInfo_StartReceiveRequest.DiscardUnknown(m)
 }
 
-var xxx_messageState_StartReceiveRequest proto.InternalMessageInfo
+var xxx_messageInfo_StartReceiveRequest proto.InternalMessageInfo
 
 func (m *StartReceiveRequest) GetPort() string {
 	if m != nil {
@@ -173,22 +173,22 @@ func (*StartReceiveResponse) Descriptor() ([]byte, []int) {
 }
 
 func (m *StartReceiveResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StartReceiveResponse.Unmarshal(m, b)
+	return xxx_messageInfo_StartReceiveResponse.Unmarshal(m, b)
 }
 func (m *StartReceiveResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StartReceiveResponse.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StartReceiveResponse.Marshal(b, m, deterministic)
 }
 func (m *StartReceiveResponse) XXX_Merge(src proto.Message) {
-	xxx_messageState_StartReceiveResponse.Merge(m, src)
+	xxx_messageInfo_StartReceiveResponse.Merge(m, src)
 }
 func (m *StartReceiveResponse) XXX_Size() int {
-	return xxx_messageState_StartReceiveResponse.Size(m)
+	return xxx_messageInfo_StartReceiveResponse.Size(m)
 }
 func (m *StartReceiveResponse) XXX_DiscardUnknown() {
-	xxx_messageState_StartReceiveResponse.DiscardUnknown(m)
+	xxx_messageInfo_StartReceiveResponse.DiscardUnknown(m)
 }
 
-var xxx_messageState_StartReceiveResponse proto.InternalMessageInfo
+var xxx_messageInfo_StartReceiveResponse proto.InternalMessageInfo
 
 func (m *StartReceiveResponse) GetStorageUUID() string {
 	if m != nil {
@@ -212,22 +212,22 @@ func (*StopReceiveRequest) Descriptor() ([]byte, []int) {
 }
 
 func (m *StopReceiveRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StopReceiveRequest.Unmarshal(m, b)
+	return xxx_messageInfo_StopReceiveRequest.Unmarshal(m, b)
 }
 func (m *StopReceiveRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StopReceiveRequest.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StopReceiveRequest.Marshal(b, m, deterministic)
 }
 func (m *StopReceiveRequest) XXX_Merge(src proto.Message) {
-	xxx_messageState_StopReceiveRequest.Merge(m, src)
+	xxx_messageInfo_StopReceiveRequest.Merge(m, src)
 }
 func (m *StopReceiveRequest) XXX_Size() int {
-	return xxx_messageState_StopReceiveRequest.Size(m)
+	return xxx_messageInfo_StopReceiveRequest.Size(m)
 }
 func (m *StopReceiveRequest) XXX_DiscardUnknown() {
-	xxx_messageState_StopReceiveRequest.DiscardUnknown(m)
+	xxx_messageInfo_StopReceiveRequest.DiscardUnknown(m)
 }
 
-var xxx_messageState_StopReceiveRequest proto.InternalMessageInfo
+var xxx_messageInfo_StopReceiveRequest proto.InternalMessageInfo
 
 func (m *StopReceiveRequest) GetPort() string {
 	if m != nil {
@@ -250,22 +250,22 @@ func (*StopReceiveResponse) Descriptor() ([]byte, []int) {
 }
 
 func (m *StopReceiveResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StopReceiveResponse.Unmarshal(m, b)
+	return xxx_messageInfo_StopReceiveResponse.Unmarshal(m, b)
 }
 func (m *StopReceiveResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StopReceiveResponse.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StopReceiveResponse.Marshal(b, m, deterministic)
 }
 func (m *StopReceiveResponse) XXX_Merge(src proto.Message) {
-	xxx_messageState_StopReceiveResponse.Merge(m, src)
+	xxx_messageInfo_StopReceiveResponse.Merge(m, src)
 }
 func (m *StopReceiveResponse) XXX_Size() int {
-	return xxx_messageState_StopReceiveResponse.Size(m)
+	return xxx_messageInfo_StopReceiveResponse.Size(m)
 }
 func (m *StopReceiveResponse) XXX_DiscardUnknown() {
-	xxx_messageState_StopReceiveResponse.DiscardUnknown(m)
+	xxx_messageInfo_StopReceiveResponse.DiscardUnknown(m)
 }
 
-var xxx_messageState_StopReceiveResponse proto.InternalMessageInfo
+var xxx_messageInfo_StopReceiveResponse proto.InternalMessageInfo
 
 type StartPlayRequest struct {
 	DeviceName           string   `protobuf:"bytes,1,opt,name=deviceName,proto3" json:"deviceName,omitempty"`
@@ -285,22 +285,22 @@ func (*StartPlayRequest) Descriptor() ([]byte, []int) {
 }
 
 func (m *StartPlayRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StartPlayRequest.Unmarshal(m, b)
+	return xxx_messageInfo_StartPlayRequest.Unmarshal(m, b)
 }
 func (m *StartPlayRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StartPlayRequest.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StartPlayRequest.Marshal(b, m, deterministic)
 }
 func (m *StartPlayRequest) XXX_Merge(src proto.Message) {
-	xxx_messageState_StartPlayRequest.Merge(m, src)
+	xxx_messageInfo_StartPlayRequest.Merge(m, src)
 }
 func (m *StartPlayRequest) XXX_Size() int {
-	return xxx_messageState_StartPlayRequest.Size(m)
+	return xxx_messageInfo_StartPlayRequest.Size(m)
 }
 func (m *StartPlayRequest) XXX_DiscardUnknown() {
-	xxx_messageState_StartPlayRequest.DiscardUnknown(m)
+	xxx_messageInfo_StartPlayRequest.DiscardUnknown(m)
 }
 
-var xxx_messageState_StartPlayRequest proto.InternalMessageInfo
+var xxx_messageInfo_StartPlayRequest proto.InternalMessageInfo
 
 func (m *StartPlayRequest) GetDeviceName() string {
 	if m != nil {
@@ -344,22 +344,22 @@ func (*StartPlayResponse) Descriptor() ([]byte, []int) {
 }
 
 func (m *StartPlayResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StartPlayResponse.Unmarshal(m, b)
+	return xxx_messageInfo_StartPlayResponse.Unmarshal(m, b)
 }
 func (m *StartPlayResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StartPlayResponse.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StartPlayResponse.Marshal(b, m, deterministic)
 }
 func (m *StartPlayResponse) XXX_Merge(src proto.Message) {
-	xxx_messageState_StartPlayResponse.Merge(m, src)
+	xxx_messageInfo_StartPlayResponse.Merge(m, src)
 }
 func (m *StartPlayResponse) XXX_Size() int {
-	return xxx_messageState_StartPlayResponse.Size(m)
+	return xxx_messageInfo_StartPlayResponse.Size(m)
 }
 func (m *StartPlayResponse) XXX_DiscardUnknown() {
-	xxx_messageState_StartPlayResponse.DiscardUnknown(m)
+	xxx_messageInfo_StartPlayResponse.DiscardUnknown(m)
 }
 
-var xxx_messageState_StartPlayResponse proto.InternalMessageInfo
+var xxx_messageInfo_StartPlayResponse proto.InternalMessageInfo
 
 type StopPlayRequest struct {
 	DeviceName           string   `protobuf:"bytes,1,opt,name=deviceName,proto3" json:"deviceName,omitempty"`
@@ -376,22 +376,22 @@ func (*StopPlayRequest) Descriptor() ([]byte, []int) {
 }
 
 func (m *StopPlayRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StopPlayRequest.Unmarshal(m, b)
+	return xxx_messageInfo_StopPlayRequest.Unmarshal(m, b)
 }
 func (m *StopPlayRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StopPlayRequest.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StopPlayRequest.Marshal(b, m, deterministic)
 }
 func (m *StopPlayRequest) XXX_Merge(src proto.Message) {
-	xxx_messageState_StopPlayRequest.Merge(m, src)
+	xxx_messageInfo_StopPlayRequest.Merge(m, src)
 }
 func (m *StopPlayRequest) XXX_Size() int {
-	return xxx_messageState_StopPlayRequest.Size(m)
+	return xxx_messageInfo_StopPlayRequest.Size(m)
 }
 func (m *StopPlayRequest) XXX_DiscardUnknown() {
-	xxx_messageState_StopPlayRequest.DiscardUnknown(m)
+	xxx_messageInfo_StopPlayRequest.DiscardUnknown(m)
 }
 
-var xxx_messageState_StopPlayRequest proto.InternalMessageInfo
+var xxx_messageInfo_StopPlayRequest proto.InternalMessageInfo
 
 func (m *StopPlayRequest) GetDeviceName() string {
 	if m != nil {
@@ -414,22 +414,22 @@ func (*StopPlayResponse) Descriptor() ([]byte, []int) {
 }
 
 func (m *StopPlayResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_StopPlayResponse.Unmarshal(m, b)
+	return xxx_messageInfo_StopPlayResponse.Unmarshal(m, b)
 }
 func (m *StopPlayResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_StopPlayResponse.Marshal(b, m, deterministic)
+	return xxx_messageInfo_StopPlayResponse.Marshal(b, m, deterministic)
 }
 func (m *StopPlayResponse) XXX_Merge(src proto.Message) {
-	xxx_messageState_StopPlayResponse.Merge(m, src)
+	xxx_messageInfo_StopPlayResponse.Merge(m, src)
 }
 func (m *StopPlayResponse) XXX_Size() int {
-	return xxx_messageState_StopPlayResponse.Size(m)
+	return xxx_messageInfo_StopPlayResponse.Size(m)
 }
 func (m *StopPlayResponse) XXX_DiscardUnknown() {
-	xxx_messageState_StopPlayResponse.DiscardUnknown(m)
+	xxx_messageInfo_StopPlayResponse.DiscardUnknown(m)
 }
 
-var xxx_messageState_StopPlayResponse proto.InternalMessageInfo
+var xxx_messageInfo_StopPlayResponse proto.InternalMessageInfo
 
 type ClearStorageRequest struct {
 	StorageUUID          string   `protobuf:"bytes,1,opt,name=storageUUID,proto3" json:"storageUUID,omitempty"`
@@ -446,22 +446,22 @@ func (*ClearStorageRequest) Descriptor() ([]byte, []int) {
 }
 
 func (m *ClearStorageRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_ClearStorageRequest.Unmarshal(m, b)
+	return xxx_messageInfo_ClearStorageRequest.Unmarshal(m, b)
 }
 func (m *ClearStorageRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_ClearStorageRequest.Marshal(b, m, deterministic)
+	return xxx_messageInfo_ClearStorageRequest.Marshal(b, m, deterministic)
 }
 func (m *ClearStorageRequest) XXX_Merge(src proto.Message) {
-	xxx_messageState_ClearStorageRequest.Merge(m, src)
+	xxx_messageInfo_ClearStorageRequest.Merge(m, src)
 }
 func (m *ClearStorageRequest) XXX_Size() int {
-	return xxx_messageState_ClearStorageRequest.Size(m)
+	return xxx_messageInfo_ClearStorageRequest.Size(m)
 }
 func (m *ClearStorageRequest) XXX_DiscardUnknown() {
-	xxx_messageState_ClearStorageRequest.DiscardUnknown(m)
+	xxx_messageInfo_ClearStorageRequest.DiscardUnknown(m)
 }
 
-var xxx_messageState_ClearStorageRequest proto.InternalMessageInfo
+var xxx_messageInfo_ClearStorageRequest proto.InternalMessageInfo
 
 func (m *ClearStorageRequest) GetStorageUUID() string {
 	if m != nil {
@@ -484,22 +484,22 @@ func (*ClearStorageResponse) Descriptor() ([]byte, []int) {
 }
 
 func (m *ClearStorageResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageState_ClearStorageResponse.Unmarshal(m, b)
+	return xxx_messageInfo_ClearStorageResponse.Unmarshal(m, b)
 }
 func (m *ClearStorageResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageState_ClearStorageResponse.Marshal(b, m, deterministic)
+	return xxx_messageInfo_ClearStorageResponse.Marshal(b, m, deterministic)
 }
 func (m *ClearStorageResponse) XXX_Merge(src proto.Message) {
-	xxx_messageState_ClearStorageResponse.Merge(m, src)
+	xxx_messageInfo_ClearStorageResponse.Merge(m, src)
 }
 func (m *ClearStorageResponse) XXX_Size() int {
-	return xxx_messageState_ClearStorageResponse.Size(m)
+	return xxx_messageInfo_ClearStorageResponse.Size(m)
 }
 func (m *ClearStorageResponse) XXX_DiscardUnknown() {
-	xxx_messageState_ClearStorageResponse.DiscardUnknown(m)
+	xxx_messageInfo_ClearStorageResponse.DiscardUnknown(m)
 }
 
-var xxx_messageState_ClearStorageResponse proto.InternalMessageInfo
+var xxx_messageInfo_ClearStorageResponse proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*StateRequest)(nil), "player.StateRequest")
@@ -519,36 +519,36 @@ func init() {
 func init() { proto.RegisterFile("player.proto", fileDescriptor_41d803d1b635d5c6) }
 
 var fileDescriptor_41d803d1b635d5c6 = []byte{
-	// 456 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0x4d, 0x6f, 0xd3, 0x40,
-	0x10, 0xad, 0x1b, 0x13, 0xe8, 0x24, 0x15, 0xb0, 0x09, 0xb0, 0xb8, 0x55, 0x15, 0xed, 0x29, 0x27,
-	0x57, 0xb4, 0x07, 0x90, 0x10, 0x5c, 0xe0, 0x40, 0x85, 0x84, 0x2a, 0x47, 0xe5, 0xc0, 0x6d, 0x1b,
-	0xa6, 0xc6, 0x92, 0xf1, 0x2e, 0xbb, 0x9b, 0xa2, 0xde, 0xf9, 0x1b, 0xfc, 0x57, 0xb4, 0x1f, 0x76,
-	0xd6, 0xad, 0xa5, 0x8a, 0x9b, 0xe7, 0xeb, 0xbd, 0x79, 0x6f, 0xc7, 0x30, 0x95, 0x35, 0xbf, 0x41,
-	0x95, 0x4b, 0x25, 0x8c, 0x20, 0x63, 0x1f, 0x65, 0x47, 0xa5, 0x10, 0x65, 0x8d, 0xc7, 0x2e, 0x7b,
-	0xb9, 0xb9, 0x3a, 0xfe, 0xad, 0xb8, 0x94, 0xa8, 0xb4, 0xef, 0x63, 0xfb, 0x30, 0x39, 0x6b, 0xae,
-	0x44, 0x81, 0xbf, 0x36, 0xa8, 0x0d, 0xfb, 0x06, 0x53, 0x1f, 0x6a, 0x29, 0x1a, 0x8d, 0x64, 0x0e,
-	0x0f, 0xa4, 0x50, 0x46, 0xd3, 0x64, 0x31, 0x5a, 0xee, 0x15, 0x3e, 0x20, 0x19, 0x3c, 0xd2, 0x46,
-	0x28, 0x5e, 0xa2, 0xa6, 0xbb, 0xae, 0xd0, 0xc5, 0x84, 0xc2, 0xc3, 0xef, 0x78, 0x5d, 0xad, 0x51,
-	0xd3, 0x91, 0x2b, 0xb5, 0x21, 0xab, 0x60, 0xb6, 0x32, 0x5c, 0x99, 0x02, 0xd7, 0x58, 0x5d, 0x63,
-	0xa0, 0x24, 0x04, 0x52, 0x8b, 0x4a, 0x93, 0x45, 0xb2, 0xdc, 0x2b, 0xdc, 0x37, 0x79, 0x0f, 0x93,
-	0x00, 0x78, 0x71, 0x71, 0xf6, 0x91, 0xee, 0x2e, 0x92, 0xe5, 0xe4, 0xe4, 0x30, 0xf7, 0x5a, 0xf2,
-	0x56, 0x4b, 0xbe, 0x32, 0xaa, 0x6a, 0xca, 0xaf, 0xbc, 0xde, 0x60, 0x11, 0x0f, 0xb0, 0x37, 0x30,
-	0xef, 0x53, 0x05, 0x39, 0x8b, 0x3e, 0xae, 0xa7, 0xec, 0x4d, 0x2e, 0x81, 0xac, 0x8c, 0x90, 0xf7,
-	0xef, 0xc8, 0x9e, 0x59, 0x39, 0x51, 0xa7, 0xa7, 0x60, 0x7f, 0x12, 0x78, 0xe2, 0xb8, 0xcf, 0x6b,
-	0x7e, 0xd3, 0xce, 0x1f, 0x01, 0x78, 0x17, 0xbe, 0xf0, 0x9f, 0x18, 0x50, 0xa2, 0x8c, 0x35, 0x74,
-	0xfd, 0x83, 0x37, 0x0d, 0xd6, 0xda, 0x89, 0xdd, 0x2f, 0xba, 0xd8, 0x72, 0x2b, 0x6e, 0x90, 0x8e,
-	0x5c, 0xde, 0x7d, 0xdf, 0xd6, 0x91, 0xde, 0xd5, 0x31, 0x83, 0xa7, 0xd1, 0x16, 0x61, 0xb7, 0x57,
-	0xf0, 0xd8, 0xae, 0xfc, 0x1f, 0x9b, 0x31, 0x62, 0xd5, 0xb4, 0x23, 0x01, 0xe6, 0x35, 0xcc, 0x3e,
-	0xd4, 0xc8, 0xd5, 0xca, 0xf3, 0xb5, 0x50, 0xf7, 0x9b, 0xfb, 0x1c, 0xe6, 0xfd, 0x41, 0x0f, 0x78,
-	0xf2, 0x77, 0x04, 0xe3, 0x73, 0x77, 0xaf, 0xe4, 0x14, 0x52, 0x7b, 0x80, 0x64, 0x96, 0x87, 0x73,
-	0x8e, 0xae, 0x33, 0x9b, 0xf7, 0x93, 0x61, 0x9d, 0x1d, 0xf2, 0x19, 0xa6, 0xe1, 0x19, 0x9c, 0x66,
-	0x72, 0xd0, 0xf6, 0x0d, 0xdc, 0x5b, 0x76, 0x38, 0x5c, 0xec, 0xc0, 0x3e, 0xc1, 0xa4, 0x03, 0x13,
-	0x92, 0x64, 0xdb, 0xf6, 0xdb, 0x67, 0x91, 0x1d, 0x0c, 0xd6, 0x3a, 0xa4, 0x77, 0x90, 0x5a, 0x55,
-	0x84, 0xf6, 0x18, 0x23, 0xf7, 0xb3, 0x97, 0x03, 0x95, 0x6e, 0xfc, 0x2d, 0xa4, 0x6e, 0x83, 0x17,
-	0x31, 0x4b, 0x3c, 0x4d, 0xef, 0x16, 0x62, 0x4b, 0x62, 0xab, 0xb7, 0x96, 0x0c, 0xbc, 0xdc, 0xd6,
-	0x92, 0xa1, 0xd7, 0x61, 0x3b, 0x97, 0x63, 0xf7, 0xc7, 0x9d, 0xfe, 0x0b, 0x00, 0x00, 0xff, 0xff,
-	0x75, 0xd4, 0x1b, 0x8b, 0x63, 0x04, 0x00, 0x00,
+	// 458 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0x4d, 0x6f, 0xd4, 0x30,
+	0x10, 0x6d, 0xba, 0xdb, 0x85, 0xce, 0x6e, 0xf9, 0xf0, 0x6e, 0xc1, 0xa4, 0x55, 0xb5, 0xf2, 0x69,
+	0x4f, 0xa9, 0x28, 0x12, 0x20, 0x21, 0xb8, 0xc0, 0x01, 0x84, 0x84, 0xaa, 0x44, 0xe5, 0xc2, 0xc9,
+	0x5d, 0x86, 0x10, 0x29, 0xc4, 0xc6, 0xf6, 0x16, 0xf5, 0xce, 0x0f, 0xe1, 0xa7, 0xa2, 0xd8, 0x4e,
+	0xd6, 0x49, 0x23, 0x55, 0xbd, 0x65, 0x3c, 0x33, 0xef, 0xcd, 0x7b, 0x33, 0x81, 0x99, 0x2c, 0xf9,
+	0x35, 0xaa, 0x44, 0x2a, 0x61, 0x04, 0x99, 0xb8, 0x28, 0x3e, 0xc9, 0x85, 0xc8, 0x4b, 0x3c, 0xb5,
+	0xaf, 0x97, 0x9b, 0x1f, 0xa7, 0x7f, 0x14, 0x97, 0x12, 0x95, 0x76, 0x75, 0xec, 0x01, 0xcc, 0x32,
+	0xc3, 0x0d, 0xa6, 0xf8, 0x7b, 0x83, 0xda, 0xb0, 0x6f, 0x70, 0xe0, 0x63, 0x2d, 0x45, 0xa5, 0x91,
+	0x2c, 0x60, 0x4f, 0x0a, 0x65, 0x34, 0x8d, 0x96, 0xa3, 0xd5, 0x7e, 0xea, 0x02, 0x12, 0xc3, 0x7d,
+	0x6d, 0x84, 0xe2, 0x39, 0x6a, 0xba, 0x6b, 0x13, 0x6d, 0x4c, 0x28, 0xdc, 0xfb, 0x8e, 0x57, 0xc5,
+	0x1a, 0x35, 0x1d, 0xd9, 0x54, 0x13, 0xb2, 0x02, 0xe6, 0x99, 0xe1, 0xca, 0xa4, 0xb8, 0xc6, 0xe2,
+	0xaa, 0xe1, 0x24, 0x04, 0xc6, 0x35, 0x2a, 0x8d, 0x96, 0xd1, 0x6a, 0x3f, 0xb5, 0xdf, 0xe4, 0x1d,
+	0x4c, 0x3d, 0xe0, 0xc5, 0xc5, 0xa7, 0x0f, 0x74, 0x77, 0x19, 0xad, 0xa6, 0x67, 0xc7, 0x89, 0x53,
+	0x93, 0x34, 0x6a, 0x92, 0xcc, 0xa8, 0xa2, 0xca, 0xbf, 0xf2, 0x72, 0x83, 0x69, 0xd8, 0xc0, 0x5e,
+	0xc3, 0xa2, 0x4b, 0xe5, 0xe5, 0x2c, 0xbb, 0xb8, 0x8e, 0xb2, 0xd3, 0xb9, 0x02, 0x92, 0x19, 0x21,
+	0x6f, 0x9f, 0x91, 0x1d, 0xd6, 0x72, 0x82, 0x4a, 0x47, 0xc1, 0xfe, 0x46, 0xf0, 0xc8, 0x72, 0x9f,
+	0x97, 0xfc, 0xba, 0xe9, 0x3f, 0x01, 0x70, 0x2e, 0x7c, 0xe1, 0xbf, 0xd0, 0xa3, 0x04, 0x2f, 0xb5,
+	0xa1, 0xeb, 0x9f, 0xbc, 0xaa, 0xb0, 0xd4, 0x56, 0xec, 0x41, 0xda, 0xc6, 0x35, 0xb7, 0xe2, 0x06,
+	0xe9, 0xc8, 0xbe, 0xdb, 0xef, 0xbe, 0x8e, 0xf1, 0x4d, 0x1d, 0x73, 0x78, 0x1c, 0x4c, 0xe1, 0x67,
+	0x7b, 0x0e, 0x0f, 0xeb, 0x91, 0xef, 0x30, 0x19, 0x23, 0xb5, 0x9a, 0xa6, 0xc5, 0xc3, 0xbc, 0x82,
+	0xf9, 0xfb, 0x12, 0xb9, 0xca, 0x1c, 0x5f, 0x03, 0x75, 0xbb, 0xb9, 0x4f, 0x60, 0xd1, 0x6d, 0x74,
+	0x80, 0x67, 0xff, 0x46, 0x30, 0x39, 0xb7, 0x17, 0x4b, 0x5e, 0xc2, 0x9e, 0xbd, 0x40, 0xb2, 0x48,
+	0xfc, 0x45, 0x87, 0x07, 0x1a, 0x1f, 0xf6, 0x5e, 0xfd, 0x44, 0x3b, 0xe4, 0x33, 0xcc, 0xfc, 0x26,
+	0xac, 0x6c, 0x72, 0x14, 0x14, 0xf6, 0x4f, 0x2e, 0x3e, 0x1e, 0x4e, 0xb6, 0x60, 0x1f, 0x61, 0xda,
+	0x82, 0x09, 0x49, 0xe2, 0x6d, 0x79, 0xff, 0x32, 0xe2, 0xa3, 0xc1, 0x5c, 0x8b, 0xf4, 0x16, 0xc6,
+	0xb5, 0x30, 0x42, 0x3b, 0x8c, 0xc1, 0x02, 0xe2, 0x67, 0x03, 0x99, 0xb6, 0xfd, 0x0d, 0x8c, 0xed,
+	0x04, 0x4f, 0x43, 0x96, 0xb0, 0x9b, 0xde, 0x4c, 0x84, 0x96, 0x84, 0x6e, 0x6f, 0x2d, 0x19, 0x58,
+	0xde, 0xd6, 0x92, 0xa1, 0x05, 0xb1, 0x9d, 0xcb, 0x89, 0xfd, 0xe9, 0x5e, 0xfc, 0x0f, 0x00, 0x00,
+	0xff, 0xff, 0x2b, 0x87, 0xd7, 0x9b, 0x68, 0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -686,14 +686,14 @@ func _Player_State_Handler(srv interface{}, ctx context.Context, dec func(interf
 	if interceptor == nil {
 		return srv.(PlayerServer).State(ctx, in)
 	}
-	State := &grpc.UnaryServerInfo{
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/player.Player/State",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PlayerServer).State(ctx, req.(*StateRequest))
 	}
-	return interceptor(ctx, in, State, handler)
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Player_ReceiveStart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -704,14 +704,14 @@ func _Player_ReceiveStart_Handler(srv interface{}, ctx context.Context, dec func
 	if interceptor == nil {
 		return srv.(PlayerServer).ReceiveStart(ctx, in)
 	}
-	State := &grpc.UnaryServerInfo{
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/player.Player/ReceiveStart",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PlayerServer).ReceiveStart(ctx, req.(*StartReceiveRequest))
 	}
-	return interceptor(ctx, in, State, handler)
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Player_ReceiveStop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -722,14 +722,14 @@ func _Player_ReceiveStop_Handler(srv interface{}, ctx context.Context, dec func(
 	if interceptor == nil {
 		return srv.(PlayerServer).ReceiveStop(ctx, in)
 	}
-	State := &grpc.UnaryServerInfo{
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/player.Player/ReceiveStop",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PlayerServer).ReceiveStop(ctx, req.(*StopReceiveRequest))
 	}
-	return interceptor(ctx, in, State, handler)
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Player_Play_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -740,14 +740,14 @@ func _Player_Play_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	if interceptor == nil {
 		return srv.(PlayerServer).Play(ctx, in)
 	}
-	State := &grpc.UnaryServerInfo{
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/player.Player/Play",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PlayerServer).Play(ctx, req.(*StartPlayRequest))
 	}
-	return interceptor(ctx, in, State, handler)
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Player_Stop_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -758,14 +758,14 @@ func _Player_Stop_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	if interceptor == nil {
 		return srv.(PlayerServer).Stop(ctx, in)
 	}
-	State := &grpc.UnaryServerInfo{
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/player.Player/Stop",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PlayerServer).Stop(ctx, req.(*StopPlayRequest))
 	}
-	return interceptor(ctx, in, State, handler)
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Player_ClearStorage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -776,14 +776,14 @@ func _Player_ClearStorage_Handler(srv interface{}, ctx context.Context, dec func
 	if interceptor == nil {
 		return srv.(PlayerServer).ClearStorage(ctx, in)
 	}
-	State := &grpc.UnaryServerInfo{
+	info := &grpc.UnaryServerInfo{
 		Server:     srv,
 		FullMethod: "/player.Player/ClearStorage",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PlayerServer).ClearStorage(ctx, req.(*ClearStorageRequest))
 	}
-	return interceptor(ctx, in, State, handler)
+	return interceptor(ctx, in, info, handler)
 }
 
 var _Player_serviceDesc = grpc.ServiceDesc{
