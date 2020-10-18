@@ -82,6 +82,43 @@ func fileStopHandler(svc server.Server, transport FileStopTransport, errorProces
 	return s.handler
 }
 
+type playerState struct {
+	svc             server.Server
+	transport       PlayerStateTransport
+	errorProcessing errorProcessing
+}
+
+func (s *playerState) handler(ctx *fasthttp.RequestCtx) {
+	var (
+		err                      error
+		playerIP                 string
+		ports, storages, devices []string
+	)
+	if playerIP, err = s.transport.Decode(ctx); err != nil {
+		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
+		return
+	}
+
+	if ports, storages, devices, err = s.svc.PlayerState(ctx, playerIP); err != nil {
+		s.errorProcessing(&ctx.Response, err, -1)
+		return
+	}
+
+	if err = s.transport.Encode(&ctx.Response, ports, storages, devices); err != nil {
+		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
+		return
+	}
+}
+
+func playerStateHandler(svc server.Server, transport PlayerStateTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+	s := &playerState{
+		svc:             svc,
+		transport:       transport,
+		errorProcessing: errorProcessing,
+	}
+	return s.handler
+}
+
 type playerReceiveStart struct {
 	svc             server.Server
 	transport       PlayerReceiveStartTransport
@@ -403,6 +440,43 @@ func (s *stopFromRecorder) handler(ctx *fasthttp.RequestCtx) {
 
 func stopFromRecorderHandler(svc server.Server, transport StopFromRecorderTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
 	s := &stopFromRecorder{
+		svc:             svc,
+		transport:       transport,
+		errorProcessing: errorProcessing,
+	}
+	return s.handler
+}
+
+type recorderState struct {
+	svc             server.Server
+	transport       RecorderStateTransport
+	errorProcessing errorProcessing
+}
+
+func (s *recorderState) handler(ctx *fasthttp.RequestCtx) {
+	var (
+		err        error
+		recorderIP string
+		devices    []string
+	)
+	if recorderIP, err = s.transport.Decode(ctx); err != nil {
+		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
+		return
+	}
+
+	if devices, err = s.svc.RecorderState(ctx, recorderIP); err != nil {
+		s.errorProcessing(&ctx.Response, err, -1)
+		return
+	}
+
+	if err = s.transport.Encode(&ctx.Response, devices); err != nil {
+		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
+		return
+	}
+}
+
+func recorderStateHandler(svc server.Server, transport RecorderStateTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+	s := &recorderState{
 		svc:             svc,
 		transport:       transport,
 		errorProcessing: errorProcessing,

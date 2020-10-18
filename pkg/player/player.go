@@ -36,6 +36,7 @@ type player struct {
 	storageCreator storageCreator
 }
 
+// State return all busy ports, devices on player and existing storage
 func (p *player) State(ctx context.Context, in *StateRequest) (out *StateResponse, err error) {
 	out = &StateResponse{}
 
@@ -164,7 +165,7 @@ func (p *player) ClearStorage(c context.Context, in *ClearStorageRequest) (out *
 	return
 }
 
-// NewPlayer todo
+// NewPlayer ...
 func NewPlayer(
 	udp udp,
 	device device,

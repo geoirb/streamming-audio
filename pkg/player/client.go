@@ -8,13 +8,13 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
-// Client rpc controller
+// Client rpc player
 type Client struct {
 	hostLayout  string
 	controlPort string
 }
 
-// State todo
+// State return all busy ports, devices on player and existing storage
 func (c *Client) State(ctx context.Context, ip string) (ports, storages, devices []string, err error) {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(c.hostLayout, ip, c.controlPort),

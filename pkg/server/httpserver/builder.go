@@ -17,6 +17,8 @@ const (
 	methodFileStop = http.MethodPost
 	uriFileStop    = "/player/file/stop"
 
+	methodPlayerState        = http.MethodGet
+	uriPlayerState           = "/player/state"
 	methodPlayerReceiveStart = http.MethodPost
 	uriPlayerReceiveStart    = "/player/receive/start"
 	methodPlayerReceiveStop  = http.MethodPost
@@ -37,6 +39,8 @@ const (
 	methodStopFromRecorder  = http.MethodPost
 	uriStopFromRecorder     = "/recoder/player/stop"
 
+	methodRecorderState = http.MethodGet
+	uriRecorderState    = "/recorder/state"
 	methodRecorderStart = http.MethodPost
 	uriRecorderStart    = "/recoder/start"
 	methodRecoderStop   = http.MethodPost
@@ -50,6 +54,7 @@ func NewServer(svc server.Server) *fasthttp.Server {
 	router.Handle(methodFilePlay, uriFilePlay, filePlayHandler(svc, newFilePlayTransport(), ErrorProcessing))
 	router.Handle(methodFileStop, uriFileStop, fileStopHandler(svc, newFileStopTransport(), ErrorProcessing))
 
+	router.Handle(methodPlayerState, uriPlayerState, playerStateHandler(svc, newPlayerStateTransport(), ErrorProcessing))
 	router.Handle(methodPlayerReceiveStart, uriPlayerReceiveStart, playerReceiveStartHandler(svc, newPlayerReceiveStartTransport(), ErrorProcessing))
 	router.Handle(methodPlayerReceiveStop, uriPlayerReceiveStop, playerReceiveStopHandler(svc, newPlayerReceiveStopTransport(), ErrorProcessing))
 	router.Handle(methodPlayerPlay, uriPlayerPlay, playerPlayHandler(svc, newPlayerPlayTransport(), ErrorProcessing))
@@ -61,6 +66,7 @@ func NewServer(svc server.Server) *fasthttp.Server {
 	router.Handle(methodPlayFromRecorder, uriPlayFromRecorder, playFromRecorderHandler(svc, newPlayFromRecorderTransport(), ErrorProcessing))
 	router.Handle(methodStopFromRecorder, uriStopFromRecorder, stopFromRecorderHandler(svc, newStopFromRecorderTransport(), ErrorProcessing))
 
+	router.Handle(methodRecorderState, uriRecorderState, recorderStateHandler(svc, newRecorderStateTransport(), ErrorProcessing))
 	router.Handle(methodRecorderStart, uriRecorderStart, recorderStartHandler(svc, newRecorderStartTransport(), ErrorProcessing))
 	router.Handle(methodRecoderStop, uriRecorderStop, recorderStopHandler(svc, newRecorderStopTransport(), ErrorProcessing))
 

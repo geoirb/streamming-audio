@@ -29,7 +29,7 @@ func (l *loggerMiddleware) Start(ctx context.Context, in *StartSendRequest) (out
 	return
 }
 
-// Stop todo
+// Stop log
 func (l *loggerMiddleware) Stop(ctx context.Context, in *StopSendRequest) (out *StopSendResponse, err error) {
 	l.logger.Log("Stop", "start", "in", in.String())
 	if out, err = l.server.Stop(ctx, in); err != nil {
@@ -38,7 +38,7 @@ func (l *loggerMiddleware) Stop(ctx context.Context, in *StopSendRequest) (out *
 	return
 }
 
-// NewLoggerMiddleware todo
+// NewLoggerMiddleware recoder
 func NewLoggerMiddleware(
 	logger log.Logger,
 	recorder RecorderServer,

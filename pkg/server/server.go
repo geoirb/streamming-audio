@@ -47,6 +47,7 @@ type Server interface {
 	FilePlay(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, err error)
 	FileStop(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid string) (err error)
 
+	PlayerState(ctx context.Context, playerIP string) (ports, storages, devices []string, err error)
 	PlayerReceiveStart(ctx context.Context, playerIP, playerPort string, uuid *string) (string, error)
 	PlayerReceiveStop(ctx context.Context, playerIP, playerPort string) error
 	PlayerPlay(ctx context.Context, playerIP, uuid, playerDeviceName string, channels, rate uint32) (err error)
@@ -58,6 +59,7 @@ type Server interface {
 	PlayFromRecorder(ctx context.Context, playerIP, playerPort, playerDeviceName string, channels, rate uint32, recorderIP, recorderDeviceName string) (uuid string, err error)
 	StopFromRecorder(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid, recorderIP, recorderDeviceName string) error
 
+	RecorderState(ctx context.Context, recorderIP string) (devices []string, err error)
 	RecorderStart(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, dstAddr string) error
 	RecoderStop(ctx context.Context, recorderIP, recorderDeviceName string) error
 }
@@ -121,6 +123,11 @@ func (s *server) FileStop(ctx context.Context, playerIP, playerPort, playerDevic
 		return
 	}
 	return s.PlayerClearStorage(ctx, playerIP, uuid)
+}
+
+// PlayerState return all busy ports, devices on player and existing storage
+func (s *server) PlayerState(ctx context.Context, playerIP string) (ports, storages, devices []string, err error) {
+	return s.player.State(ctx, playerIP)
 }
 
 // PlayerReceiveStart player with playerIP start receive signal from server on playerPort.
@@ -205,6 +212,11 @@ func (s *server) StopFromRecorder(ctx context.Context, playerIP, playerPort, pla
 	s.PlayerClearStorage(ctx, playerIP, uuid)
 	s.RecoderStop(ctx, recorderIP, recorderDeviceName)
 	return nil
+}
+
+// RecorderState return all busy devices on recorder
+func (s *server) RecorderState(ctx context.Context, recorderIP string) (devices []string, err error) {
+	return s.recorder.State(ctx, recorderIP)
 }
 
 // RecorderStart start recording audio on recorder with recorderIP from recorderDeviceName and receive on dstAddr

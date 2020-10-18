@@ -85,6 +85,46 @@ func newFileStopTransport() FileStopTransport {
 	return &fileStopTransport{}
 }
 
+// PlayerStateTransport ...
+type PlayerStateTransport interface {
+	Decode(ctx *fasthttp.RequestCtx) (playerIP string, err error)
+	Encode(res *fasthttp.Response, ports, storages, devices []string) (err error)
+}
+
+type playerStateTransport struct{}
+
+type playerStateRequest struct {
+	PlayerIP string `json:"playerIP"`
+}
+
+func (t *playerStateTransport) Decode(ctx *fasthttp.RequestCtx) (string, error) {
+	var request playerStateRequest
+	err := json.Unmarshal(ctx.Request.Body(), &request)
+	return request.PlayerIP, err
+}
+
+type playerStateResponse struct {
+	Ports    []string `json:"ports"`
+	Storages []string `json:"storages"`
+	Devices  []string `json:"devices"`
+}
+
+func (t *playerStateTransport) Encode(res *fasthttp.Response, ports, storages, devices []string) (err error) {
+	response := &playerStateResponse{
+		Ports:    ports,
+		Storages: storages,
+		Devices:  devices,
+	}
+	body, err := json.Marshal(response)
+	res.SetBody(body)
+	res.SetStatusCode(http.StatusOK)
+	return
+}
+
+func newPlayerStateTransport() PlayerStateTransport {
+	return &playerStateTransport{}
+}
+
 // PlayerReceiveStartTransport ...
 type PlayerReceiveStartTransport interface {
 	Decode(ctx *fasthttp.RequestCtx) (playerIP, playerPort string, uuid *string, err error)
@@ -406,6 +446,42 @@ func (t *stopFromRecorderTransport) Encode(res *fasthttp.Response) (err error) {
 
 func newStopFromRecorderTransport() StopFromRecorderTransport {
 	return &stopFromRecorderTransport{}
+}
+
+// RecorderStateTransport ...
+type RecorderStateTransport interface {
+	Decode(ctx *fasthttp.RequestCtx) (recorderIP string, err error)
+	Encode(res *fasthttp.Response, devices []string) (err error)
+}
+
+type recorderStateTransport struct{}
+
+type recorderStateRequest struct {
+	RecorderIP string `json:"recorderIP"`
+}
+
+func (t *recorderStateTransport) Decode(ctx *fasthttp.RequestCtx) (string, error) {
+	var request recorderStateRequest
+	err := json.Unmarshal(ctx.Request.Body(), &request)
+	return request.RecorderIP, err
+}
+
+type recorderStateResponse struct {
+	Devices []string `json:"devices"`
+}
+
+func (t *recorderStateTransport) Encode(res *fasthttp.Response, devices []string) (err error) {
+	response := &recorderStateResponse{
+		Devices: devices,
+	}
+	body, err := json.Marshal(response)
+	res.SetBody(body)
+	res.SetStatusCode(http.StatusOK)
+	return
+}
+
+func newRecorderStateTransport() RecorderStateTransport {
+	return &recorderStateTransport{}
 }
 
 // RecorderStartTransport ...

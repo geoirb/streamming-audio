@@ -23,7 +23,7 @@ type recorder struct {
 	device device
 }
 
-// State todo
+// State return busy recorder device
 func (r *recorder) State(ctx context.Context, in *StateRequest) (out *StateResponse, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
@@ -37,7 +37,7 @@ func (r *recorder) State(ctx context.Context, in *StateRequest) (out *StateRespo
 	return
 }
 
-// Start todo
+// Start recording audio on recorder from recorderDeviceName
 func (r *recorder) Start(c context.Context, in *StartSendRequest) (out *StartSendResponse, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
@@ -59,7 +59,7 @@ func (r *recorder) Start(c context.Context, in *StartSendRequest) (out *StartSen
 	return
 }
 
-// Stop todo
+// Stop recording audio on recorder from recorderDeviceName
 func (r *recorder) Stop(ctx context.Context, in *StopSendRequest) (out *StopSendResponse, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
@@ -74,7 +74,7 @@ func (r *recorder) Stop(ctx context.Context, in *StopSendRequest) (out *StopSend
 	return
 }
 
-// NewRecorder todo
+// NewRecorder ...
 func NewRecorder(
 	udp udp,
 	device device,

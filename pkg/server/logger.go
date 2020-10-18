@@ -50,6 +50,24 @@ func (l *loggerMiddleware) FileStop(ctx context.Context, playerIP, playerPort, p
 	return
 }
 
+func (l *loggerMiddleware) PlayerState(ctx context.Context, playerIP string) (ports, storages, devices []string, err error) {
+	l.logger.Log("PlayerState", "start")
+	if ports, storages, devices, err = l.server.PlayerState(ctx, playerIP); err != nil {
+		l.logger.Log(
+			"PlayerReceiveStart", "err",
+			"playerIP", playerIP,
+			"err", err,
+		)
+	}
+	l.logger.Log(
+		"PlayerReceiveStart", "end",
+		"ports", ports,
+		"storages", storages,
+		"devices", devices,
+	)
+	return
+}
+
 func (l *loggerMiddleware) PlayerReceiveStart(ctx context.Context, playerIP, playerPort string, uuid *string) (sUUID string, err error) {
 	l.logger.Log("PlayerReceiveStart", "start")
 	if sUUID, err = l.server.PlayerReceiveStart(ctx, playerIP, playerPort, uuid); err != nil {
@@ -197,6 +215,22 @@ func (l *loggerMiddleware) StopFromRecorder(ctx context.Context, playerIP, playe
 		)
 	}
 	l.logger.Log("StopFromRecorder", "end")
+	return
+}
+
+func (l *loggerMiddleware) RecorderState(ctx context.Context, recorderIP string) (devices []string, err error) {
+	l.logger.Log("PlayerState", "start")
+	if devices, err = l.server.RecorderState(ctx, recorderIP); err != nil {
+		l.logger.Log(
+			"PlayerReceiveStart", "err",
+			"recorderIP", recorderIP,
+			"err", err,
+		)
+	}
+	l.logger.Log(
+		"PlayerReceiveStart", "end",
+		"devices", devices,
+	)
 	return
 }
 

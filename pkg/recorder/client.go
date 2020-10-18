@@ -7,13 +7,13 @@ import (
 	"google.golang.org/grpc"
 )
 
-// Client rpc controller
+// Client rpc recorder
 type Client struct {
 	hostLayout  string
 	controlPort string
 }
 
-// State todo
+// State return busy recorder device
 func (c *Client) State(ctx context.Context, ip string) (devices []string, err error) {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(c.hostLayout, ip, c.controlPort),
