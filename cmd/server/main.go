@@ -24,7 +24,7 @@ type configuration struct {
 	PlayerPort   string `envconfig:"PLAYER_PORT" default:"8081"`
 	RecorderPort string `envconfig:"RECODER_PORT" default:"8082"`
 
-	UDPBuffSize int `envconfig:"UDP_BUF_SIZE" default:"1024"`
+	UDPBuffSize int `envconfig:"UDP_BUF_SIZE" default:"32"`
 
 	AddrLayout   string `envconfig:"ADDRESS_LAYOUT" default:"%s:%s"`
 	DeviceLayout string `envconfig:"DEVICE_LAYOUT" default:"%s:%s"`
@@ -79,7 +79,7 @@ func main() {
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Info(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 	// todo
-	// if err := server.Shutdown(); err != nil {
-	// 	level.Error(logger).Log("server shutdown failure %v", err)
-	// }
+	if err := server.Shutdown(); err != nil {
+		level.Error(logger).Log("server shutdown failure %v", err)
+	}
 }

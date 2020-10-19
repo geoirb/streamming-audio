@@ -8,8 +8,8 @@ Start from project root
 
 2. Start player
    
-   `go run cmd/player/main`
+   `go run cmd/player/main.go`
 
 3. Start example server
 
-    `go run example/play-file/main.go`
+    `go run example/play-file/server.go`
