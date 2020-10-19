@@ -13,7 +13,7 @@ type storageCreator interface {
 	List() io.ReadWriteCloser
 }
 
-type udp interface {
+type tcp interface {
 	Receive(ctx context.Context, receivePort string, storage io.Writer) error
 }
 
@@ -31,7 +31,7 @@ type player struct {
 	playbackDeviceMutex sync.Mutex
 	playbackDevice      map[string]func()
 
-	udp            udp
+	tcp            tcp
 	device         device
 	storageCreator storageCreator
 }
@@ -80,7 +80,7 @@ func (p *player) ReceiveStart(c context.Context, in *StartReceiveRequest) (out *
 		}
 
 		ctx, stop := context.WithCancel(context.Background())
-		if err = p.udp.Receive(ctx, in.Port, storage); err == nil {
+		if err = p.tcp.Receive(ctx, in.Port, storage); err == nil {
 			p.storage[uuid] = storage
 			p.receivingPort[in.Port] = stop
 			out = &StartReceiveResponse{
@@ -167,7 +167,7 @@ func (p *player) ClearStorage(c context.Context, in *ClearStorageRequest) (out *
 
 // NewPlayer ...
 func NewPlayer(
-	udp udp,
+	tcp tcp,
 	device device,
 	storage storageCreator,
 ) PlayerServer {
@@ -176,7 +176,7 @@ func NewPlayer(
 		storage:        make(map[string]io.ReadWriteCloser),
 		playbackDevice: make(map[string]func()),
 
-		udp:            udp,
+		tcp:            tcp,
 		device:         device,
 		storageCreator: storage,
 	}

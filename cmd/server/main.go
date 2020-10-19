@@ -13,7 +13,7 @@ import (
 	"github.com/geoirb/ausio-service/pkg/recorder"
 	"github.com/geoirb/ausio-service/pkg/server"
 	"github.com/geoirb/ausio-service/pkg/server/httpserver"
-	"github.com/geoirb/ausio-service/pkg/udp"
+	"github.com/geoirb/ausio-service/pkg/tcp"
 	"github.com/geoirb/ausio-service/pkg/wav"
 )
 
@@ -52,12 +52,12 @@ func main() {
 		cfg.AddrLayout,
 		cfg.RecorderPort,
 	)
-	udp := udp.NewUDP(cfg.UDPBuffSize)
+	tcp := tcp.NewTCP(cfg.UDPBuffSize)
 	svc := server.NewServer(
 		wav,
 		recorder,
 		player,
-		udp,
+		tcp,
 
 		cfg.ServerIP,
 		cfg.AddrLayout,

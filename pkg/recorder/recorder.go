@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-type udp interface {
+type tcp interface {
 	TurnOnSender(string) (io.WriteCloser, error)
 }
 
@@ -19,7 +19,7 @@ type recorder struct {
 	mutex         sync.Mutex
 	captureDevice map[string]func()
 
-	udp    udp
+	tcp    tcp
 	device device
 }
 
@@ -44,7 +44,7 @@ func (r *recorder) Start(c context.Context, in *StartSendRequest) (out *StartSen
 
 	if _, isExist := r.captureDevice[in.DeviceName]; !isExist {
 		var destination io.WriteCloser
-		if destination, err = r.udp.TurnOnSender(in.DestAddr); err == nil {
+		if destination, err = r.tcp.TurnOnSender(in.DestAddr); err == nil {
 			ctx, stop := context.WithCancel(context.Background())
 			if err = r.device.Record(ctx, in.DeviceName, int(in.Channels), int(in.Rate), destination); err == nil {
 				r.captureDevice[in.DeviceName] = stop
@@ -76,13 +76,13 @@ func (r *recorder) Stop(ctx context.Context, in *StopSendRequest) (out *StopSend
 
 // NewRecorder ...
 func NewRecorder(
-	udp udp,
+	tcp tcp,
 	device device,
 ) RecorderServer {
 	return &recorder{
 		captureDevice: make(map[string]func()),
 
-		udp:    udp,
+		tcp:    tcp,
 		device: device,
 	}
 }

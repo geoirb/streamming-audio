@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -13,7 +12,7 @@ import (
 
 	"github.com/geoirb/ausio-service/pkg/recorder"
 	"github.com/geoirb/ausio-service/pkg/server"
-	"github.com/geoirb/ausio-service/pkg/udp"
+	"github.com/geoirb/ausio-service/pkg/tcp"
 	"github.com/geoirb/ausio-service/pkg/wav"
 )
 
@@ -49,12 +48,12 @@ func main() {
 		cfg.AddrLayout,
 		cfg.RecorderPort,
 	)
-	udp := udp.NewUDP(cfg.UDPBuffSize)
+	tcp := tcp.NewTCP(cfg.UDPBuffSize)
 	svc := server.NewServer(
 		wav,
 		recorder,
 		nil,
-		udp,
+		tcp,
 
 		cfg.ServerIP,
 		cfg.AddrLayout,
@@ -64,17 +63,16 @@ func main() {
 	recorderIP := "127.0.0.1"
 	receivePort := "8083"
 	recorderDevice := "hw:0,0"
-	file := "/home/geo/go/src/github.com/geoirb/ausio-service/example/record-file/test.wav"
+	pwd, _ := os.Getwd()
+	file := pwd + "/example/record-file/test.wav"
 	svc = server.NewLoggerMiddleware(svc, logger)
 	svc.StartFileRecoding(context.Background(), recorderIP, recorderDevice, 2, 44100, receivePort, file)
 	level.Info(logger).Log("msg", "server start")
 
-	time.Sleep(30 * time.Second)
-
-	svc.StopFileRecoding(context.Background(), recorderIP, recorderDevice, receivePort)
-
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Info(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
+
+	svc.StopFileRecoding(context.Background(), recorderIP, recorderDevice, receivePort)
 
 }

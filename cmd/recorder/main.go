@@ -14,7 +14,7 @@ import (
 	"github.com/geoirb/ausio-service/pkg/capture"
 	"github.com/geoirb/ausio-service/pkg/converter"
 	"github.com/geoirb/ausio-service/pkg/recorder"
-	udp "github.com/geoirb/ausio-service/pkg/udp"
+	tcp "github.com/geoirb/ausio-service/pkg/tcp"
 )
 
 type configuration struct {
@@ -36,12 +36,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	udp := udp.NewUDP(cfg.UDPBuffSize)
+	tcp := tcp.NewTCP(cfg.UDPBuffSize)
 
 	converter := converter.NewConverter()
 	capture := capture.NewCapture(converter, cfg.UDPBuffSize)
 	r5r := recorder.NewRecorder(
-		udp,
+		tcp,
 		capture,
 	)
 	r5r = recorder.NewLoggerMiddleware(logger, r5r)

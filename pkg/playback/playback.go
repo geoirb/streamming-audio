@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 	"sync"
-	"time"
 
 	alsa "github.com/cocoonlife/goalsa"
 )
@@ -43,7 +42,6 @@ func (d *Playback) Play(ctx context.Context, deviceName string, channels, rate i
 			default:
 				if l, err := r.Read(samples); err == nil {
 					out.Write(d.converter.ToInt16(samples[:l]))
-					time.Sleep(22675)
 				}
 			}
 		}

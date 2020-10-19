@@ -15,7 +15,7 @@ import (
 	"github.com/geoirb/ausio-service/pkg/playback"
 	"github.com/geoirb/ausio-service/pkg/player"
 	"github.com/geoirb/ausio-service/pkg/storage"
-	udp "github.com/geoirb/ausio-service/pkg/udp"
+	tcp "github.com/geoirb/ausio-service/pkg/tcp"
 )
 
 type configuration struct {
@@ -37,7 +37,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	udp := udp.NewUDP(cfg.UDPBuffSize)
+	tcp := tcp.NewTCP(cfg.UDPBuffSize)
 
 	converter := converter.NewConverter()
 	playback := playback.NewPlayback(
@@ -48,7 +48,7 @@ func main() {
 	storage := storage.NewStorage()
 
 	p4r := player.NewPlayer(
-		udp,
+		tcp,
 		playback,
 		storage,
 	)

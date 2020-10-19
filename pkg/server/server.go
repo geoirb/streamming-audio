@@ -22,7 +22,7 @@ type audio interface {
 	Writer(fileName string, channels uint16, rate uint32) (io.WriteCloser, error)
 }
 
-type udp interface {
+type tcp interface {
 	Send(ctx context.Context, host string, r io.Reader) error
 	Receive(ctx context.Context, receivePort string, w io.Writer) (err error)
 }
@@ -74,7 +74,7 @@ type server struct {
 	audio    audio
 	player   player
 	recorder recorder
-	udp      udp
+	tcp      tcp
 
 	serverIP     string
 	addrLayout   string
@@ -237,7 +237,7 @@ func (s *server) startSending(ctx context.Context, playerIP, playerPort string, 
 	dstAddr := fmt.Sprintf(s.addrLayout, playerIP, playerPort)
 	if _, isExist := s.sending[dstAddr]; !isExist {
 		c, stop := context.WithCancel(context.Background())
-		if err = s.udp.Send(c, dstAddr, r); err == nil {
+		if err = s.tcp.Send(c, dstAddr, r); err == nil {
 			s.sending[dstAddr] = stop
 			return
 		}
@@ -268,7 +268,7 @@ func (s *server) startReceive(ctx context.Context, recorderIP, receivePort strin
 
 	if _, isExist := s.receiving[receivePort]; !isExist {
 		c, stop := context.WithCancel(context.Background())
-		if err = s.udp.Receive(c, receivePort, wc); err == nil {
+		if err = s.tcp.Receive(c, receivePort, wc); err == nil {
 			s.receiving[receivePort] = func() {
 				stop()
 				wc.Close()
@@ -300,7 +300,7 @@ func NewServer(
 	audio audio,
 	recorder recorder,
 	player player,
-	udp udp,
+	tcp tcp,
 
 	serverIP string,
 	addrLayout string,
@@ -313,7 +313,7 @@ func NewServer(
 		audio:    audio,
 		recorder: recorder,
 		player:   player,
-		udp:      udp,
+		tcp:      tcp,
 
 		serverIP:     serverIP,
 		addrLayout:   addrLayout,

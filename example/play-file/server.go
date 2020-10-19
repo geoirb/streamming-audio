@@ -12,7 +12,7 @@ import (
 
 	"github.com/geoirb/ausio-service/pkg/player"
 	"github.com/geoirb/ausio-service/pkg/server"
-	"github.com/geoirb/ausio-service/pkg/udp"
+	"github.com/geoirb/ausio-service/pkg/tcp"
 	"github.com/geoirb/ausio-service/pkg/wav"
 )
 
@@ -46,12 +46,12 @@ func main() {
 		cfg.AddrLayout,
 		cfg.PlayerPort,
 	)
-	udp := udp.NewUDP(cfg.UDPBuffSize)
+	tcp := tcp.NewTCP(cfg.UDPBuffSize)
 	svc := server.NewServer(
 		wav,
 		nil,
 		player,
-		udp,
+		tcp,
 
 		cfg.ServerIP,
 		cfg.AddrLayout,
@@ -60,8 +60,8 @@ func main() {
 	svc = server.NewLoggerMiddleware(svc, logger)
 	level.Info(logger).Log("msg", "server start")
 
-	// pwd, _ := os.Getwd()
-	file := "/home/geo/go/src/github.com/geoirb/audio-service/example/play-file/test.wav"
+	pwd, _ := os.Getwd()
+	file := pwd + "/example/play-file/test.wav"
 	playerIP := "127.0.0.1"
 	playerPort := "8083"
 	playerDeviceName := "hw:1,0"

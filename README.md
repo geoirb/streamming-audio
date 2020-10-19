@@ -74,7 +74,7 @@ Streaming audio
 
         docker run -d --rm \
         -p 0.0.0.0:8081:8081/tcp \ 
-        -p 0.0.0.0:PORT:PORT -p 0.0.0.0:PORT:PORT/udp \
+        -p 0.0.0.0:PORT:PORT -p 0.0.0.0:PORT:PORT/tcp \
         --device /dev/snd \
         -e ENVIRONMENTS \
         IMAGE-NAME
@@ -87,4 +87,4 @@ Streaming audio
 - PLAYBACK_DEVICE_NAME - устройство, на котором будет воспроизводиться принятый аудио сигнал
 
         make build-player tag player
-        docker run -d --rm -p 0.0.0.0:8081:8081/tcp -p 0.0.0.0:8082:8082 -p 0.0.0.0:8082:8082/udp --device /dev/snd player
+        docker run -d --rm -p 0.0.0.0:8081:8081/tcp -p 0.0.0.0:8082:8082 -p 0.0.0.0:8082:8082/tcp --device /dev/snd player
