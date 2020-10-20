@@ -18,11 +18,11 @@ import (
 )
 
 type configuration struct {
-	Port     string `envconfig:"PORT" default:"8080"`
+	Port     string `envconfig:"PORT" default:"8000"`
 	ServerIP string `envconfig:"SERVER_IP" default:"127.0.0.1"`
 
-	PlayerPort   string `envconfig:"PLAYER_PORT" default:"8081"`
-	RecorderPort string `envconfig:"RECODER_PORT" default:"8082"`
+	PlayerPort   string `envconfig:"PLAYER_PORT" default:"8080"`
+	RecorderPort string `envconfig:"RECODER_PORT" default:"8080"`
 
 	UDPBuffSize int `envconfig:"UDP_BUF_SIZE" default:"32"`
 
@@ -78,7 +78,8 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Info(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
-	// todo
+
+
 	if err := server.Shutdown(); err != nil {
 		level.Error(logger).Log("server shutdown failure %v", err)
 	}

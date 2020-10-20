@@ -74,6 +74,7 @@ func NewServer(svc server.Server) *fasthttp.Server {
 	router.Handle("GET", "/debug/pprof/profile", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Profile))
 
 	return &fasthttp.Server{
-		Handler: router.Handler,
+		Handler:          router.Handler,
+		DisableKeepalive: true,
 	}
 }

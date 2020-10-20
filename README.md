@@ -48,7 +48,7 @@ Streaming audio
 4. Запуск сервера
 
         docker run -d --rm \
-        -p PORT:PORT \ 
+        -p 8080:8080 \ 
         -e ENVIRONMENTS \ 
         IMAGE-NAME
 
@@ -70,11 +70,12 @@ Streaming audio
 2. Собрать образ клиент
 
         make build-player tag=IMAGE-NAME
+
 3. Запуск клиента
 
         docker run -d --rm \
-        -p 0.0.0.0:8081:8081/tcp \ 
-        -p 0.0.0.0:PORT:PORT -p 0.0.0.0:PORT:PORT/tcp \
+        -p 8080:8080 \ 
+        -p PORT:PORT \
         --device /dev/snd \
         -e ENVIRONMENTS \
         IMAGE-NAME
@@ -86,5 +87,11 @@ Streaming audio
 - PORT - порт, на котором будет работать клиент
 - PLAYBACK_DEVICE_NAME - устройство, на котором будет воспроизводиться принятый аудио сигнал
 
-        make build-player tag player
-        docker run -d --rm -p 0.0.0.0:8081:8081/tcp -p 0.0.0.0:8082:8082 -p 0.0.0.0:8082:8082/tcp --device /dev/snd player
+
+make build-server tag=server
+docker run --rm -p 8080:8080 --device /dev/snd --name server server
+
+make build-player tag=player
+docker run --rm -p 8080:8080 -p 8081:8081 --device /dev/snd --name player1 player
+docker run --rm -p 8080:8080 -p 8082:8082 --device /dev/snd --name player2 player
+docker run --rm -p 8080:8080 -p 8083:8083 --device /dev/snd --name player3 player

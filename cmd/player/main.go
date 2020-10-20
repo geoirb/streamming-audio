@@ -19,7 +19,7 @@ import (
 )
 
 type configuration struct {
-	Port        string `envconfig:"PORT" default:"8081"`
+	Port        string `envconfig:"PORT" default:"8080"`
 	UDPBuffSize int    `envconfig:"UDP_BUFF_SIZE" default:"1024"`
 }
 

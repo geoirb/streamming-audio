@@ -2,7 +2,6 @@ package tcp
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net"
 )
@@ -30,9 +29,7 @@ func (u *TCP) Send(ctx context.Context, dstAddr string, r io.Reader) (err error)
 		defer func() {
 			connection.Close()
 		}()
-		i := 0
 		for {
-			i++
 			select {
 			case <-ctx.Done():
 				return
@@ -41,7 +38,6 @@ func (u *TCP) Send(ctx context.Context, dstAddr string, r io.Reader) (err error)
 				if err != nil {
 					return
 				}
-				fmt.Println(i)
 				connection.Write(outputBytes[:l])
 			}
 		}
@@ -64,15 +60,12 @@ func (u *TCP) Receive(ctx context.Context, receivePort string, w io.Writer) (err
 			connection.Close()
 		}()
 
-		i := 0
 		for {
-			i++
 			inputBytes := make([]byte, u.buffSize)
 			l, err := connection.Read(inputBytes)
 			if err != nil {
 				return
 			}
-			fmt.Println(i)
 			w.Write(inputBytes[:l])
 		}
 	}()
