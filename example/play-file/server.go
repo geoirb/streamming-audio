@@ -19,8 +19,8 @@ import (
 type configuration struct {
 	ServerIP string `envconfig:"SERVER_IP" default:"127.0.0.1"`
 
-	PlayerPort   string `envconfig:"PLAYER_PORT" default:"8081"`
-	RecorderPort string `envconfig:"RECODER_PORT" default:"8082"`
+	PlayerPort   string `envconfig:"PLAYER_PORT" default:"8080"`
+	RecorderPort string `envconfig:"RECODER_PORT" default:"8080"`
 
 	UDPBuffSize int `envconfig:"UDP_BUF_SIZE" default:"1024"`
 
@@ -61,7 +61,7 @@ func main() {
 	level.Info(logger).Log("msg", "server start")
 
 	pwd, _ := os.Getwd()
-	file := pwd + "/example/play-file/test.wav"
+	file := pwd + "/audio/test.wav"
 	playerIP := "127.0.0.1"
 	playerPort := "8083"
 	playerDeviceName := "hw:1,0"
