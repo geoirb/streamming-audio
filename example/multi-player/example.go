@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/geoirb/ausio-service/pkg/server/httpclient"
+	"github.com/geoirb/audio-service/pkg/server/httpclient"
 )
 
 type playerInfo struct {
@@ -23,19 +23,19 @@ var player map[string]playerInfo = map[string]playerInfo{
 		IP:     "127.0.0.1",
 		Port:   "8081",
 		Device: "hw:1,0",
-		File:   "/home/geo/go/src/github.com/geoirb/audio-service/example/server-test/test.wav",
+		File:   "/home/geo/go/src/github.com/geoirb/audio-service/example/multi-player/test.wav",
 	},
 	"2": playerInfo{
 		IP:     "127.0.0.1",
 		Port:   "8081",
 		Device: "hw:0,0",
-		File:   "/home/geo/go/src/github.com/geoirb/audio-service/example/server-test/test.wav",
+		File:   "/home/geo/go/src/github.com/geoirb/audio-service/example/multi-player/test.wav",
 	},
 	"3": playerInfo{
 		IP:     "127.0.0.1",
 		Port:   "8081",
 		Device: "hw:0,0",
-		File:   "/home/geo/go/src/github.com/geoirb/audio-service/example/server-test/test.wav",
+		File:   "/home/geo/go/src/github.com/geoirb/audio-service/example/multi-player/test.wav",
 	},
 }
 
@@ -43,7 +43,6 @@ func main() {
 	cli := httpclient.NewClient("localhost:8000")
 
 	scanner := bufio.NewScanner(os.Stdin)
-	var err error
 	fmt.Println("Input number of player")
 	for scanner.Scan() {
 		num := scanner.Text()
@@ -57,15 +56,17 @@ func main() {
 				p.Start = true
 				player[num] = p
 				continue
+			} else {
+				fmt.Println(err)
 			}
-			fmt.Println(err)
 		} else {
 			if err := cli.FileStop(context.Background(), p.IP, p.Port, p.Device, p.UUID); err == nil {
 				p.Start = false
 				player[num] = p
 				continue
+			} else {
+				fmt.Println(err)
 			}
-			fmt.Println(err)
 		}
 	}
 }

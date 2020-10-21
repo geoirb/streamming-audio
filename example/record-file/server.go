@@ -10,10 +10,10 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/kelseyhightower/envconfig"
 
-	"github.com/geoirb/ausio-service/pkg/recorder"
-	"github.com/geoirb/ausio-service/pkg/server"
-	"github.com/geoirb/ausio-service/pkg/tcp"
-	"github.com/geoirb/ausio-service/pkg/wav"
+	"github.com/geoirb/audio-service/pkg/recorder"
+	"github.com/geoirb/audio-service/pkg/server"
+	"github.com/geoirb/audio-service/pkg/tcp"
+	"github.com/geoirb/audio-service/pkg/wav"
 )
 
 type configuration struct {
@@ -27,7 +27,7 @@ type configuration struct {
 	AddrLayout   string `envconfig:"ADDRESS_LAYOUT" default:"%s:%s"`
 	DeviceLayout string `envconfig:"DEVICE_LAYOUT" default:"%s:%s"`
 
-	RecodeFile string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/ausio-service/audio/testRecode.wav"`
+	RecodeFile string `envconfig:"FILE" default:"/home/geo/go/src/github.com/geoirb/audio-service/audio/testRecode.wav"`
 }
 
 func main() {

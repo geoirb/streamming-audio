@@ -10,10 +10,10 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/kelseyhightower/envconfig"
 
-	"github.com/geoirb/ausio-service/pkg/player"
-	"github.com/geoirb/ausio-service/pkg/server"
-	"github.com/geoirb/ausio-service/pkg/tcp"
-	"github.com/geoirb/ausio-service/pkg/wav"
+	"github.com/geoirb/audio-service/pkg/player"
+	"github.com/geoirb/audio-service/pkg/server"
+	"github.com/geoirb/audio-service/pkg/tcp"
+	"github.com/geoirb/audio-service/pkg/wav"
 )
 
 type configuration struct {

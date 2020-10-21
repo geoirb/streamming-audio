@@ -33,7 +33,7 @@ func (w *WAV) Writer(fileName string, channels uint16, rate uint32) (wc io.Write
 		return
 	}
 
-	wc = wav.NewWriter(file, channels, rate, wav.FormatS16LE)
+	wc = wav.NewWriter(file, channels, rate, wav.S16)
 	return
 }
 

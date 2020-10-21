@@ -11,10 +11,10 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"google.golang.org/grpc"
 
-	"github.com/geoirb/ausio-service/pkg/capture"
-	"github.com/geoirb/ausio-service/pkg/converter"
-	"github.com/geoirb/ausio-service/pkg/recorder"
-	tcp "github.com/geoirb/ausio-service/pkg/tcp"
+	"github.com/geoirb/audio-service/pkg/capture"
+	"github.com/geoirb/audio-service/pkg/converter"
+	"github.com/geoirb/audio-service/pkg/recorder"
+	tcp "github.com/geoirb/audio-service/pkg/tcp"
 )
 
 type configuration struct {
