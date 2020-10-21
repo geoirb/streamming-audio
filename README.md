@@ -86,12 +86,3 @@ Streaming audio
 
 - PORT - порт, на котором будет работать клиент
 - PLAYBACK_DEVICE_NAME - устройство, на котором будет воспроизводиться принятый аудио сигнал
-
-
-make build-server tag=server
-docker run --rm -p 8000:8000 --device /dev/snd --name server server
-
-make build-player tag=player
-docker run --rm -p 8080:8080 -p 8081:8081 --device /dev/snd --name player1 player
-docker run --rm -p 8080:8080 -p 8081:8081 --device /dev/snd --name player2 player
-docker run --rm -p 8080:8080 -p 8081:8081 --device /dev/snd --name player3 player

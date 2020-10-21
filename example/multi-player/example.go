@@ -20,22 +20,22 @@ type playerInfo struct {
 
 var player map[string]playerInfo = map[string]playerInfo{
 	"1": playerInfo{
-		IP:     "127.0.0.1",
+		IP:     "192.168.0.106",
 		Port:   "8081",
 		Device: "hw:1,0",
-		File:   "/home/geo/go/src/github.com/geoirb/audio-service/example/multi-player/test.wav",
+		File:   "/audio/test.wav",
 	},
 	"2": playerInfo{
-		IP:     "127.0.0.1",
+		IP:     "192.168.0.106",
 		Port:   "8081",
 		Device: "hw:0,0",
-		File:   "/home/geo/go/src/github.com/geoirb/audio-service/example/multi-player/test.wav",
+		File:   "/audio/NAME_TEST_FILE_ON_AUDIO_DIR.wav",
 	},
 	"3": playerInfo{
-		IP:     "127.0.0.1",
+		IP:     "192.168.0.106",
 		Port:   "8081",
 		Device: "hw:0,0",
-		File:   "/home/geo/go/src/github.com/geoirb/audio-service/example/multi-player/test.wav",
+		File:   "/audio/NAME_TEST_FILE_ON_AUDIO_DIR.wav",
 	},
 }
 
