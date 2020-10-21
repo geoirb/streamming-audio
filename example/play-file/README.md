@@ -10,6 +10,6 @@ Start from project root
    
    `go run cmd/player/main.go`
 
-3. Start example server
+3. Start test server
 
     `go run example/play-file/server.go`

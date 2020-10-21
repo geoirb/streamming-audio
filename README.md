@@ -89,9 +89,9 @@ Streaming audio
 
 
 make build-server tag=server
-docker run --rm -p 8080:8080 --device /dev/snd --name server server
+docker run --rm -p 8000:8000 --device /dev/snd --name server server
 
 make build-player tag=player
 docker run --rm -p 8080:8080 -p 8081:8081 --device /dev/snd --name player1 player
-docker run --rm -p 8080:8080 -p 8082:8082 --device /dev/snd --name player2 player
-docker run --rm -p 8080:8080 -p 8083:8083 --device /dev/snd --name player3 player
+docker run --rm -p 8080:8080 -p 8081:8081 --device /dev/snd --name player2 player
+docker run --rm -p 8080:8080 -p 8081:8081 --device /dev/snd --name player3 player

@@ -34,10 +34,10 @@ func (l *loggerMiddleware) FilePlay(ctx context.Context, file, playerIP, playerP
 }
 
 func (l *loggerMiddleware) FileStop(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid string) (err error) {
-	l.logger.Log("FilePlay", "start")
+	l.logger.Log("FileStop", "start")
 	if err = l.server.FileStop(ctx, playerIP, playerPort, playerDeviceName, uuid); err != nil {
 		l.logger.Log(
-			"FilePlay", "err",
+			"FileStop", "err",
 			"playerIP", playerIP,
 			"playerPort", playerPort,
 			"playerDeviceName", playerDeviceName,
@@ -46,7 +46,7 @@ func (l *loggerMiddleware) FileStop(ctx context.Context, playerIP, playerPort, p
 		)
 		return
 	}
-	l.logger.Log("FilePlay", "end")
+	l.logger.Log("FileStop", "end")
 	return
 }
 

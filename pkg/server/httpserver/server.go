@@ -21,7 +21,7 @@ func (s *filePlay) handler(ctx *fasthttp.RequestCtx) {
 		channels                                           uint16
 		rate                                               uint32
 	)
-	if file, playerIP, playerPort, playerDeviceName, err = s.transport.Decode(ctx); err != nil {
+	if file, playerIP, playerPort, playerDeviceName, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -31,7 +31,7 @@ func (s *filePlay) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response, uuid, channels, rate); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response, uuid, channels, rate); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -57,7 +57,7 @@ func (s *fileStop) handler(ctx *fasthttp.RequestCtx) {
 		err                                          error
 		playerIP, playerPort, playerDeviceName, uuid string
 	)
-	if playerIP, playerPort, playerDeviceName, uuid, err = s.transport.Decode(ctx); err != nil {
+	if playerIP, playerPort, playerDeviceName, uuid, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -67,7 +67,7 @@ func (s *fileStop) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -94,7 +94,7 @@ func (s *playerState) handler(ctx *fasthttp.RequestCtx) {
 		playerIP                 string
 		ports, storages, devices []string
 	)
-	if playerIP, err = s.transport.Decode(ctx); err != nil {
+	if playerIP, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -104,7 +104,7 @@ func (s *playerState) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response, ports, storages, devices); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response, ports, storages, devices); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -131,7 +131,7 @@ func (s *playerReceiveStart) handler(ctx *fasthttp.RequestCtx) {
 		playerIP, playerPort, sUUID string
 		uuid                        *string
 	)
-	if playerIP, playerPort, uuid, err = s.transport.Decode(ctx); err != nil {
+	if playerIP, playerPort, uuid, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -141,7 +141,7 @@ func (s *playerReceiveStart) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response, sUUID); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response, sUUID); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -167,7 +167,7 @@ func (s *playerReceiveStop) handler(ctx *fasthttp.RequestCtx) {
 		err                  error
 		playerIP, playerPort string
 	)
-	if playerIP, playerPort, err = s.transport.Decode(ctx); err != nil {
+	if playerIP, playerPort, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -177,7 +177,7 @@ func (s *playerReceiveStop) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -204,7 +204,7 @@ func (s *playerPlay) handler(ctx *fasthttp.RequestCtx) {
 		playerIP, uuid, playerDeviceName string
 		channels, rate                   uint32
 	)
-	if playerIP, uuid, playerDeviceName, channels, rate, err = s.transport.Decode(ctx); err != nil {
+	if playerIP, uuid, playerDeviceName, channels, rate, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -214,7 +214,7 @@ func (s *playerPlay) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -240,7 +240,7 @@ func (s *playerStop) handler(ctx *fasthttp.RequestCtx) {
 		err                        error
 		playerIP, playerDeviceName string
 	)
-	if playerIP, playerDeviceName, err = s.transport.Decode(ctx); err != nil {
+	if playerIP, playerDeviceName, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -250,7 +250,7 @@ func (s *playerStop) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -276,7 +276,7 @@ func (s *playerClearStorage) handler(ctx *fasthttp.RequestCtx) {
 		err            error
 		playerIP, uuid string
 	)
-	if playerIP, uuid, err = s.transport.Decode(ctx); err != nil {
+	if playerIP, uuid, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -286,7 +286,7 @@ func (s *playerClearStorage) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -313,7 +313,7 @@ func (s *startFileRecoding) handler(ctx *fasthttp.RequestCtx) {
 		recorderIP, recorderDeviceName, receivePort, file string
 		channels, rate                                    uint32
 	)
-	if recorderIP, recorderDeviceName, channels, rate, receivePort, file, err = s.transport.Decode(ctx); err != nil {
+	if recorderIP, recorderDeviceName, channels, rate, receivePort, file, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -323,7 +323,7 @@ func (s *startFileRecoding) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -349,7 +349,7 @@ func (s *stopFileRecoding) handler(ctx *fasthttp.RequestCtx) {
 		err                                         error
 		recorderIP, recorderDeviceName, receivePort string
 	)
-	if recorderIP, recorderDeviceName, receivePort, err = s.transport.Decode(ctx); err != nil {
+	if recorderIP, recorderDeviceName, receivePort, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -359,7 +359,7 @@ func (s *stopFileRecoding) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -386,7 +386,7 @@ func (s *playFromRecorder) handler(ctx *fasthttp.RequestCtx) {
 		playerIP, playerPort, playerDeviceName, recorderIP, recorderDeviceName, uuid string
 		channels, rate                                                               uint32
 	)
-	if playerIP, playerPort, playerDeviceName, channels, rate, recorderIP, recorderDeviceName, err = s.transport.Decode(ctx); err != nil {
+	if playerIP, playerPort, playerDeviceName, channels, rate, recorderIP, recorderDeviceName, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -396,7 +396,7 @@ func (s *playFromRecorder) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response, uuid); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response, uuid); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -422,7 +422,7 @@ func (s *stopFromRecorder) handler(ctx *fasthttp.RequestCtx) {
 		err                                                                          error
 		playerIP, playerPort, playerDeviceName, uuid, recorderIP, recorderDeviceName string
 	)
-	if playerIP, playerPort, playerDeviceName, uuid, recorderIP, recorderDeviceName, err = s.transport.Decode(ctx); err != nil {
+	if playerIP, playerPort, playerDeviceName, uuid, recorderIP, recorderDeviceName, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -432,7 +432,7 @@ func (s *stopFromRecorder) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -459,7 +459,7 @@ func (s *recorderState) handler(ctx *fasthttp.RequestCtx) {
 		recorderIP string
 		devices    []string
 	)
-	if recorderIP, err = s.transport.Decode(ctx); err != nil {
+	if recorderIP, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -469,7 +469,7 @@ func (s *recorderState) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response, devices); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response, devices); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -496,7 +496,7 @@ func (s *recorderStart) handler(ctx *fasthttp.RequestCtx) {
 		recorderIP, recorderDeviceName, dstAddr string
 		channels, rate                          uint32
 	)
-	if recorderIP, recorderDeviceName, channels, rate, dstAddr, err = s.transport.Decode(ctx); err != nil {
+	if recorderIP, recorderDeviceName, channels, rate, dstAddr, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -506,7 +506,7 @@ func (s *recorderStart) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -532,7 +532,7 @@ func (s *recorderStop) handler(ctx *fasthttp.RequestCtx) {
 		err                            error
 		recorderIP, recorderDeviceName string
 	)
-	if recorderIP, recorderDeviceName, err = s.transport.Decode(ctx); err != nil {
+	if recorderIP, recorderDeviceName, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
@@ -542,7 +542,7 @@ func (s *recorderStop) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.transport.Encode(&ctx.Response); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}

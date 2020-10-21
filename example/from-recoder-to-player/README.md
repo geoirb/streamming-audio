@@ -14,6 +14,6 @@ Start from project root
    
    `go run cmd/recorder/main.go`
 
-5. Start example server
+5. Start test server
 
    `go run example/from-recoder-to-player/server.go`
