@@ -3,7 +3,6 @@ package playback
 import (
 	"context"
 	"io"
-	"sync"
 
 	alsa "github.com/cocoonlife/goalsa"
 )
@@ -16,7 +15,6 @@ type converter interface {
 type Playback struct {
 	converter converter
 	buffSize  int
-	mutex     sync.Mutex
 }
 
 // Play audio on deviceName

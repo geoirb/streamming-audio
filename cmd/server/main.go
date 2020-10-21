@@ -79,7 +79,6 @@ func main() {
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Info(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 
-
 	if err := server.Shutdown(); err != nil {
 		level.Error(logger).Log("server shutdown failure %v", err)
 	}

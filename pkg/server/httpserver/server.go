@@ -537,7 +537,7 @@ func (s *recorderStop) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.svc.RecoderStop(ctx, recorderIP, recorderDeviceName); err != nil {
+	if err = s.svc.RecorderStop(ctx, recorderIP, recorderDeviceName); err != nil {
 		s.errorProcessing(&ctx.Response, err, -1)
 		return
 	}

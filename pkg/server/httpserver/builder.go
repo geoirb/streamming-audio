@@ -43,7 +43,7 @@ const (
 	uriRecorderState    = "/recorder/state"
 	methodRecorderStart = http.MethodPost
 	uriRecorderStart    = "/recoder/start"
-	methodRecoderStop   = http.MethodPost
+	methodRecorderStop  = http.MethodPost
 	uriRecorderStop     = "/recoder/stop"
 )
 
@@ -68,7 +68,7 @@ func NewServer(svc server.Server) *fasthttp.Server {
 
 	router.Handle(methodRecorderState, uriRecorderState, recorderStateHandler(svc, newRecorderStateTransport(), ErrorProcessing))
 	router.Handle(methodRecorderStart, uriRecorderStart, recorderStartHandler(svc, newRecorderStartTransport(), ErrorProcessing))
-	router.Handle(methodRecoderStop, uriRecorderStop, recorderStopHandler(svc, newRecorderStopTransport(), ErrorProcessing))
+	router.Handle(methodRecorderStop, uriRecorderStop, recorderStopHandler(svc, newRecorderStopTransport(), ErrorProcessing))
 
 	router.Handle("GET", "/debug/pprof/", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Index))
 	router.Handle("GET", "/debug/pprof/profile", fasthttpadaptor.NewFastHTTPHandlerFunc(pprof.Profile))

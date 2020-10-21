@@ -251,17 +251,17 @@ func (l *loggerMiddleware) RecorderStart(ctx context.Context, recorderIP, record
 	return
 }
 
-func (l *loggerMiddleware) RecoderStop(ctx context.Context, recorderIP, recorderDeviceName string) (err error) {
-	l.logger.Log("RecoderStop", "start")
-	if err = l.server.RecoderStop(ctx, recorderIP, recorderDeviceName); err != nil {
+func (l *loggerMiddleware) RecorderStop(ctx context.Context, recorderIP, recorderDeviceName string) (err error) {
+	l.logger.Log("RecorderStop", "start")
+	if err = l.server.RecorderStop(ctx, recorderIP, recorderDeviceName); err != nil {
 		l.logger.Log(
-			"RecoderStop", "err",
+			"RecorderStop", "err",
 			"recorderIP", recorderIP,
 			"recorderDeviceName", recorderDeviceName,
 			"err", err,
 		)
 	}
-	l.logger.Log("RecoderStop", "end")
+	l.logger.Log("RecorderStop", "end")
 	return
 }
 
