@@ -63,8 +63,8 @@ github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5Kwzbycv
 github.com/franela/goblin v0.0.0-20200105215937-c9ffbefa60db/go.mod h1:7dvUGVsVBjqR7JHJk0brhHOZYGmfBYOrK0ZhYMEtBr4=
 github.com/franela/goreq v0.0.0-20171204163338-bcd34c9993f8/go.mod h1:ZhphrRTfi2rbfLwlschooIH4+wKKDR4Pdxhh+TRoA20=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
-github.com/geoirb/wav v0.0.0-20201021104159-84bcb3e00942 h1:RWuuv1cE6e/GKxcIP1hK/yOaqze9NnXMlDr0I0wuMdU=
-github.com/geoirb/wav v0.0.0-20201021104159-84bcb3e00942/go.mod h1:SPrFj8dTxhPkEPRF0UCAIQhq2FeI5vUpBbtI3HMAPlc=
+github.com/geoirb/wav v0.0.0-20201021105418-7f8d5ec42d51 h1:ei0yftDiaTr0+YHnrj2Jh1AHlXKoLVzUmuxuf4924es=
+github.com/geoirb/wav v0.0.0-20201021105418-7f8d5ec42d51/go.mod h1:SPrFj8dTxhPkEPRF0UCAIQhq2FeI5vUpBbtI3HMAPlc=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/go-kit/kit v0.8.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=
 github.com/go-kit/kit v0.9.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=

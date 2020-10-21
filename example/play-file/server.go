@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -26,6 +28,36 @@ type configuration struct {
 
 	AddrLayout   string `envconfig:"ADDRESS_LAYOUT" default:"%s:%s"`
 	DeviceLayout string `envconfig:"DEVICE_LAYOUT" default:"%s:%s"`
+}
+
+type playerInfo struct {
+	Start  bool
+	UUID   string
+	IP     string
+	Port   string
+	Device string
+	File   string
+}
+
+var playerConf map[string]playerInfo = map[string]playerInfo{
+	"1": playerInfo{
+		IP:     "192.168.0.106",
+		Port:   "8081",
+		Device: "hw:1,0",
+		File:   "/home/geo/go/src/github.com/geoirb/audio-service/audio/test.wav",
+	},
+	"2": playerInfo{
+		IP:     "192.168.0.106",
+		Port:   "8081",
+		Device: "hw:0,0",
+		File:   "/audio/NAME_TEST_FILE_ON_AUDIO_DIR.wav",
+	},
+	"3": playerInfo{
+		IP:     "192.168.0.106",
+		Port:   "8081",
+		Device: "hw:0,0",
+		File:   "/audio/NAME_TEST_FILE_ON_AUDIO_DIR.wav",
+	},
 }
 
 func main() {
@@ -60,16 +92,37 @@ func main() {
 	svc = server.NewLoggerMiddleware(svc, logger)
 	level.Info(logger).Log("msg", "server start")
 
-	pwd, _ := os.Getwd()
-	file := pwd + "/audio/test.wav"
-	playerIP := "127.0.0.1"
-	playerPort := "8083"
-	playerDeviceName := "hw:1,0"
-	uuid, _, _, _ := svc.FilePlay(context.Background(), file, playerIP, playerPort, playerDeviceName)
+	// example
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Println("Input number of player")
+	for scanner.Scan() {
+		num := scanner.Text()
+		p, isExist := playerConf[num]
+		if !isExist {
+			fmt.Printf("player num %v not exist\n", num)
+		}
+		if !p.Start {
+			if uuid, _, _, err := svc.FilePlay(context.Background(), p.File, p.IP, p.Port, p.Device); err == nil {
+				p.UUID = uuid
+				p.Start = true
+				playerConf[num] = p
+				continue
+			} else {
+				fmt.Println(err)
+			}
+		} else {
+			if err := svc.FileStop(context.Background(), p.IP, p.Port, p.Device, p.UUID); err == nil {
+				p.Start = false
+				playerConf[num] = p
+				continue
+			} else {
+				fmt.Println(err)
+			}
+		}
+	}
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Info(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 
-	svc.FileStop(context.Background(), playerIP, playerPort, playerDeviceName, uuid)
 }
