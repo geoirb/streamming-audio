@@ -41,9 +41,9 @@ type playerInfo struct {
 
 var playerConf map[string]playerInfo = map[string]playerInfo{
 	"1": playerInfo{
-		IP:     "192.168.0.106",
+		IP:     "127.0.0.1",
 		Port:   "8081",
-		Device: "hw:1,0",
+		Device: "hw:0,0",
 		File:   "/home/geo/go/src/github.com/geoirb/audio-service/audio/test.wav",
 	},
 	"2": playerInfo{
