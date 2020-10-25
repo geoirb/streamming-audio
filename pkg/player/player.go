@@ -18,7 +18,7 @@ type tcp interface {
 }
 
 type device interface {
-	Play(context.Context, string, int, int, io.Reader) error
+	Play(ctx context.Context, deviceName string, channels, rate, bitsPerSample int, r io.Reader) (err error)
 }
 
 type player struct {
@@ -123,7 +123,7 @@ func (p *player) Play(c context.Context, in *StartPlayRequest) (out *StartPlayRe
 
 	if _, isExist := p.playbackDevice[in.DeviceName]; !isExist {
 		ctx, stop := context.WithCancel(context.Background())
-		if err = p.device.Play(ctx, in.DeviceName, int(in.Channels), int(in.Rate), storage); err == nil {
+		if err = p.device.Play(ctx, in.DeviceName, int(in.Channels), int(in.Rate), int(in.BitsPerSample), storage); err == nil {
 			p.playbackDevice[in.DeviceName] = stop
 			out = &StartPlayResponse{}
 			return

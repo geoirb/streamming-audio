@@ -12,7 +12,7 @@ import (
 // FilePlayTransport ...
 type FilePlayTransport interface {
 	EncodeRequest(ctx context.Context, req *fasthttp.Request, file, playerIP, playerPort, playerDeviceName string) (err error)
-	DecodeResponse(ctx context.Context, res *fasthttp.Response) (uuid string, channels uint16, rate uint32, err error)
+	DecodeResponse(ctx context.Context, res *fasthttp.Response) (uuid string, channels uint16, rate uint32, bitsPerSample uint16, err error)
 }
 
 type filePlayTransport struct {
@@ -47,12 +47,13 @@ func (t *filePlayTransport) EncodeRequest(ctx context.Context, req *fasthttp.Req
 }
 
 type filePlayResponse struct {
-	UUID     string `json:"uuid"`
-	Channels uint16 `json:"channels"`
-	Rate     uint32 `json:"rate"`
+	UUID          string `json:"uuid"`
+	Channels      uint16 `json:"channels"`
+	Rate          uint32 `json:"rate"`
+	BitsPerSample uint16 `json:"bitsPerSample"`
 }
 
-func (t *filePlayTransport) DecodeResponse(ctx context.Context, res *fasthttp.Response) (uuid string, channels uint16, rate uint32, err error) {
+func (t *filePlayTransport) DecodeResponse(ctx context.Context, res *fasthttp.Response) (uuid string, channels uint16, rate uint32, bitsPerSample uint16, err error) {
 	if res.StatusCode() != http.StatusOK {
 		err = fmt.Errorf(string(res.Body()))
 		return
@@ -302,7 +303,7 @@ func NewPlayerReceiveStopTransport(method, pathTemplate string) PlayerReceiveSto
 
 // PlayerPlayTransport ...
 type PlayerPlayTransport interface {
-	EncodeRequest(ctx context.Context, req *fasthttp.Request, playerIP, uuid, playerDeviceName string, channels, rate uint32) (err error)
+	EncodeRequest(ctx context.Context, req *fasthttp.Request, playerIP, uuid, playerDeviceName string, channels, rate, bitsPerSample uint32) (err error)
 	DecodeResponse(ctx context.Context, res *fasthttp.Response) (err error)
 }
 
@@ -317,9 +318,10 @@ type playerPlayRequest struct {
 	PlayerDeviceName string `json:"playerDeviceName"`
 	Channels         uint32 `json:"channels"`
 	Rate             uint32 `json:"rate"`
+	BitsPerSample    uint32 `json:"bitsPerSample"`
 }
 
-func (t *playerPlayTransport) EncodeRequest(ctx context.Context, req *fasthttp.Request, playerIP, uuid, playerDeviceName string, channels, rate uint32) (err error) {
+func (t *playerPlayTransport) EncodeRequest(ctx context.Context, req *fasthttp.Request, playerIP, uuid, playerDeviceName string, channels, rate, bitsPerSample uint32) (err error) {
 	req.Header.SetMethod(t.method)
 	req.SetRequestURI(t.pathTemplate)
 
@@ -329,6 +331,7 @@ func (t *playerPlayTransport) EncodeRequest(ctx context.Context, req *fasthttp.R
 		PlayerDeviceName: playerDeviceName,
 		Channels:         channels,
 		Rate:             rate,
+		BitsPerSample:    bitsPerSample,
 	}
 	body, err := json.Marshal(&request)
 	if err != nil {

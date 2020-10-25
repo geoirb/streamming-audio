@@ -31,8 +31,9 @@ POST
 ```json
 {
 	"uuid": "string",
-	"channels": "string",
-	"rate": "string"
+	"channels": uint32,
+	"rate": uint32,
+	"bitsPerSample": uint32
 }
 ```
 > uuid - uuid хранилища в которое будет сохраняться аудио до воспроизведения
@@ -40,6 +41,8 @@ POST
 > channels - количество аудиоканалов (из аудио файла)
 > 
 > rate - частота дискретизации (из аудио файла)
+>
+> bitsPerSample - количество бит на семпл
 
 * Описание:
 
@@ -189,8 +192,10 @@ POST
 	"playerIP":"string",
 	"uuid":"string",
 	"playerDeviceName":"string",
-	"channels":"string",
-	"rate":"string"
+	"channels":uint32,
+	"rate":uint32,
+	"bitsPerSample": uint32
+
 }
 ```
 
@@ -203,6 +208,8 @@ POST
 > channels - количество аудиоканалов 
 > 
 > rate - частота дискретизации 
+> 
+> bitsPerSample - количество бит на семпл
 
 * Описание:
   

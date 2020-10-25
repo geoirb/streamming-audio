@@ -18,7 +18,7 @@ func (s *filePlay) handler(ctx *fasthttp.RequestCtx) {
 	var (
 		err                                                error
 		file, playerIP, playerPort, playerDeviceName, uuid string
-		channels                                           uint16
+		channels, bitsPerSample                            uint16
 		rate                                               uint32
 	)
 	if file, playerIP, playerPort, playerDeviceName, err = s.transport.DecodeRequest(ctx); err != nil {
@@ -26,12 +26,12 @@ func (s *filePlay) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if uuid, channels, rate, err = s.svc.FilePlay(ctx, file, playerIP, playerPort, playerDeviceName); err != nil {
+	if uuid, channels, rate, bitsPerSample, err = s.svc.FilePlay(ctx, file, playerIP, playerPort, playerDeviceName); err != nil {
 		s.errorProcessing(&ctx.Response, err, -1)
 		return
 	}
 
-	if err = s.transport.EncodeResponse(&ctx.Response, uuid, channels, rate); err != nil {
+	if err = s.transport.EncodeResponse(&ctx.Response, uuid, channels, rate, bitsPerSample); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusInternalServerError)
 		return
 	}
@@ -202,14 +202,14 @@ func (s *playerPlay) handler(ctx *fasthttp.RequestCtx) {
 	var (
 		err                              error
 		playerIP, uuid, playerDeviceName string
-		channels, rate                   uint32
+		channels, rate, bitsPerSample    uint32
 	)
-	if playerIP, uuid, playerDeviceName, channels, rate, err = s.transport.DecodeRequest(ctx); err != nil {
+	if playerIP, uuid, playerDeviceName, channels, rate, bitsPerSample, err = s.transport.DecodeRequest(ctx); err != nil {
 		s.errorProcessing(&ctx.Response, err, http.StatusBadRequest)
 		return
 	}
 
-	if err = s.svc.PlayerPlay(ctx, playerIP, uuid, playerDeviceName, channels, rate); err != nil {
+	if err = s.svc.PlayerPlay(ctx, playerIP, uuid, playerDeviceName, channels, rate, bitsPerSample); err != nil {
 		s.errorProcessing(&ctx.Response, err, -1)
 		return
 	}

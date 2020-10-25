@@ -43,7 +43,8 @@ message  StartPlayRequest {
   string deviceName = 1; 
   uint32 channels = 2;
   uint32 rate = 3;
-  string storageUUID = 4;
+  uint32 bitsPerSample = 4;
+  string storageUUID = 5;
 }
 message StartPlayResponse {}
 

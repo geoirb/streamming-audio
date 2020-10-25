@@ -44,7 +44,7 @@ var playerConf map[string]playerInfo = map[string]playerInfo{
 		IP:     "192.168.0.106",
 		Port:   "8081",
 		Device: "hw:1,0",
-		File:   "/home/geo/go/src/github.com/geoirb/audio-service/audio/test.wav",
+		File:   "/home/geo/go/src/github.com/geoirb/audio-service/audio/test16_1.wav",
 	},
 	"2": playerInfo{
 		IP:     "192.168.0.106",
@@ -102,7 +102,7 @@ func main() {
 			fmt.Printf("player num %v not exist\n", num)
 		}
 		if !p.Start {
-			if uuid, _, _, err := svc.FilePlay(context.Background(), p.File, p.IP, p.Port, p.Device); err == nil {
+			if uuid, _, _, _, err := svc.FilePlay(context.Background(), p.File, p.IP, p.Port, p.Device); err == nil {
 				p.UUID = uuid
 				p.Start = true
 				playerConf[num] = p

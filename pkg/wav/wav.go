@@ -12,13 +12,14 @@ import (
 type WAV struct{}
 
 // Reader wav file
-func (w *WAV) Reader(data []byte) (r io.Reader, channels uint16, rate uint32, err error) {
+func (w *WAV) Reader(data []byte) (r io.Reader, channels uint16, rate uint32, bitsPerSample uint16, err error) {
 	wav, err := wav.NewReader(data)
 	if err != nil {
 		return
 	}
 	channels = wav.GetNumChannels()
 	rate = wav.GetSampleRate()
+	bitsPerSample = wav.GetBitsPerSample()
 	r = wav
 	return
 }

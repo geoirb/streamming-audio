@@ -92,7 +92,7 @@ func (c *Client) ReceiveStop(ctx context.Context, ip, port string) (err error) {
 
 // Play rpc request to player with ip for play audio signal from storage with UUID on deviceName
 // channels, rate - playback options
-func (c *Client) Play(ctx context.Context, ip, UUID, deviceName string, channels, rate uint32) (err error) {
+func (c *Client) Play(ctx context.Context, ip, UUID, deviceName string, channels, rate, bitsPerSample uint32) (err error) {
 	conn, err := grpc.Dial(
 		fmt.Sprintf(c.hostLayout, ip, c.controlPort),
 		// todo
@@ -107,10 +107,11 @@ func (c *Client) Play(ctx context.Context, ip, UUID, deviceName string, channels
 		Play(
 			ctx,
 			&StartPlayRequest{
-				DeviceName:  deviceName,
-				Channels:    uint32(channels),
-				Rate:        rate,
-				StorageUUID: UUID,
+				DeviceName:    deviceName,
+				Channels:      channels,
+				Rate:          rate,
+				BitsPerSample: bitsPerSample,
+				StorageUUID:   UUID,
 			})
 	return
 }

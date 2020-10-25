@@ -10,7 +10,7 @@ import (
 // FilePlayTransport ...
 type FilePlayTransport interface {
 	DecodeRequest(ctx *fasthttp.RequestCtx) (file, playerIP, playerPort, playerDeviceName string, err error)
-	EncodeResponse(res *fasthttp.Response, uuid string, channels uint16, rate uint32) (err error)
+	EncodeResponse(res *fasthttp.Response, uuid string, channels uint16, rate uint32, bitsPerSample uint16) (err error)
 }
 
 type filePlayTransport struct{}
@@ -29,16 +29,18 @@ func (t *filePlayTransport) DecodeRequest(ctx *fasthttp.RequestCtx) (string, str
 }
 
 type filePlayResponse struct {
-	UUID     string `json:"uuid"`
-	Channels uint16 `json:"channels"`
-	Rate     uint32 `json:"rate"`
+	UUID          string `json:"uuid"`
+	Channels      uint16 `json:"channels"`
+	Rate          uint32 `json:"rate"`
+	BitsPerSample uint16 `json:"bitsPerSample "`
 }
 
-func (t *filePlayTransport) EncodeResponse(res *fasthttp.Response, uuid string, channels uint16, rate uint32) (err error) {
+func (t *filePlayTransport) EncodeResponse(res *fasthttp.Response, uuid string, channels uint16, rate uint32, bitsPerSample uint16) (err error) {
 	response := &filePlayResponse{
-		UUID:     uuid,
-		Channels: channels,
-		Rate:     rate,
+		UUID:          uuid,
+		Channels:      channels,
+		Rate:          rate,
+		BitsPerSample: bitsPerSample,
 	}
 	body, err := json.Marshal(response)
 	res.SetBody(body)
@@ -198,7 +200,7 @@ func newPlayerReceiveStopTransport() PlayerReceiveStopTransport {
 
 // PlayerPlayTransport ...
 type PlayerPlayTransport interface {
-	DecodeRequest(ctx *fasthttp.RequestCtx) (playerIP, uuid, playerDeviceName string, channels, rate uint32, err error)
+	DecodeRequest(ctx *fasthttp.RequestCtx) (playerIP, uuid, playerDeviceName string, channels, rate, bitsPerSample uint32, err error)
 	EncodeResponse(res *fasthttp.Response) (err error)
 }
 
@@ -210,12 +212,13 @@ type playerPlayRequest struct {
 	PlayerDeviceName string `json:"playerDeviceName"`
 	Channels         uint32 `json:"channels"`
 	Rate             uint32 `json:"rate"`
+	BitsPerSample    uint32 `json:"bitsPerSample"`
 }
 
-func (t *playerPlayTransport) DecodeRequest(ctx *fasthttp.RequestCtx) (string, string, string, uint32, uint32, error) {
+func (t *playerPlayTransport) DecodeRequest(ctx *fasthttp.RequestCtx) (string, string, string, uint32, uint32, uint32, error) {
 	var request playerPlayRequest
 	err := json.Unmarshal(ctx.Request.Body(), &request)
-	return request.PlayerIP, request.UUID, request.PlayerDeviceName, request.Channels, request.Rate, err
+	return request.PlayerIP, request.UUID, request.PlayerDeviceName, request.Channels, request.Rate, request.BitsPerSample, err
 }
 
 type playerPlayResponse struct{}

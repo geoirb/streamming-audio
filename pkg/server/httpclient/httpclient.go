@@ -36,7 +36,7 @@ type client struct {
 // FilePlay send file to player with playerIP on port and play on playerDeviceName
 // channel and rate audio info from file.
 // Player save audio from server in storage with uuid.
-func (c *client) FilePlay(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, err error) {
+func (c *client) FilePlay(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, bitsPerSample uint16, err error) {
 	req, res := fasthttp.AcquireRequest(), fasthttp.AcquireResponse()
 	defer func() {
 		fasthttp.ReleaseRequest(req)
@@ -136,15 +136,15 @@ func (c *client) PlayerReceiveStop(ctx context.Context, playerIP, playerPort str
 }
 
 // PlayerPlay play audio from storage with uuid on player with playerIP on playerDeviceName
-// channels, rate - params audio
-func (c *client) PlayerPlay(ctx context.Context, playerIP, uuid, playerDeviceName string, channels, rate uint32) (err error) {
+// channels, rate, bitsPerSample - params audio
+func (c *client) PlayerPlay(ctx context.Context, playerIP, uuid, playerDeviceName string, channels, rate, bitsPerSample uint32) (err error) {
 	req, res := fasthttp.AcquireRequest(), fasthttp.AcquireResponse()
 	defer func() {
 		fasthttp.ReleaseRequest(req)
 		fasthttp.ReleaseResponse(res)
 	}()
 
-	if err = c.playerPlayTransport.EncodeRequest(ctx, req, playerIP, uuid, playerDeviceName, channels, rate); err != nil {
+	if err = c.playerPlayTransport.EncodeRequest(ctx, req, playerIP, uuid, playerDeviceName, channels, rate, bitsPerSample); err != nil {
 		return
 	}
 

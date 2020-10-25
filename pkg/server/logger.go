@@ -11,9 +11,9 @@ type loggerMiddleware struct {
 	logger log.Logger
 }
 
-func (l *loggerMiddleware) FilePlay(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, err error) {
+func (l *loggerMiddleware) FilePlay(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, bitsPerSample uint16, err error) {
 	l.logger.Log("FilePlay", "start")
-	if uuid, channels, rate, err = l.server.FilePlay(ctx, file, playerIP, playerPort, playerDeviceName); err != nil {
+	if uuid, channels, rate, bitsPerSample, err = l.server.FilePlay(ctx, file, playerIP, playerPort, playerDeviceName); err != nil {
 		l.logger.Log(
 			"FilePlay", "err",
 			"file", file,
@@ -29,6 +29,7 @@ func (l *loggerMiddleware) FilePlay(ctx context.Context, file, playerIP, playerP
 		"uuid", uuid,
 		"channels", channels,
 		"rate", rate,
+		"bitsPerSample", bitsPerSample,
 	)
 	return
 }
@@ -100,9 +101,9 @@ func (l *loggerMiddleware) PlayerReceiveStop(ctx context.Context, playerIP, play
 	return
 }
 
-func (l *loggerMiddleware) PlayerPlay(ctx context.Context, playerIP, uuid, playerDeviceName string, channels, rate uint32) (err error) {
+func (l *loggerMiddleware) PlayerPlay(ctx context.Context, playerIP, uuid, playerDeviceName string, channels, rate, bitsPerSample uint32) (err error) {
 	l.logger.Log("PlayerPlay", "start")
-	if err = l.server.PlayerPlay(ctx, playerIP, uuid, playerDeviceName, channels, rate); err != nil {
+	if err = l.server.PlayerPlay(ctx, playerIP, uuid, playerDeviceName, channels, rate, bitsPerSample); err != nil {
 		l.logger.Log(
 			"PlayerPlay", "err",
 			"playerIP", playerIP,
@@ -110,6 +111,7 @@ func (l *loggerMiddleware) PlayerPlay(ctx context.Context, playerIP, uuid, playe
 			"playerDeviceName", playerDeviceName,
 			"channels", channels,
 			"rate", rate,
+			"bitsPerSample", bitsPerSample,
 			"err", err,
 		)
 	}
