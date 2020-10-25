@@ -43,16 +43,15 @@ func (d *Playback) Play(ctx context.Context, deviceName string, channels, rate, 
 	}
 
 	go func() {
+		<-ctx.Done()
+		out.Close()
+	}()
+
+	go func() {
 		samples := make([]byte, d.buffSize)
 		for {
-			select {
-			case <-ctx.Done():
-				out.Close()
-				return
-			default:
-				if l, err := r.Read(samples); err == nil {
-					out.Write(d.converter.ToInt16(samples[:l]))
-				}
+			if l, err := r.Read(samples); err == nil {
+				out.Write(d.converter.ToInt16(samples[:l]))
 			}
 		}
 	}()
