@@ -453,18 +453,18 @@ func NewPlayerClearStorageTransport(method, pathTemplate string) PlayerClearStor
 	}
 }
 
-// StartFileRecodingTransport ...
-type StartFileRecodingTransport interface {
+// StartFileRecordingTransport ...
+type StartFileRecordingTransport interface {
 	EncodeRequest(ctx context.Context, req *fasthttp.Request, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error)
 	DecodeResponse(ctx context.Context, res *fasthttp.Response) (err error)
 }
 
-type startFileRecodingTransport struct {
+type startFileRecordingTransport struct {
 	method       string
 	pathTemplate string
 }
 
-type startFileRecodingRequest struct {
+type startFileRecordingRequest struct {
 	RecorderIP         string `json:"playerIP"`
 	RecorderDeviceName string `json:"recorderDeviceName"`
 	Channels           uint32 `json:"channels"`
@@ -473,11 +473,11 @@ type startFileRecodingRequest struct {
 	File               string `json:"file"`
 }
 
-func (t *startFileRecodingTransport) EncodeRequest(ctx context.Context, req *fasthttp.Request, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error) {
+func (t *startFileRecordingTransport) EncodeRequest(ctx context.Context, req *fasthttp.Request, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error) {
 	req.Header.SetMethod(t.method)
 	req.SetRequestURI(t.pathTemplate)
 
-	request := startFileRecodingRequest{
+	request := startFileRecordingRequest{
 		RecorderIP:         recorderIP,
 		RecorderDeviceName: recorderDeviceName,
 		Channels:           channels,
@@ -494,43 +494,43 @@ func (t *startFileRecodingTransport) EncodeRequest(ctx context.Context, req *fas
 	return
 }
 
-func (t *startFileRecodingTransport) DecodeResponse(ctx context.Context, res *fasthttp.Response) (err error) {
+func (t *startFileRecordingTransport) DecodeResponse(ctx context.Context, res *fasthttp.Response) (err error) {
 	if res.StatusCode() != http.StatusOK {
 		err = fmt.Errorf(string(res.Body()))
 	}
 	return
 }
 
-// NewStartFileRecodingTransport ...
-func NewStartFileRecodingTransport(method, pathTemplate string) StartFileRecodingTransport {
-	return &startFileRecodingTransport{
+// NewStartFileRecordingTransport ...
+func NewStartFileRecordingTransport(method, pathTemplate string) StartFileRecordingTransport {
+	return &startFileRecordingTransport{
 		method:       method,
 		pathTemplate: pathTemplate,
 	}
 }
 
-// StopFileRecodingTransport ...
-type StopFileRecodingTransport interface {
+// StopFileRecordingTransport ...
+type StopFileRecordingTransport interface {
 	EncodeRequest(ctx context.Context, req *fasthttp.Request, recorderIP, recorderDeviceName, receivePort string) (err error)
 	DecodeResponse(ctx context.Context, res *fasthttp.Response) (err error)
 }
 
-type stopFileRecodingTransport struct {
+type stopFileRecordingTransport struct {
 	method       string
 	pathTemplate string
 }
 
-type stopFileRecodingRequest struct {
+type stopFileRecordingRequest struct {
 	RecorderIP         string `json:"recorderIP"`
 	RecorderDeviceName string `json:"recorderDeviceName"`
 	ReceivePort        string `json:"receivePort"`
 }
 
-func (t *stopFileRecodingTransport) EncodeRequest(ctx context.Context, req *fasthttp.Request, recorderIP, recorderDeviceName, receivePort string) (err error) {
+func (t *stopFileRecordingTransport) EncodeRequest(ctx context.Context, req *fasthttp.Request, recorderIP, recorderDeviceName, receivePort string) (err error) {
 	req.Header.SetMethod(t.method)
 	req.SetRequestURI(t.pathTemplate)
 
-	request := stopFileRecodingRequest{
+	request := stopFileRecordingRequest{
 		RecorderIP:         recorderIP,
 		RecorderDeviceName: recorderDeviceName,
 		ReceivePort:        receivePort,
@@ -544,16 +544,16 @@ func (t *stopFileRecodingTransport) EncodeRequest(ctx context.Context, req *fast
 	return
 }
 
-func (t *stopFileRecodingTransport) DecodeResponse(ctx context.Context, res *fasthttp.Response) (err error) {
+func (t *stopFileRecordingTransport) DecodeResponse(ctx context.Context, res *fasthttp.Response) (err error) {
 	if res.StatusCode() != http.StatusOK {
 		err = fmt.Errorf(string(res.Body()))
 	}
 	return
 }
 
-// NewStopFileRecodingTransport ...
-func NewStopFileRecodingTransport(method, pathTemplate string) StopFileRecodingTransport {
-	return &stopFileRecodingTransport{
+// NewStopFileRecordingTransport ...
+func NewStopFileRecordingTransport(method, pathTemplate string) StopFileRecordingTransport {
+	return &stopFileRecordingTransport{
 		method:       method,
 		pathTemplate: pathTemplate,
 	}

@@ -28,14 +28,14 @@ const (
 	methodPlayerClearStorage = http.MethodPost
 	uriPlayerClearStorage    = "/player/clearstorage"
 
-	methodStartFileRecoding = http.MethodPost
-	uriStartFileRecoding    = "/recoder/file/start"
-	methodStopFileRecoding  = http.MethodPost
-	uriStopFileRecoding     = "/recoder/file/stop"
-	methodPlayFromRecorder  = http.MethodPost
-	uriPlayFromRecorder     = "/recoder/player/play"
-	methodStopFromRecorder  = http.MethodPost
-	uriStopFromRecorder     = "/recoder/player/stop"
+	methodStartFileRecording = http.MethodPost
+	uriStartFileRecording    = "/recoder/file/start"
+	methodStopFileRecording  = http.MethodPost
+	uriStopFileRecording     = "/recoder/file/stop"
+	methodPlayFromRecorder   = http.MethodPost
+	uriPlayFromRecorder      = "/recoder/player/play"
+	methodStopFromRecorder   = http.MethodPost
+	uriStopFromRecorder      = "/recoder/player/stop"
 
 	methodRecorderState = http.MethodGet
 	uriRecorderState    = "/recorder/state"
@@ -60,8 +60,8 @@ func NewClient(serverAddr string) Client {
 		playerPlayTransport:         NewPlayerPlayTransport(methodPlayerPlay, serverAddr+uriPlayerPlay),
 		playerStopTransport:         NewPlayerStopTransport(methodPlayerStop, serverAddr+uriPlayerStop),
 		playerClearStorageTransport: NewPlayerClearStorageTransport(methodPlayerClearStorage, serverAddr+uriPlayerClearStorage),
-		startFileRecodingTransport:  NewStartFileRecodingTransport(methodStartFileRecoding, serverAddr+uriStartFileRecoding),
-		stopFileRecodingTransport:   NewStopFileRecodingTransport(methodStopFileRecoding, serverAddr+uriStopFileRecoding),
+		startFileRecordingTransport: NewStartFileRecordingTransport(methodStartFileRecording, serverAddr+uriStartFileRecording),
+		stopFileRecordingTransport:  NewStopFileRecordingTransport(methodStopFileRecording, serverAddr+uriStopFileRecording),
 		playFromRecorderTransport:   NewPlayFromRecorderTransport(methodPlayFromRecorder, serverAddr+uriPlayFromRecorder),
 		stopFromRecorderTransport:   NewStopFromRecorderTransport(methodStopFromRecorder, serverAddr+uriStopFromRecorder),
 		recorderStateTransport:      NewRecorderStateTransport(methodRecorderState, serverAddr+uriRecorderState),

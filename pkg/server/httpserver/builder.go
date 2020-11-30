@@ -30,14 +30,14 @@ const (
 	methodPlayerClearStorage = http.MethodPost
 	uriPlayerClearStorage    = "/player/clearstorage"
 
-	methodStartFileRecoding = http.MethodPost
-	uriStartFileRecoding    = "/recoder/file/start"
-	methodStopFileRecoding  = http.MethodPost
-	uriStopFileRecoding     = "/recoder/file/stop"
-	methodPlayFromRecorder  = http.MethodPost
-	uriPlayFromRecorder     = "/recoder/player/play"
-	methodStopFromRecorder  = http.MethodPost
-	uriStopFromRecorder     = "/recoder/player/stop"
+	methodStartFileRecording = http.MethodPost
+	uriStartFileRecording    = "/recoder/file/start"
+	methodStopFileRecording  = http.MethodPost
+	uriStopFileRecording     = "/recoder/file/stop"
+	methodPlayFromRecorder   = http.MethodPost
+	uriPlayFromRecorder      = "/recoder/player/play"
+	methodStopFromRecorder   = http.MethodPost
+	uriStopFromRecorder      = "/recoder/player/stop"
 
 	methodRecorderState = http.MethodGet
 	uriRecorderState    = "/recorder/state"
@@ -61,8 +61,8 @@ func NewServer(svc server.Server) *fasthttp.Server {
 	router.Handle(methodPlayerStop, uriPlayerStop, playerStopHandler(svc, newPlayerStopTransport(), ErrorProcessing))
 	router.Handle(methodPlayerClearStorage, uriPlayerClearStorage, playerClearStorageHandler(svc, newPlayerClearStorageTransport(), ErrorProcessing))
 
-	router.Handle(methodStartFileRecoding, uriStartFileRecoding, startFileRecodingHandler(svc, newStartFileRecodingTransport(), ErrorProcessing))
-	router.Handle(methodStopFileRecoding, uriStopFileRecoding, stopFileRecodingHandler(svc, newStopFileRecodingTransport(), ErrorProcessing))
+	router.Handle(methodStartFileRecording, uriStartFileRecording, startFileRecordingHandler(svc, newStartFileRecordingTransport(), ErrorProcessing))
+	router.Handle(methodStopFileRecording, uriStopFileRecording, stopFileRecordingHandler(svc, newStopFileRecordingTransport(), ErrorProcessing))
 	router.Handle(methodPlayFromRecorder, uriPlayFromRecorder, playFromRecorderHandler(svc, newPlayFromRecorderTransport(), ErrorProcessing))
 	router.Handle(methodStopFromRecorder, uriStopFromRecorder, stopFromRecorderHandler(svc, newStopFromRecorderTransport(), ErrorProcessing))
 

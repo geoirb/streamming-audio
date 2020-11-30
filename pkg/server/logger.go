@@ -147,11 +147,11 @@ func (l *loggerMiddleware) PlayerClearStorage(ctx context.Context, playerIP, uui
 	return
 }
 
-func (l *loggerMiddleware) StartFileRecoding(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error) {
-	l.logger.Log("StartFileRecoding", "start")
-	if err = l.server.StartFileRecoding(ctx, recorderIP, recorderDeviceName, channels, rate, receivePort, file); err != nil {
+func (l *loggerMiddleware) StartFileRecording(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error) {
+	l.logger.Log("StartFileRecording", "start")
+	if err = l.server.StartFileRecording(ctx, recorderIP, recorderDeviceName, channels, rate, receivePort, file); err != nil {
 		l.logger.Log(
-			"StartFileRecoding", "err",
+			"StartFileRecording", "err",
 			"recorderIP", recorderIP,
 			"recorderDeviceName", recorderDeviceName,
 			"channels", channels,
@@ -161,22 +161,22 @@ func (l *loggerMiddleware) StartFileRecoding(ctx context.Context, recorderIP, re
 			"err", err,
 		)
 	}
-	l.logger.Log("StartFileRecoding", "end")
+	l.logger.Log("StartFileRecording", "end")
 	return
 }
 
-func (l *loggerMiddleware) StopFileRecoding(ctx context.Context, recorderIP, recorderDeviceName, receivePort string) (err error) {
-	l.logger.Log("StopFileRecoding", "start")
-	if err = l.server.StopFileRecoding(ctx, recorderIP, recorderDeviceName, receivePort); err != nil {
+func (l *loggerMiddleware) StopFileRecording(ctx context.Context, recorderIP, recorderDeviceName, receivePort string) (err error) {
+	l.logger.Log("StopFileRecording", "start")
+	if err = l.server.StopFileRecording(ctx, recorderIP, recorderDeviceName, receivePort); err != nil {
 		l.logger.Log(
-			"StopFileRecoding", "err",
+			"StopFileRecording", "err",
 			"recorderIP", recorderIP,
 			"recorderDeviceName", recorderDeviceName,
 			"receivePort", receivePort,
 			"err", err,
 		)
 	}
-	l.logger.Log("StopFileRecoding", "end")
+	l.logger.Log("StopFileRecording", "end")
 	return
 }
 

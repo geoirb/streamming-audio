@@ -7,11 +7,11 @@ import (
 	alsa "github.com/cocoonlife/goalsa"
 )
 
-var formatList map[int]alsa.Format = map[int]alsa.Format{
-	16: alsa.FormatS16LE,
-	24: alsa.FormatS24LE,
-	32: alsa.FormatS32LE,
-}
+// var formatList map[int]alsa.Format = map[int]alsa.Format{
+// 	// 16: alsa.FormatS16LE,
+// 	24: alsa.FormatS24LE,
+// 	32: alsa.FormatS32LE,
+// }
 
 type converter interface {
 	ToInt16([]byte) []int16
@@ -34,7 +34,7 @@ func (d *Playback) Play(ctx context.Context, deviceName string, channels, rate, 
 	out, err := alsa.NewPlaybackDevice(
 		deviceName,
 		channels,
-		alsa.FormatS24LE,
+		alsa.FormatS16LE,
 		rate,
 		alsa.BufferParams{},
 	)

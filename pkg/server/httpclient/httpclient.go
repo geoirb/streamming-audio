@@ -24,8 +24,8 @@ type client struct {
 	playerPlayTransport         PlayerPlayTransport
 	playerStopTransport         PlayerStopTransport
 	playerClearStorageTransport PlayerClearStorageTransport
-	startFileRecodingTransport  StartFileRecodingTransport
-	stopFileRecodingTransport   StopFileRecodingTransport
+	startFileRecordingTransport StartFileRecordingTransport
+	stopFileRecordingTransport  StopFileRecordingTransport
 	playFromRecorderTransport   PlayFromRecorderTransport
 	stopFromRecorderTransport   StopFromRecorderTransport
 	recorderStateTransport      RecorderStateTransport
@@ -193,16 +193,16 @@ func (c *client) PlayerClearStorage(ctx context.Context, playerIP, uuid string) 
 	return c.playerClearStorageTransport.DecodeResponse(ctx, res)
 }
 
-// StartFileRecoding start receive on receivePort audio signal from recorder with recorderIP from recordeDeviceName and write in file
+// StartFileRecording start receive on receivePort audio signal from recorder with recorderIP from recordeDeviceName and write in file
 // channels, rate - params audio
-func (c *client) StartFileRecoding(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error) {
+func (c *client) StartFileRecording(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error) {
 	req, res := fasthttp.AcquireRequest(), fasthttp.AcquireResponse()
 	defer func() {
 		fasthttp.ReleaseRequest(req)
 		fasthttp.ReleaseResponse(res)
 	}()
 
-	if err = c.startFileRecodingTransport.EncodeRequest(ctx, req, recorderIP, recorderDeviceName, channels, rate, receivePort, file); err != nil {
+	if err = c.startFileRecordingTransport.EncodeRequest(ctx, req, recorderIP, recorderDeviceName, channels, rate, receivePort, file); err != nil {
 		return
 	}
 
@@ -210,18 +210,18 @@ func (c *client) StartFileRecoding(ctx context.Context, recorderIP, recorderDevi
 		return
 	}
 
-	return c.startFileRecodingTransport.DecodeResponse(ctx, res)
+	return c.startFileRecordingTransport.DecodeResponse(ctx, res)
 }
 
-// StopFileRecoding stop receive on receivePort audio signal from recorder with recorderIP from recordeDeviceName
-func (c *client) StopFileRecoding(ctx context.Context, recorderIP, recorderDeviceName, receivePort string) (err error) {
+// StopFileRecording stop receive on receivePort audio signal from recorder with recorderIP from recordeDeviceName
+func (c *client) StopFileRecording(ctx context.Context, recorderIP, recorderDeviceName, receivePort string) (err error) {
 	req, res := fasthttp.AcquireRequest(), fasthttp.AcquireResponse()
 	defer func() {
 		fasthttp.ReleaseRequest(req)
 		fasthttp.ReleaseResponse(res)
 	}()
 
-	if err = c.stopFileRecodingTransport.EncodeRequest(ctx, req, recorderIP, recorderDeviceName, receivePort); err != nil {
+	if err = c.stopFileRecordingTransport.EncodeRequest(ctx, req, recorderIP, recorderDeviceName, receivePort); err != nil {
 		return
 	}
 
@@ -229,7 +229,7 @@ func (c *client) StopFileRecoding(ctx context.Context, recorderIP, recorderDevic
 		return
 	}
 
-	return c.stopFileRecodingTransport.DecodeResponse(ctx, res)
+	return c.stopFileRecordingTransport.DecodeResponse(ctx, res)
 }
 
 // PlayFromRecorder play audio on player with playerIP from recorder with recorderIP
@@ -290,7 +290,7 @@ func (c *client) RecorderState(ctx context.Context, recorderIP string) (devices 
 }
 
 // RecorderStart start recording audio on recorder with recorderIP from recorderDeviceName and receive on dstAddr
-// channels, rate - recoding param
+// channels, rate - recording param
 func (c *client) RecorderStart(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, dstAddr string) (err error) {
 	req, res := fasthttp.AcquireRequest(), fasthttp.AcquireResponse()
 	defer func() {

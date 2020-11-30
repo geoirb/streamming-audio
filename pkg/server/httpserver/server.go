@@ -301,13 +301,13 @@ func playerClearStorageHandler(svc server.Server, transport PlayerClearStorageTr
 	return s.handler
 }
 
-type startFileRecoding struct {
+type startFileRecording struct {
 	svc             server.Server
-	transport       StartFileRecodingTransport
+	transport       StartFileRecordingTransport
 	errorProcessing errorProcessing
 }
 
-func (s *startFileRecoding) handler(ctx *fasthttp.RequestCtx) {
+func (s *startFileRecording) handler(ctx *fasthttp.RequestCtx) {
 	var (
 		err                                               error
 		recorderIP, recorderDeviceName, receivePort, file string
@@ -318,7 +318,7 @@ func (s *startFileRecoding) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.svc.StartFileRecoding(ctx, recorderIP, recorderDeviceName, channels, rate, receivePort, file); err != nil {
+	if err = s.svc.StartFileRecording(ctx, recorderIP, recorderDeviceName, channels, rate, receivePort, file); err != nil {
 		s.errorProcessing(&ctx.Response, err, -1)
 		return
 	}
@@ -329,8 +329,8 @@ func (s *startFileRecoding) handler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func startFileRecodingHandler(svc server.Server, transport StartFileRecodingTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
-	s := &startFileRecoding{
+func startFileRecordingHandler(svc server.Server, transport StartFileRecordingTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+	s := &startFileRecording{
 		svc:             svc,
 		transport:       transport,
 		errorProcessing: errorProcessing,
@@ -338,13 +338,13 @@ func startFileRecodingHandler(svc server.Server, transport StartFileRecodingTran
 	return s.handler
 }
 
-type stopFileRecoding struct {
+type stopFileRecording struct {
 	svc             server.Server
-	transport       StopFileRecodingTransport
+	transport       StopFileRecordingTransport
 	errorProcessing errorProcessing
 }
 
-func (s *stopFileRecoding) handler(ctx *fasthttp.RequestCtx) {
+func (s *stopFileRecording) handler(ctx *fasthttp.RequestCtx) {
 	var (
 		err                                         error
 		recorderIP, recorderDeviceName, receivePort string
@@ -354,7 +354,7 @@ func (s *stopFileRecoding) handler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if err = s.svc.StopFileRecoding(ctx, recorderIP, recorderDeviceName, receivePort); err != nil {
+	if err = s.svc.StopFileRecording(ctx, recorderIP, recorderDeviceName, receivePort); err != nil {
 		s.errorProcessing(&ctx.Response, err, -1)
 		return
 	}
@@ -365,8 +365,8 @@ func (s *stopFileRecoding) handler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func stopFileRecodingHandler(svc server.Server, transport StopFileRecodingTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
-	s := &stopFileRecoding{
+func stopFileRecordingHandler(svc server.Server, transport StopFileRecordingTransport, errorProcessing errorProcessing) fasthttp.RequestHandler {
+	s := &stopFileRecording{
 		svc:             svc,
 		transport:       transport,
 		errorProcessing: errorProcessing,

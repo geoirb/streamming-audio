@@ -301,15 +301,15 @@ func newPlayerClearStorageTransport() PlayerClearStorageTransport {
 	return &playerClearStorageTransport{}
 }
 
-// StartFileRecodingTransport ...
-type StartFileRecodingTransport interface {
+// StartFileRecordingTransport ...
+type StartFileRecordingTransport interface {
 	DecodeRequest(ctx *fasthttp.RequestCtx) (recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string, err error)
 	EncodeResponse(res *fasthttp.Response) (err error)
 }
 
-type startFileRecodingTransport struct{}
+type startFileRecordingTransport struct{}
 
-type startFileRecodingRequest struct {
+type startFileRecordingRequest struct {
 	RecorderIP         string `json:"recorderIP"`
 	RecorderDeviceName string `json:"recorderDeviceName"`
 	Channels           uint32 `json:"channels"`
@@ -318,58 +318,58 @@ type startFileRecodingRequest struct {
 	File               string `json:"file"`
 }
 
-func (t *startFileRecodingTransport) DecodeRequest(ctx *fasthttp.RequestCtx) (string, string, uint32, uint32, string, string, error) {
-	var request startFileRecodingRequest
+func (t *startFileRecordingTransport) DecodeRequest(ctx *fasthttp.RequestCtx) (string, string, uint32, uint32, string, string, error) {
+	var request startFileRecordingRequest
 	err := json.Unmarshal(ctx.Request.Body(), &request)
 	return request.RecorderIP, request.RecorderDeviceName, request.Channels, request.Rate, request.ReceivePort, request.File, err
 }
 
-type startFileRecodingResponse struct{}
+type startFileRecordingResponse struct{}
 
-func (t *startFileRecodingTransport) EncodeResponse(res *fasthttp.Response) (err error) {
-	response := &startFileRecodingResponse{}
+func (t *startFileRecordingTransport) EncodeResponse(res *fasthttp.Response) (err error) {
+	response := &startFileRecordingResponse{}
 	body, err := json.Marshal(response)
 	res.SetBody(body)
 	res.SetStatusCode(http.StatusOK)
 	return
 }
 
-func newStartFileRecodingTransport() StartFileRecodingTransport {
-	return &startFileRecodingTransport{}
+func newStartFileRecordingTransport() StartFileRecordingTransport {
+	return &startFileRecordingTransport{}
 }
 
-// StopFileRecodingTransport ...
-type StopFileRecodingTransport interface {
+// StopFileRecordingTransport ...
+type StopFileRecordingTransport interface {
 	DecodeRequest(ctx *fasthttp.RequestCtx) (recorderIP, recorderDeviceName, receivePort string, err error)
 	EncodeResponse(res *fasthttp.Response) (err error)
 }
 
-type stopFileRecodingTransport struct{}
+type stopFileRecordingTransport struct{}
 
-type stopFileRecodingRequest struct {
+type stopFileRecordingRequest struct {
 	RecorderIP         string `json:"recorderIP"`
 	RecorderDeviceName string `json:"recorderDeviceName"`
 	ReceivePort        string `json:"receivePort"`
 }
 
-func (t *stopFileRecodingTransport) DecodeRequest(ctx *fasthttp.RequestCtx) (string, string, string, error) {
-	var request stopFileRecodingRequest
+func (t *stopFileRecordingTransport) DecodeRequest(ctx *fasthttp.RequestCtx) (string, string, string, error) {
+	var request stopFileRecordingRequest
 	err := json.Unmarshal(ctx.Request.Body(), &request)
 	return request.RecorderIP, request.RecorderDeviceName, request.ReceivePort, err
 }
 
-type stopFileRecodingResponse struct{}
+type stopFileRecordingResponse struct{}
 
-func (t *stopFileRecodingTransport) EncodeResponse(res *fasthttp.Response) (err error) {
-	response := &stopFileRecodingResponse{}
+func (t *stopFileRecordingTransport) EncodeResponse(res *fasthttp.Response) (err error) {
+	response := &stopFileRecordingResponse{}
 	body, err := json.Marshal(response)
 	res.SetBody(body)
 	res.SetStatusCode(http.StatusOK)
 	return
 }
 
-func newStopFileRecodingTransport() StopFileRecodingTransport {
-	return &stopFileRecodingTransport{}
+func newStopFileRecordingTransport() StopFileRecordingTransport {
+	return &stopFileRecordingTransport{}
 }
 
 // PlayFromRecorderTransport ...

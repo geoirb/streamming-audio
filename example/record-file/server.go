@@ -66,13 +66,13 @@ func main() {
 	pwd, _ := os.Getwd()
 	file := pwd + "/example/record-file/test.wav"
 	svc = server.NewLoggerMiddleware(svc, logger)
-	svc.StartFileRecoding(context.Background(), recorderIP, recorderDevice, 2, 44100, receivePort, file)
+	svc.StartFileRecording(context.Background(), recorderIP, recorderDevice, 2, 44100, receivePort, file)
 	level.Info(logger).Log("msg", "server start")
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	level.Info(logger).Log("msg", "received signal, exiting signal", "signal", <-c)
 
-	svc.StopFileRecoding(context.Background(), recorderIP, recorderDevice, receivePort)
+	svc.StopFileRecording(context.Background(), recorderIP, recorderDevice, receivePort)
 
 }

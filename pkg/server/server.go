@@ -42,7 +42,7 @@ type recorder interface {
 	Stop(ctx context.Context, recorderIP, deviceName string) (err error)
 }
 
-// Server for control recorder and player
+// Server to control recorder and player
 type Server interface {
 	FilePlay(ctx context.Context, file, playerIP, playerPort, playerDeviceName string) (uuid string, channels uint16, rate uint32, bitsPerSample uint16, err error)
 	FileStop(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid string) (err error)
@@ -54,8 +54,9 @@ type Server interface {
 	PlayerStop(ctx context.Context, playerIP, playerDeviceName string) (err error)
 	PlayerClearStorage(ctx context.Context, playerIP, uuid string) (err error)
 
-	StartFileRecoding(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error)
-	StopFileRecoding(ctx context.Context, recorderIP, recorderDeviceName, receivePort string) (err error)
+	//todo
+	StartFileRecording(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error)
+	StopFileRecording(ctx context.Context, recorderIP, recorderDeviceName, receivePort string) (err error)
 	PlayFromRecorder(ctx context.Context, playerIP, playerPort, playerDeviceName string, channels, rate uint32, recorderIP, recorderDeviceName string) (uuid string, err error)
 	StopFromRecorder(ctx context.Context, playerIP, playerPort, playerDeviceName, uuid, recorderIP, recorderDeviceName string) (err error)
 
@@ -159,9 +160,9 @@ func (s *server) PlayerClearStorage(ctx context.Context, playerIP, uuid string) 
 	return s.player.ClearStorage(ctx, playerIP, uuid)
 }
 
-// StartFileRecoding start receive on receivePort audio signal from recorder with recorderIP from recordeDeviceName and write in file
+// StartFileRecording start receive on receivePort audio signal from recorder with recorderIP from recordeDeviceName and write in file
 // channels, rate - params audio
-func (s *server) StartFileRecoding(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error) {
+func (s *server) StartFileRecording(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, receivePort, file string) (err error) {
 	var wc io.WriteCloser
 	if wc, err = s.audio.Writer(file, uint16(channels), rate); err != nil {
 		return
@@ -177,8 +178,8 @@ func (s *server) StartFileRecoding(ctx context.Context, recorderIP, recorderDevi
 	return
 }
 
-// StopFileRecoding stop receive on receivePort audio signal from recorder with recorderIP from recordeDeviceName
-func (s *server) StopFileRecoding(ctx context.Context, recorderIP, recorderDeviceName, receivePort string) error {
+// StopFileRecording stop receive on receivePort audio signal from recorder with recorderIP from recordeDeviceName
+func (s *server) StopFileRecording(ctx context.Context, recorderIP, recorderDeviceName, receivePort string) error {
 	s.stopReceive(ctx, receivePort)
 	s.recorder.Stop(ctx, recorderIP, recorderDeviceName)
 	return nil
@@ -220,7 +221,7 @@ func (s *server) RecorderState(ctx context.Context, recorderIP string) (devices 
 }
 
 // RecorderStart start recording audio on recorder with recorderIP from recorderDeviceName and receive on dstAddr
-// channels, rate - recoding param
+// channels, rate - recording param
 func (s *server) RecorderStart(ctx context.Context, recorderIP, recorderDeviceName string, channels, rate uint32, dstAddr string) error {
 	return s.recorder.Start(ctx, dstAddr, recorderIP, recorderDeviceName, channels, rate)
 }
