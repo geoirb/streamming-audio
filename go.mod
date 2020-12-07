@@ -1,6 +1,6 @@
-module github.com/geoirb/audio-service
+module audio-service
 
-go 1.13
+go 1.15
 
 require (
 	github.com/buaazp/fasthttprouter v0.1.1
@@ -13,7 +13,7 @@ require (
 	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/twinj/uuid v1.0.0
 	github.com/valyala/fasthttp v1.17.0
-	google.golang.org/grpc v1.33.2
+	google.golang.org/grpc v1.34.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect
 )

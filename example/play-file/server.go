@@ -12,10 +12,10 @@ import (
 	"github.com/go-kit/kit/log/level"
 	"github.com/kelseyhightower/envconfig"
 
-	"github.com/geoirb/audio-service/pkg/player"
-	"github.com/geoirb/audio-service/pkg/server"
-	"github.com/geoirb/audio-service/pkg/tcp"
-	"github.com/geoirb/audio-service/pkg/wav"
+	"audio-service/pkg/player"
+	"audio-service/pkg/server"
+	"audio-service/pkg/tcp"
+	"audio-service/pkg/wav"
 )
 
 type configuration struct {
@@ -40,19 +40,19 @@ type playerInfo struct {
 }
 
 var playerConf map[string]playerInfo = map[string]playerInfo{
-	"1": playerInfo{
+	"1": {
 		IP:     "127.0.0.1",
 		Port:   "8081",
 		Device: "hw:0,0",
-		File:   "/home/geo/go/src/github.com/geoirb/audio-service/audio/test.wav",
+		File:   "/home/geo/go/src/audio-service",
 	},
-	"2": playerInfo{
+	"2": {
 		IP:     "192.168.0.106",
 		Port:   "8081",
 		Device: "hw:0,0",
 		File:   "/audio/NAME_TEST_FILE_ON_AUDIO_DIR.wav",
 	},
-	"3": playerInfo{
+	"3": {
 		IP:     "192.168.0.106",
 		Port:   "8081",
 		Device: "hw:0,0",

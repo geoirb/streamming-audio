@@ -5,7 +5,7 @@ import (
 
 	"github.com/valyala/fasthttp"
 
-	"github.com/geoirb/audio-service/pkg/server"
+	"audio-service/pkg/server"
 )
 
 // Client to audio-service
