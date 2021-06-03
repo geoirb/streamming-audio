@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+// protoc --go_out=plugins=grpc:. *.proto
+
+package recorder;
+
+// grpc service to record audio
+service Recorder {
+  // State return receiving ports, storages and busy device 
+  rpc State(StateRequest) returns (StateResponse) {}
+  // Start record from deviceName and send audio on destAddr
+  rpc Start (StartSendRequest) returns (StartSendResponse) {}
+  // Stop record from deviceName
+  rpc Stop (StopSendRequest) returns (StopSendResponse) {}
+}
+
+message StateRequest {}
+message StateResponse {
+  repeated string devices = 1;
+}
+
+message  StartSendRequest{
+  string deviceName = 1; 
+  uint32 channels = 2;
+  uint32 rate = 3;
+  string destAddr = 4;
+}
+message StartSendResponse{}
+
+message StopSendRequest {
+  string deviceName = 1;
+}
+message StopSendResponse{}

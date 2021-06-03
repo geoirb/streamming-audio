@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+// protoc --go_out=plugins=grpc:. *.proto
+
+package player;
+import "google/protobuf/wrappers.proto";
+
+// grpc service to play audio
+service Player {
+  // State return receiving ports, storages and busy device 
+  rpc State(StateRequest) returns (StateResponse) {}
+  // Start receive data on port and save on storage
+  rpc ReceiveStart (StartReceiveRequest) returns (StartReceiveResponse) {}
+  rpc ReceiveStop (StopReceiveRequest) returns (StopReceiveResponse) {}
+  // Play audio on deviceName drom storage
+  rpc Play (StartPlayRequest) returns (StartPlayResponse) {}
+  // Stop audio on deviceName
+  rpc Stop (StopPlayRequest) returns (StopPlayResponse) {}
+  rpc ClearStorage(ClearStorageRequest) returns (ClearStorageResponse) {}
+}
+
+message StateRequest {}
+message StateResponse {
+  repeated string ports = 1;
+  repeated string storages = 2;
+  repeated string devices = 3;
+}
+
+message  StartReceiveRequest {
+  string port = 1;
+  google.protobuf.StringValue storageUUID = 2;
+}
+message StartReceiveResponse {
+  string storageUUID = 1;
+}
+
+message StopReceiveRequest {
+  string port = 1;
+}
+message StopReceiveResponse {}
+
+message  StartPlayRequest {
+  string deviceName = 1; 
+  uint32 channels = 2;
+  uint32 rate = 3;
+  uint32 bitsPerSample = 4;
+  string storageUUID = 5;
+}
+message StartPlayResponse {}
+
+message StopPlayRequest {
+  string deviceName = 1; 
+}
+message StopPlayResponse {}
+
+message ClearStorageRequest {
+  string storageUUID = 1;
+}
+message ClearStorageResponse {}
